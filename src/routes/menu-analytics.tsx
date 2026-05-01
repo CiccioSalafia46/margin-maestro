@@ -29,7 +29,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { recipes, computeRecipeMetrics, TARGET_GPM } from "@/data/mock";
+import { TARGET_GPM } from "@/data/mock";
+import { getMenuAnalyticsRows, getMenuBenchmarks } from "@/data/selectors";
 
 export const Route = createFileRoute("/menu-analytics")({
   head: () => ({
