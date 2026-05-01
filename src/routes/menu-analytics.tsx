@@ -38,7 +38,7 @@ export const Route = createFileRoute("/menu-analytics")({
       { title: "Menu Analytics — Margin IQ" },
       {
         name: "description",
-        content: "Per-dish profitability: COGS, GP, GPM, target status, and snapshot delta.",
+        content: "Per-dish profitability: COGS, GP, GPM, target status, derived snapshot delta.",
       },
     ],
   }),
@@ -50,74 +50,54 @@ function MenuAnalyticsPage() {
   const [category, setCategory] = useState("all");
   const [onMenu, setOnMenu] = useState("all");
 
-  const dishMetrics = useMemo(
-    () =>
-      recipes
-        .filter((r) => r.type === "Dish")
-        .map((r) => ({ recipe: r, metrics: computeRecipeMetrics(r) })),
-    [],
-  );
+  const rows = useMemo(() => getMenuAnalyticsRows(), []);
+  const bench = useMemo(() => getMenuBenchmarks(), []);
 
   const categories = useMemo(
-    () => Array.from(new Set(dishMetrics.map((d) => d.recipe.category))).sort(),
-    [dishMetrics],
+    () => Array.from(new Set(rows.map((d) => d.recipe.category))).sort(),
+    [rows],
   );
 
-  const filtered = dishMetrics.filter((d) => {
-    if (belowOnly && d.metrics.on_target) return false;
+  const filtered = rows.filter((d) => {
+    if (belowOnly && d.on_target) return false;
     if (category !== "all" && d.recipe.category !== category) return false;
     if (onMenu === "yes" && !d.recipe.on_menu) return false;
     if (onMenu === "no" && d.recipe.on_menu) return false;
     return true;
   });
 
-  const onMenuRows = dishMetrics.filter((d) => d.recipe.on_menu);
-  const gpms = onMenuRows
-    .map((d) => d.metrics.gpm)
-    .filter((g): g is number => g !== null);
-  const gps = onMenuRows.map((d) => d.metrics.gp).filter((g): g is number => g !== null);
-  const avgGpm = gpms.length ? gpms.reduce((a, b) => a + b, 0) / gpms.length : null;
-  const avgGp = gps.length ? gps.reduce((a, b) => a + b, 0) / gps.length : null;
-
-  const sortedByGpm = [...onMenuRows]
-    .filter((d) => d.metrics.gpm !== null)
-    .sort((a, b) => (b.metrics.gpm ?? 0) - (a.metrics.gpm ?? 0));
-  const top = sortedByGpm[0];
-  const bottom = sortedByGpm[sortedByGpm.length - 1];
-  const belowCount = onMenuRows.filter((d) => !d.metrics.on_target).length;
-
   return (
     <AppShell>
       <PageHeader
         title="Menu Analytics"
-        description={`Target GPM ${(TARGET_GPM * 100).toFixed(0)}%. Sort by worst margin first.`}
+        description={`Target GPM ${(TARGET_GPM * 100).toFixed(0)}%. Δ vs last confirmed snapshot. Off-menu dishes excluded from benchmarks.`}
       />
 
       <div className="space-y-6 p-6">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <KpiCard
             label="Average GPM"
-            value={<PercentCell value={avgGpm} decimals={1} />}
-            tone={avgGpm !== null && avgGpm >= TARGET_GPM ? "positive" : "warning"}
-            hint={`Target ${(TARGET_GPM * 100).toFixed(0)}%`}
+            value={<PercentCell value={bench.avg_gpm} decimals={1} />}
+            tone={bench.avg_gpm !== null && bench.avg_gpm >= TARGET_GPM ? "positive" : "warning"}
+            hint={`Target ${(TARGET_GPM * 100).toFixed(0)}% • ${bench.on_menu_count} on menu`}
           />
-          <KpiCard label="Average GP" value={<MoneyCell value={avgGp} />} hint="Per cover" />
+          <KpiCard label="Average GP" value={<MoneyCell value={bench.avg_gp} />} hint="Per cover" />
           <KpiCard
             label="Top performer"
-            value={top ? <span className="text-base">{top.recipe.name}</span> : "—"}
-            hint={top ? <PercentCell value={top.metrics.gpm} /> : ""}
+            value={bench.top ? <span className="text-base">{bench.top.recipe.name}</span> : "—"}
+            hint={bench.top ? <PercentCell value={bench.top.gpm} /> : ""}
             tone="positive"
           />
           <KpiCard
             label="Bottom performer"
-            value={bottom ? <span className="text-base">{bottom.recipe.name}</span> : "—"}
-            hint={bottom ? <PercentCell value={bottom.metrics.gpm} /> : ""}
+            value={bench.bottom ? <span className="text-base">{bench.bottom.recipe.name}</span> : "—"}
+            hint={bench.bottom ? <PercentCell value={bench.bottom.gpm} /> : ""}
             tone="negative"
           />
           <KpiCard
             label="Dishes below target"
-            value={belowCount}
-            tone={belowCount > 0 ? "negative" : "positive"}
+            value={bench.below_target_count}
+            tone={bench.below_target_count > 0 ? "negative" : "positive"}
           />
         </div>
       </div>
@@ -153,7 +133,7 @@ function MenuAnalyticsPage() {
           </SelectContent>
         </Select>
         <p className="ml-auto text-xs text-muted-foreground">
-          {filtered.length} of {dishMetrics.length} dishes
+          {filtered.length} of {rows.length} dishes
         </p>
       </FilterBar>
 
@@ -170,28 +150,29 @@ function MenuAnalyticsPage() {
                 <TableHead className="text-right">GP</TableHead>
                 <TableHead className="text-right">GPM</TableHead>
                 <TableHead>Target</TableHead>
-                <TableHead className="text-right">Δ vs snapshot</TableHead>
+                <TableHead className="text-right">Δ COGS</TableHead>
+                <TableHead className="text-right">Δ GPM</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered
-                .sort((a, b) => (a.metrics.gpm ?? 1) - (b.metrics.gpm ?? 1))
-                .map(({ recipe, metrics }) => (
-                  <TableRow key={recipe.id}>
+              {[...filtered]
+                .sort((a, b) => (a.gpm ?? 1) - (b.gpm ?? 1))
+                .map((row) => (
+                  <TableRow key={row.recipe.id}>
                     <TableCell className="font-medium">
                       <Link
                         to="/dish-analysis/$id"
-                        params={{ id: recipe.id }}
+                        params={{ id: row.recipe.id }}
                         className="hover:underline"
                       >
-                        {recipe.name}
+                        {row.recipe.name}
                       </Link>
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {recipe.category}
+                      {row.recipe.category}
                     </TableCell>
                     <TableCell>
-                      {recipe.on_menu ? (
+                      {row.recipe.on_menu ? (
                         <Badge
                           variant="outline"
                           className="border-success/30 bg-success/10 text-success"
@@ -205,28 +186,46 @@ function MenuAnalyticsPage() {
                       )}
                     </TableCell>
                     <TableCell className="text-right">
-                      {recipe.menu_price === null || recipe.menu_price === 0 ? (
+                      {row.recipe.menu_price === null || row.recipe.menu_price === 0 ? (
                         <span className="text-xs italic text-muted-foreground">
                           Set menu price
                         </span>
                       ) : (
-                        <MoneyCell value={recipe.menu_price} />
+                        <MoneyCell value={row.recipe.menu_price} />
                       )}
                     </TableCell>
                     <TableCell className="text-right">
-                      <MoneyCell value={metrics.cogs} />
+                      <MoneyCell value={row.cost_per_serving} />
                     </TableCell>
                     <TableCell className="text-right">
-                      <MoneyCell value={metrics.gp} />
+                      <MoneyCell value={row.gp} />
                     </TableCell>
                     <TableCell className="text-right">
-                      <PercentCell value={metrics.gpm} />
+                      <PercentCell value={row.gpm} />
                     </TableCell>
                     <TableCell>
-                      <OnTargetBadge onTarget={metrics.on_target} />
+                      <OnTargetBadge onTarget={row.on_target} />
                     </TableCell>
                     <TableCell className="text-right">
-                      <PpDeltaCell value={recipe.delta_gpm_vs_snapshot} />
+                      {row.delta_cogs_vs_snapshot === null ? (
+                        <span className="text-muted-foreground">—</span>
+                      ) : (
+                        <span
+                          className={
+                            row.delta_cogs_vs_snapshot > 0
+                              ? "tabular-nums text-destructive"
+                              : row.delta_cogs_vs_snapshot < 0
+                                ? "tabular-nums text-success"
+                                : "tabular-nums text-muted-foreground"
+                          }
+                        >
+                          {row.delta_cogs_vs_snapshot > 0 ? "+" : ""}
+                          {row.delta_cogs_vs_snapshot.toFixed(2)}
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <PpDeltaCell value={row.delta_gpm_vs_snapshot} />
                     </TableCell>
                   </TableRow>
                 ))}
