@@ -39,6 +39,7 @@ import {
   recipes,
   TARGET_GPM,
 } from "@/data/mock";
+import { getMenuAnalyticsRows } from "@/data/selectors";
 import { suggestedMenuPrice, computeGPM } from "@/lib/margin";
 import { convertQuantity } from "@/lib/units";
 import { formatPercent } from "@/lib/format";
