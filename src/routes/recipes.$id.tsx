@@ -23,6 +23,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
+import type { Recipe } from "@/lib/types";
 import {
   computeRecipeMetrics,
   getIngredientById,
@@ -66,7 +67,12 @@ function RecipeDetailPage() {
   const { recipe } = Route.useLoaderData();
   const metrics = computeRecipeMetrics(recipe);
 
-  const lineRows = recipe.lines.map((l) => {
+  type LineRow = {
+    line: Recipe["lines"][number];
+    ingredient: ReturnType<typeof getIngredientById>;
+    lineCost: number;
+  };
+  const lineRows: LineRow[] = recipe.lines.map((l: Recipe["lines"][number]) => {
     const ing = getIngredientById(l.ingredient_id);
     const lineCost = ing ? l.qty * ing.recipe_unit_cost : 0;
     return { line: l, ingredient: ing, lineCost };

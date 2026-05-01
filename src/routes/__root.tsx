@@ -1,6 +1,8 @@
 import { Outlet, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import { AuthProvider } from "@/auth/AuthProvider";
+import { AuthGate } from "@/auth/AuthGate";
 
 function NotFoundComponent() {
   return (
@@ -56,5 +58,11 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
-  return <Outlet />;
+  return (
+    <AuthProvider>
+      <AuthGate>
+        <Outlet />
+      </AuthGate>
+    </AuthProvider>
+  );
 }

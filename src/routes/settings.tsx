@@ -216,6 +216,17 @@ function SettingsPage() {
                 </Link>
               </Button>
             </div>
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-sm text-muted-foreground">
+                Authentication, tenant membership, active restaurant, and RLS
+                smoke checks for the Build 1.0 backend foundation.
+              </p>
+              <Button asChild variant="outline" size="sm">
+                <Link to="/qa-auth" aria-label="Open Auth QA">
+                  Auth QA
+                </Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
