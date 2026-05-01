@@ -13,10 +13,7 @@ import {
 import { AppShell } from "@/components/layout/AppShell";
 import { PageHeader } from "@/components/common/PageHeader";
 import { KpiCard } from "@/components/common/KpiCard";
-import {
-  PercentCell,
-  UnitCostCell,
-} from "@/components/common/badges";
+import { PercentCell, UnitCostCell } from "@/components/common/badges";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
@@ -25,6 +22,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -54,13 +53,15 @@ function PriceTrendPage() {
   const [selectedId, setSelectedId] = useState(
     ingredients.find((i) => i.id === "ing-sundried-tomatoes")?.id ?? tracked[0]?.id ?? "",
   );
+  const [includeBaseline, setIncludeBaseline] = useState(true);
 
   const entries = useMemo(
     () =>
       priceLog
         .filter((p) => p.ingredient_id === selectedId)
+        .filter((p) => (includeBaseline ? true : p.event !== "baseline"))
         .sort((a, b) => a.timestamp.localeCompare(b.timestamp)),
-    [selectedId],
+    [selectedId, includeBaseline],
   );
 
   const first = entries[0]?.new_unit_cost ?? null;
@@ -90,18 +91,30 @@ function PriceTrendPage() {
         title="Price Trend"
         description="Track an ingredient's unit cost across batches."
         actions={
-          <Select value={selectedId} onValueChange={setSelectedId}>
-            <SelectTrigger className="h-9 w-72">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {tracked.map((i) => (
-                <SelectItem key={i.id} value={i.id}>
-                  {i.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 rounded-md border bg-card px-3 h-9">
+              <Switch
+                id="include-baseline"
+                checked={includeBaseline}
+                onCheckedChange={setIncludeBaseline}
+              />
+              <Label htmlFor="include-baseline" className="text-xs cursor-pointer">
+                Include baseline
+              </Label>
+            </div>
+            <Select value={selectedId} onValueChange={setSelectedId}>
+              <SelectTrigger className="h-9 w-72">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {tracked.map((i) => (
+                  <SelectItem key={i.id} value={i.id}>
+                    {i.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         }
       />
 

@@ -43,8 +43,10 @@ function severityForGpmGap(gapPp: number, criticalGapPp = 0.05): AlertSeverity {
   return "info";
 }
 
-function severityForSpike(pct: number, criticalPct = 0.20): AlertSeverity {
-  if (pct >= criticalPct) return "critical";
+function severityForSpike(pct: number, affectedCount: number): AlertSeverity {
+  // Spec: spikes are at most "warning". Spikes with zero affected on-menu
+  // dishes drop to "info" so they never appear as critical dashboard actions.
+  if (affectedCount === 0) return "info";
   if (pct >= 0.10) return "warning";
   return "info";
 }
@@ -88,7 +90,7 @@ export function deriveAlerts(input: DeriveAlertsInput): AlertItem[] {
     const affectedCount = countDishesForIngredient(c.ingredient_id, cascade);
     out.push({
       id: `alert-spike-${c.ingredient_id}-${c.timestamp}`,
-      severity: severityForSpike(c.pct_change),
+      severity: severityForSpike(c.pct_change, affectedCount),
       type: "ingredient_spike",
       status: "open",
       title: `${c.name_at_time} up ${formatPercent(c.pct_change, { decimals: 1, signed: true })}`,

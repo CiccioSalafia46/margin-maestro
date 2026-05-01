@@ -28,7 +28,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { alerts, getRecipeById, getIngredientById } from "@/data/mock";
+import { getRecipeById, getIngredientById } from "@/data/mock";
+import { getAlerts } from "@/data/selectors";
 import { formatDateTime } from "@/lib/format";
 import type { AlertItem } from "@/lib/types";
 
@@ -51,6 +52,7 @@ function AlertsPage() {
   const [status, setStatus] = useState("all");
   const [openAlert, setOpenAlert] = useState<AlertItem | null>(null);
 
+  const alerts = useMemo(() => getAlerts(), []);
   const filtered = useMemo(
     () =>
       alerts
@@ -66,7 +68,7 @@ function AlertsPage() {
             return sevRank[a.severity] - sevRank[b.severity];
           return b.created_at.localeCompare(a.created_at);
         }),
-    [severity, type, status],
+    [alerts, severity, type, status],
   );
 
   return (
