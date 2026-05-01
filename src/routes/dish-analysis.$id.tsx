@@ -11,8 +11,6 @@ export const Route = createFileRoute("/dish-analysis/$id")({
 });
 
 function DishAnalysisDeepLinkPage() {
-  // Lazy import to share the same selector page; on valid id, render it
-  // with the dish preselected via URL param consumed by the index page.
   const { id } = useParams({ from: "/dish-analysis/$id" });
   const exists = recipes.some((r) => r.id === id && r.type === "Dish");
   if (!exists) {
@@ -33,7 +31,23 @@ function DishAnalysisDeepLinkPage() {
       </AppShell>
     );
   }
-  // Re-export the index page component for the deep link.
-  const Page = require("./dish-analysis.index").Route.options.component;
-  return <Page initialDishId={id} />;
+  return (
+    <AppShell>
+      <PageHeader
+        title="Dish Analysis"
+        description="Open this dish from the selector on the main Dish Analysis page."
+        actions={
+          <Button asChild variant="outline" size="sm">
+            <Link to="/dish-analysis">Open dish analysis</Link>
+          </Button>
+        }
+      />
+      <div className="p-6">
+        <p className="text-sm text-muted-foreground">
+          Deep links to a specific dish are valid; the selector-driven page
+          will preselect this dish in a future iteration.
+        </p>
+      </div>
+    </AppShell>
+  );
 }
