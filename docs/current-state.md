@@ -1,6 +1,8 @@
-# Current State — Build 0.4
+# Current State — Build 0.5A
 
 **Phase:** Frontend-only mock UI shell with derived intelligence + UX polish.
+GitHub Checkpoint Verification — project structure, docs, and QA validated
+after the GitHub connection. No new functionality; baseline is Build 0.4.
 **Backend:** None. No Supabase, no Auth, no schema, no Edge Functions, no
 billing, no API calls, no `localStorage` persistence.
 
