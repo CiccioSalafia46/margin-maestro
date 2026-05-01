@@ -58,6 +58,7 @@ export const Route = createFileRoute("/dashboard")({
 
 function DashboardPage() {
   const kpis = getDashboardKpis();
+  const latestSummary = getLatestImpactCascadeSummary();
   const allAlerts = getAlerts();
   const menuRows = getMenuAnalyticsRows();
   const belowTarget = menuRows.filter((r) => r.recipe.on_menu && !r.on_target);
