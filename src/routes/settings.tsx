@@ -187,14 +187,26 @@ function SettingsPage() {
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Developer QA</CardTitle>
           </CardHeader>
-          <CardContent className="flex items-center justify-between gap-4">
-            <p className="text-sm text-muted-foreground">
-              Pure-helper pass/fail checks for the calculation engine (UoM
-              conversions, ingredient costing, COGS, GP/GPM, suggested price).
-            </p>
-            <Button asChild variant="outline" size="sm">
-              <Link to="/qa-calculations">Open Calculation QA</Link>
-            </Button>
+          <CardContent className="space-y-3">
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-sm text-muted-foreground">
+                Pure-helper pass/fail checks for the calculation engine (UoM
+                conversions, ingredient costing, COGS, GP/GPM, suggested price,
+                cascade pathways).
+              </p>
+              <Button asChild variant="outline" size="sm">
+                <Link to="/qa-calculations">Calculation QA</Link>
+              </Button>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-sm text-muted-foreground">
+                Reference, uniqueness, and derived-data integrity checks
+                (recipes, ingredients, price log, snapshots, alerts, cascade).
+              </p>
+              <Button asChild variant="outline" size="sm">
+                <Link to="/qa-data-integrity">Data Integrity QA</Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
