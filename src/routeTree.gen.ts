@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RecipesRouteImport } from './routes/recipes'
 import { Route as QaDataIntegrityRouteImport } from './routes/qa-data-integrity'
@@ -16,6 +17,7 @@ import { Route as QaCalculationsRouteImport } from './routes/qa-calculations'
 import { Route as PriceTrendRouteImport } from './routes/price-trend'
 import { Route as PriceLogRouteImport } from './routes/price-log'
 import { Route as MenuAnalyticsRouteImport } from './routes/menu-analytics'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as IngredientsRouteImport } from './routes/ingredients'
 import { Route as ImpactCascadeRouteImport } from './routes/impact-cascade'
 import { Route as DishAnalysisRouteImport } from './routes/dish-analysis'
@@ -24,10 +26,17 @@ import { Route as AlertsRouteImport } from './routes/alerts'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DishAnalysisIndexRouteImport } from './routes/dish-analysis.index'
 import { Route as RecipesIdRouteImport } from './routes/recipes.$id'
+import { Route as OnboardingCreateRestaurantRouteImport } from './routes/onboarding.create-restaurant'
 import { Route as IngredientsIdRouteImport } from './routes/ingredients.$id'
 import { Route as ImpactCascadeBatchIdRouteImport } from './routes/impact-cascade.$batchId'
 import { Route as DishAnalysisIdRouteImport } from './routes/dish-analysis.$id'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -61,6 +70,11 @@ const PriceLogRoute = PriceLogRouteImport.update({
 const MenuAnalyticsRoute = MenuAnalyticsRouteImport.update({
   id: '/menu-analytics',
   path: '/menu-analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IngredientsRoute = IngredientsRouteImport.update({
@@ -103,6 +117,12 @@ const RecipesIdRoute = RecipesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => RecipesRoute,
 } as any)
+const OnboardingCreateRestaurantRoute =
+  OnboardingCreateRestaurantRouteImport.update({
+    id: '/onboarding/create-restaurant',
+    path: '/onboarding/create-restaurant',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const IngredientsIdRoute = IngredientsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -118,6 +138,11 @@ const DishAnalysisIdRoute = DishAnalysisIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => DishAnalysisRoute,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -126,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/dish-analysis': typeof DishAnalysisRouteWithChildren
   '/impact-cascade': typeof ImpactCascadeRouteWithChildren
   '/ingredients': typeof IngredientsRouteWithChildren
+  '/login': typeof LoginRoute
   '/menu-analytics': typeof MenuAnalyticsRoute
   '/price-log': typeof PriceLogRoute
   '/price-trend': typeof PriceTrendRoute
@@ -133,9 +159,12 @@ export interface FileRoutesByFullPath {
   '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/recipes': typeof RecipesRouteWithChildren
   '/settings': typeof SettingsRoute
+  '/signup': typeof SignupRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/dish-analysis/$id': typeof DishAnalysisIdRoute
   '/impact-cascade/$batchId': typeof ImpactCascadeBatchIdRoute
   '/ingredients/$id': typeof IngredientsIdRoute
+  '/onboarding/create-restaurant': typeof OnboardingCreateRestaurantRoute
   '/recipes/$id': typeof RecipesIdRoute
   '/dish-analysis/': typeof DishAnalysisIndexRoute
 }
@@ -145,6 +174,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/impact-cascade': typeof ImpactCascadeRouteWithChildren
   '/ingredients': typeof IngredientsRouteWithChildren
+  '/login': typeof LoginRoute
   '/menu-analytics': typeof MenuAnalyticsRoute
   '/price-log': typeof PriceLogRoute
   '/price-trend': typeof PriceTrendRoute
@@ -152,9 +182,12 @@ export interface FileRoutesByTo {
   '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/recipes': typeof RecipesRouteWithChildren
   '/settings': typeof SettingsRoute
+  '/signup': typeof SignupRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/dish-analysis/$id': typeof DishAnalysisIdRoute
   '/impact-cascade/$batchId': typeof ImpactCascadeBatchIdRoute
   '/ingredients/$id': typeof IngredientsIdRoute
+  '/onboarding/create-restaurant': typeof OnboardingCreateRestaurantRoute
   '/recipes/$id': typeof RecipesIdRoute
   '/dish-analysis': typeof DishAnalysisIndexRoute
 }
@@ -166,6 +199,7 @@ export interface FileRoutesById {
   '/dish-analysis': typeof DishAnalysisRouteWithChildren
   '/impact-cascade': typeof ImpactCascadeRouteWithChildren
   '/ingredients': typeof IngredientsRouteWithChildren
+  '/login': typeof LoginRoute
   '/menu-analytics': typeof MenuAnalyticsRoute
   '/price-log': typeof PriceLogRoute
   '/price-trend': typeof PriceTrendRoute
@@ -173,9 +207,12 @@ export interface FileRoutesById {
   '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/recipes': typeof RecipesRouteWithChildren
   '/settings': typeof SettingsRoute
+  '/signup': typeof SignupRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/dish-analysis/$id': typeof DishAnalysisIdRoute
   '/impact-cascade/$batchId': typeof ImpactCascadeBatchIdRoute
   '/ingredients/$id': typeof IngredientsIdRoute
+  '/onboarding/create-restaurant': typeof OnboardingCreateRestaurantRoute
   '/recipes/$id': typeof RecipesIdRoute
   '/dish-analysis/': typeof DishAnalysisIndexRoute
 }
@@ -188,6 +225,7 @@ export interface FileRouteTypes {
     | '/dish-analysis'
     | '/impact-cascade'
     | '/ingredients'
+    | '/login'
     | '/menu-analytics'
     | '/price-log'
     | '/price-trend'
@@ -195,9 +233,12 @@ export interface FileRouteTypes {
     | '/qa-data-integrity'
     | '/recipes'
     | '/settings'
+    | '/signup'
+    | '/auth/callback'
     | '/dish-analysis/$id'
     | '/impact-cascade/$batchId'
     | '/ingredients/$id'
+    | '/onboarding/create-restaurant'
     | '/recipes/$id'
     | '/dish-analysis/'
   fileRoutesByTo: FileRoutesByTo
@@ -207,6 +248,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/impact-cascade'
     | '/ingredients'
+    | '/login'
     | '/menu-analytics'
     | '/price-log'
     | '/price-trend'
@@ -214,9 +256,12 @@ export interface FileRouteTypes {
     | '/qa-data-integrity'
     | '/recipes'
     | '/settings'
+    | '/signup'
+    | '/auth/callback'
     | '/dish-analysis/$id'
     | '/impact-cascade/$batchId'
     | '/ingredients/$id'
+    | '/onboarding/create-restaurant'
     | '/recipes/$id'
     | '/dish-analysis'
   id:
@@ -227,6 +272,7 @@ export interface FileRouteTypes {
     | '/dish-analysis'
     | '/impact-cascade'
     | '/ingredients'
+    | '/login'
     | '/menu-analytics'
     | '/price-log'
     | '/price-trend'
@@ -234,9 +280,12 @@ export interface FileRouteTypes {
     | '/qa-data-integrity'
     | '/recipes'
     | '/settings'
+    | '/signup'
+    | '/auth/callback'
     | '/dish-analysis/$id'
     | '/impact-cascade/$batchId'
     | '/ingredients/$id'
+    | '/onboarding/create-restaurant'
     | '/recipes/$id'
     | '/dish-analysis/'
   fileRoutesById: FileRoutesById
@@ -248,6 +297,7 @@ export interface RootRouteChildren {
   DishAnalysisRoute: typeof DishAnalysisRouteWithChildren
   ImpactCascadeRoute: typeof ImpactCascadeRouteWithChildren
   IngredientsRoute: typeof IngredientsRouteWithChildren
+  LoginRoute: typeof LoginRoute
   MenuAnalyticsRoute: typeof MenuAnalyticsRoute
   PriceLogRoute: typeof PriceLogRoute
   PriceTrendRoute: typeof PriceTrendRoute
@@ -255,10 +305,20 @@ export interface RootRouteChildren {
   QaDataIntegrityRoute: typeof QaDataIntegrityRoute
   RecipesRoute: typeof RecipesRouteWithChildren
   SettingsRoute: typeof SettingsRoute
+  SignupRoute: typeof SignupRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
+  OnboardingCreateRestaurantRoute: typeof OnboardingCreateRestaurantRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings': {
       id: '/settings'
       path: '/settings'
@@ -306,6 +366,13 @@ declare module '@tanstack/react-router' {
       path: '/menu-analytics'
       fullPath: '/menu-analytics'
       preLoaderRoute: typeof MenuAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ingredients': {
@@ -364,6 +431,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RecipesIdRouteImport
       parentRoute: typeof RecipesRoute
     }
+    '/onboarding/create-restaurant': {
+      id: '/onboarding/create-restaurant'
+      path: '/onboarding/create-restaurant'
+      fullPath: '/onboarding/create-restaurant'
+      preLoaderRoute: typeof OnboardingCreateRestaurantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ingredients/$id': {
       id: '/ingredients/$id'
       path: '/$id'
@@ -384,6 +458,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dish-analysis/$id'
       preLoaderRoute: typeof DishAnalysisIdRouteImport
       parentRoute: typeof DishAnalysisRoute
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -444,6 +525,7 @@ const rootRouteChildren: RootRouteChildren = {
   DishAnalysisRoute: DishAnalysisRouteWithChildren,
   ImpactCascadeRoute: ImpactCascadeRouteWithChildren,
   IngredientsRoute: IngredientsRouteWithChildren,
+  LoginRoute: LoginRoute,
   MenuAnalyticsRoute: MenuAnalyticsRoute,
   PriceLogRoute: PriceLogRoute,
   PriceTrendRoute: PriceTrendRoute,
@@ -451,6 +533,9 @@ const rootRouteChildren: RootRouteChildren = {
   QaDataIntegrityRoute: QaDataIntegrityRoute,
   RecipesRoute: RecipesRouteWithChildren,
   SettingsRoute: SettingsRoute,
+  SignupRoute: SignupRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
+  OnboardingCreateRestaurantRoute: OnboardingCreateRestaurantRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
