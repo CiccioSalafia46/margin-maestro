@@ -35,6 +35,7 @@ import { TARGET_GPM } from "@/data/mock";
 import {
   getAlerts,
   getDashboardKpis,
+  getLatestImpactCascadeSummary,
   getMenuAnalyticsRows,
   getPriceLogByBatch,
   suggestedMenuPrice,
