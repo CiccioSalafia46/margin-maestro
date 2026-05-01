@@ -22,6 +22,15 @@ import {
 import { convertQuantity } from "@/lib/units";
 import { computeGP, computeGPM, suggestedMenuPrice } from "@/lib/margin";
 import { calculationNotes } from "@/lib/calculationNotes";
+import {
+  getAlerts,
+  getDashboardKpis,
+  getLatestImpactCascade,
+  getMenuAnalyticsRows,
+  getMenuBenchmarks,
+  getPriceTrendStats,
+} from "@/data/selectors";
+import { priceLog, recipes } from "@/data/mock";
 import type { Ingredient } from "@/lib/types";
 
 export const Route = createFileRoute("/qa-calculations")({
