@@ -66,6 +66,11 @@ function DishAnalysisPage() {
 
   const recipe = useMemo(() => dishes.find((d) => d.id === selectedId), [dishes, selectedId]);
   const metrics = useMemo(() => (recipe ? computeRecipeMetrics(recipe) : null), [recipe]);
+  const derivedDeltaGpm = useMemo(() => {
+    if (!recipe) return null;
+    const row = getMenuAnalyticsRows().find((r) => r.recipe.id === recipe.id);
+    return row?.delta_gpm_vs_snapshot ?? null;
+  }, [recipe]);
 
   if (!recipe || !metrics) {
     return (
