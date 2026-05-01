@@ -66,7 +66,7 @@ function RecipeDetailPage() {
   const { recipe } = Route.useLoaderData();
   const metrics = computeRecipeMetrics(recipe);
 
-  const lineRows = recipe.lines.map((l) => {
+  const lineRows = recipe.lines.map((l: Recipe["lines"][number]) => {
     const ing = getIngredientById(l.ingredient_id);
     const lineCost = ing ? l.qty * ing.recipe_unit_cost : 0;
     return { line: l, ingredient: ing, lineCost };
