@@ -28,9 +28,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { alerts, getRecipeById, getIngredientById } from "@/data/mock";
-import { formatDateTime } from "@/lib/format";
-import type { AlertItem } from "@/lib/types";
+import { getRecipeById, getIngredientById } from "@/data/mock";
+import { getAlerts } from "@/data/selectors";
 
 export const Route = createFileRoute("/alerts")({
   head: () => ({
