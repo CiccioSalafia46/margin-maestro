@@ -92,7 +92,7 @@ function SettingsPage() {
                 />
                 <div />
                 <div className="md:col-span-2">
-                  <Button onClick={() => toast.info("Mock UI — settings not saved.")}>
+                  <Button onClick={() => toast.info("Demo only — settings were not saved.")}>
                     Save changes
                   </Button>
                 </div>
@@ -144,7 +144,7 @@ function SettingsPage() {
                 <Field label="Critical GPM gap (pp)" defaultValue="5" />
                 <Field label="Lookback window (days)" defaultValue="30" />
                 <div className="md:col-span-2">
-                  <Button onClick={() => toast.info("Mock UI — thresholds not saved.")}>
+                  <Button onClick={() => toast.info("Demo only — thresholds were not saved.")}>
                     Save thresholds
                   </Button>
                 </div>
