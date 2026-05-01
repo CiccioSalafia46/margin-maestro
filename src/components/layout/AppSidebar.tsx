@@ -138,7 +138,7 @@ export function AppSidebar() {
       <SidebarFooter className="border-t">
         {!collapsed && (
           <p className="px-2 py-1 text-[10px] text-muted-foreground">
-            Build 0.1 — Mock UI
+            Build 0.3 — Derived Intelligence
           </p>
         )}
       </SidebarFooter>
