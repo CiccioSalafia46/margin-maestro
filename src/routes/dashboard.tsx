@@ -31,18 +31,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { TARGET_GPM } from "@/data/mock";
 import {
-  alerts,
-  ingredients,
-  latestBatch,
-  latestCascade,
-  priceLog,
-  recipes,
-  TARGET_GPM,
-  computeRecipeMetrics,
-} from "@/data/mock";
+  getAlerts,
+  getDashboardKpis,
+  getMenuAnalyticsRows,
+  getPriceLogByBatch,
+  suggestedMenuPrice,
+} from "@/data/selectors";
 import { formatDateTime, formatMoney } from "@/lib/format";
-import { suggestedMenuPrice } from "@/lib/margin";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -59,33 +56,17 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 function DashboardPage() {
-  // ---- Derived KPIs ----
-  const dishMetrics = recipes
-    .filter((r) => r.type === "Dish")
-    .map((r) => ({ recipe: r, metrics: computeRecipeMetrics(r) }));
-
-  const onMenuDishes = dishMetrics.filter((d) => d.recipe.on_menu);
-  const gpms = onMenuDishes
-    .map((d) => d.metrics.gpm)
-    .filter((g): g is number => g !== null);
-  const avgGpm = gpms.length ? gpms.reduce((a, b) => a + b, 0) / gpms.length : null;
-
-  const belowTarget = dishMetrics.filter((d) => !d.metrics.on_target && d.recipe.on_menu);
-  const spikes = ingredients.filter((i) => i.spike);
-
-  const recentChanges = priceLog
-    .filter((p) => p.event === "change")
-    .sort((a, b) => b.timestamp.localeCompare(a.timestamp))
-    .slice(0, 5);
-
-  const profitAtRisk = belowTarget.reduce((sum, d) => {
-    if (d.metrics.gpm === null || d.recipe.menu_price === null) return sum;
-    // Estimate: gap to target * menu price (per-unit profit shortfall)
-    const gap = TARGET_GPM - d.metrics.gpm;
-    return sum + gap * d.recipe.menu_price;
-  }, 0);
-
-  const criticalAlerts = alerts.filter((a) => a.severity === "critical" && a.status === "open");
+  const kpis = getDashboardKpis();
+  const allAlerts = getAlerts();
+  const menuRows = getMenuAnalyticsRows();
+  const belowTarget = menuRows.filter((r) => r.recipe.on_menu && !r.on_target);
+  const recentChanges = kpis.latest_batch
+    ? getPriceLogByBatch(kpis.latest_batch.id)
+        .filter((p) => p.event === "change")
+        .sort((a, b) => b.timestamp.localeCompare(a.timestamp))
+        .slice(0, 5)
+    : [];
+  const criticalAlerts = allAlerts.filter((a) => a.severity === "critical").slice(0, 5);
 
   return (
     <AppShell>
@@ -135,37 +116,51 @@ function DashboardPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <KpiCard
             label="Average GPM"
-            value={<PercentCell value={avgGpm} decimals={1} />}
-            hint={`Target ${(TARGET_GPM * 100).toFixed(0)}%`}
-            tone={avgGpm !== null && avgGpm >= TARGET_GPM ? "positive" : "warning"}
+            value={<PercentCell value={kpis.avg_gpm} decimals={1} />}
+            hint={`Target ${(TARGET_GPM * 100).toFixed(0)}% • on-menu only`}
+            tone={kpis.avg_gpm !== null && kpis.avg_gpm >= TARGET_GPM ? "positive" : "warning"}
             icon={<Activity className="h-4 w-4" />}
           />
           <KpiCard
             label="Dishes Below Target"
-            value={belowTarget.length}
-            hint={`of ${onMenuDishes.length} on menu`}
-            tone={belowTarget.length > 0 ? "negative" : "positive"}
-            trend={belowTarget.length > 0 ? "down" : "flat"}
+            value={kpis.below_target_count}
+            hint={`of ${kpis.on_menu_count} on menu`}
+            tone={kpis.below_target_count > 0 ? "negative" : "positive"}
+            trend={kpis.below_target_count > 0 ? "down" : "flat"}
             icon={<TrendingDown className="h-4 w-4" />}
           />
           <KpiCard
             label="Ingredient Cost Spikes"
-            value={spikes.length}
-            hint={`${spikes.length} ingredients flagged`}
-            tone={spikes.length > 0 ? "warning" : "positive"}
+            value={kpis.ingredient_cost_spike_count}
+            hint={`In latest batch (>10%)`}
+            tone={kpis.ingredient_cost_spike_count > 0 ? "warning" : "positive"}
             icon={<TrendingDown className="h-4 w-4" />}
           />
-          <KpiCard
-            label="Estimated Profit at Risk"
-            value={<MoneyCell value={profitAtRisk} />}
-            hint="per cover, across off-target dishes"
-            tone={profitAtRisk > 0 ? "negative" : "positive"}
-            icon={<DollarSign className="h-4 w-4" />}
-          />
+          {kpis.has_sales_data ? (
+            <KpiCard
+              label="Estimated Profit at Risk"
+              value={<MoneyCell value={kpis.profit_at_risk_monthly_usd} />}
+              hint="Monthly, demo unit sales"
+              tone={(kpis.profit_at_risk_monthly_usd ?? 0) > 0 ? "negative" : "positive"}
+              icon={<DollarSign className="h-4 w-4" />}
+            />
+          ) : (
+            <KpiCard
+              label="Estimated Margin Gap"
+              value={<MoneyCell value={kpis.margin_gap_per_cover_usd} />}
+              hint="per cover, off-target dishes"
+              tone={kpis.margin_gap_per_cover_usd > 0 ? "negative" : "positive"}
+              icon={<DollarSign className="h-4 w-4" />}
+            />
+          )}
           <KpiCard
             label="Recent Price Changes"
-            value={recentChanges.length}
-            hint={`Latest batch ${formatDateTime(latestBatch.created_at)}`}
+            value={kpis.recent_price_changes_count}
+            hint={
+              kpis.latest_batch
+                ? `Latest batch ${formatDateTime(kpis.latest_batch.created_at)}`
+                : "No batches"
+            }
             icon={<Receipt className="h-4 w-4" />}
           />
         </div>
@@ -212,13 +207,13 @@ function DashboardPage() {
                           <p className="text-xs text-muted-foreground">{d.recipe.category}</p>
                         </TableCell>
                         <TableCell className="text-right">
-                          <PercentCell value={d.metrics.gpm} />
+                          <PercentCell value={d.gpm} />
                         </TableCell>
                         <TableCell className="text-right">
-                          <PpDeltaCell value={d.recipe.delta_gpm_vs_snapshot} />
+                          <PpDeltaCell value={d.delta_gpm_vs_snapshot} />
                         </TableCell>
                         <TableCell className="text-right">
-                          <OnTargetBadge onTarget={d.metrics.on_target} />
+                          <OnTargetBadge onTarget={d.on_target} />
                         </TableCell>
                       </TableRow>
                     ))
@@ -247,17 +242,25 @@ function DashboardPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {recentChanges.map((p) => (
-                    <TableRow key={p.id}>
-                      <TableCell className="font-medium">{p.name_at_time}</TableCell>
-                      <TableCell className="text-xs text-muted-foreground">
-                        {formatDateTime(p.timestamp)}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <PercentCell value={p.pct_change} signed decimals={2} />
+                  {recentChanges.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={3} className="py-6 text-center text-sm text-muted-foreground">
+                        No recent changes.
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ) : (
+                    recentChanges.map((p) => (
+                      <TableRow key={p.id}>
+                        <TableCell className="font-medium">{p.name_at_time}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground">
+                          {formatDateTime(p.timestamp)}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <PercentCell value={p.pct_change} signed decimals={2} />
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
@@ -281,35 +284,43 @@ function DashboardPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {belowTarget.map((d) => {
-                    const suggested = suggestedMenuPrice(d.metrics.cost_per_serving, TARGET_GPM);
-                    const delta =
-                      suggested !== null && d.recipe.menu_price !== null
-                        ? suggested - d.recipe.menu_price
-                        : null;
-                    return (
-                      <TableRow key={d.recipe.id}>
-                        <TableCell className="font-medium">
-                          <Link
-                            to="/dish-analysis/$id"
-                            params={{ id: d.recipe.id }}
-                            className="hover:underline"
-                          >
-                            {d.recipe.name}
-                          </Link>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <MoneyCell value={d.recipe.menu_price} />
-                        </TableCell>
-                        <TableCell className="text-right font-medium">
-                          <MoneyCell value={suggested} />
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <SignedMoneyCell value={delta} />
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
+                  {belowTarget.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={4} className="py-6 text-center text-sm text-muted-foreground">
+                        Nothing to reprice.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    belowTarget.map((d) => {
+                      const suggested = suggestedMenuPrice(d.cost_per_serving, TARGET_GPM);
+                      const delta =
+                        suggested !== null && d.recipe.menu_price !== null
+                          ? suggested - d.recipe.menu_price
+                          : null;
+                      return (
+                        <TableRow key={d.recipe.id}>
+                          <TableCell className="font-medium">
+                            <Link
+                              to="/dish-analysis/$id"
+                              params={{ id: d.recipe.id }}
+                              className="hover:underline"
+                            >
+                              {d.recipe.name}
+                            </Link>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <MoneyCell value={d.recipe.menu_price} />
+                          </TableCell>
+                          <TableCell className="text-right font-medium">
+                            <MoneyCell value={suggested} />
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <SignedMoneyCell value={delta} />
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
@@ -325,51 +336,64 @@ function DashboardPage() {
               </Button>
             </CardHeader>
             <CardContent>
-              <p className="text-sm font-medium">{latestBatch.label}</p>
-              <p className="text-xs text-muted-foreground">{formatDateTime(latestBatch.created_at)}</p>
-              <div className="mt-4 grid grid-cols-2 gap-3">
-                <div className="rounded-md border bg-muted/30 p-3">
-                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                    Ingredients changed
+              {kpis.latest_batch && kpis.latest_cascade ? (
+                <>
+                  <p className="text-sm font-medium">{kpis.latest_batch.label}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {formatDateTime(kpis.latest_batch.created_at)}
                   </p>
-                  <p className="mt-1 text-lg font-semibold tabular-nums">
-                    {latestCascade.ingredients_changed}
-                  </p>
-                </div>
-                <div className="rounded-md border bg-muted/30 p-3">
-                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                    Dishes affected
-                  </p>
-                  <p className="mt-1 text-lg font-semibold tabular-nums">
-                    {latestCascade.dishes_affected}
-                  </p>
-                </div>
-                <div className="rounded-md border bg-muted/30 p-3">
-                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                    Newly below target
-                  </p>
-                  <p className="mt-1 text-lg font-semibold tabular-nums text-destructive">
-                    {latestCascade.dishes_newly_below_target}
-                  </p>
-                </div>
-                <div className="rounded-md border bg-muted/30 p-3">
-                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                    Margin impact
-                  </p>
-                  <p className="mt-1 text-lg font-semibold tabular-nums text-destructive">
-                    {formatMoney(latestCascade.total_margin_impact_usd)}
-                  </p>
-                </div>
-              </div>
+                  <div className="mt-4 grid grid-cols-2 gap-3">
+                    <Stat label="Ingredients changed" value={kpis.latest_cascade.ingredients_changed} />
+                    <Stat label="Dishes affected" value={kpis.latest_cascade.dishes_affected} />
+                    <Stat
+                      label="Newly below target"
+                      value={kpis.latest_cascade.dishes_newly_below_target}
+                      negative
+                    />
+                    <Stat
+                      label="Margin impact"
+                      value={formatMoney(-kpis.latest_cascade.total_margin_impact_usd)}
+                      negative
+                    />
+                  </div>
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground">No batches yet.</p>
+              )}
             </CardContent>
           </Card>
         </div>
 
         <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Bell className="h-3 w-3" />
-          This is a mock UI build. No data is persisted and no backend is connected.
+          Build 0.3 — derived intelligence over a mock dataset. No persistence, no backend.
         </p>
       </div>
     </AppShell>
+  );
+}
+
+function Stat({
+  label,
+  value,
+  negative,
+}: {
+  label: string;
+  value: React.ReactNode;
+  negative?: boolean;
+}) {
+  return (
+    <div className="rounded-md border bg-muted/30 p-3">
+      <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</p>
+      <p
+        className={
+          negative
+            ? "mt-1 text-lg font-semibold tabular-nums text-destructive"
+            : "mt-1 text-lg font-semibold tabular-nums"
+        }
+      >
+        {value}
+      </p>
+    </div>
   );
 }
