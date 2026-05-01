@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -182,6 +182,21 @@ function SettingsPage() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        <Card className="mt-6 border-dashed">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Developer QA</CardTitle>
+          </CardHeader>
+          <CardContent className="flex items-center justify-between gap-4">
+            <p className="text-sm text-muted-foreground">
+              Pure-helper pass/fail checks for the calculation engine (UoM
+              conversions, ingredient costing, COGS, GP/GPM, suggested price).
+            </p>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/qa-calculations">Open Calculation QA</Link>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </AppShell>
   );

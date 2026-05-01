@@ -35,10 +35,12 @@ import { Label } from "@/components/ui/label";
 import {
   computeRecipeMetrics,
   getIngredientById,
+  getIngredientCostState,
   recipes,
   TARGET_GPM,
 } from "@/data/mock";
 import { suggestedMenuPrice, computeGPM } from "@/lib/margin";
+import { convertQuantity } from "@/lib/units";
 import { formatPercent } from "@/lib/format";
 
 export const Route = createFileRoute("/dish-analysis/")({
@@ -81,14 +83,34 @@ function DishAnalysisPage() {
 
   const lineRows = recipe.lines.map((l) => {
     const ing = getIngredientById(l.ingredient_id);
-    const lineCost = ing ? l.qty * ing.recipe_unit_cost : 0;
-    return { line: l, ingredient: ing, lineCost };
+    const cs = getIngredientCostState(l.ingredient_id);
+    let qtyInRecipeUom = l.qty;
+    let unitCost = 0;
+    if (ing && cs && cs.ok) {
+      unitCost = cs.recipe_unit_cost;
+      if (l.uom !== cs.recipe_uom) {
+        const c = convertQuantity(l.qty, l.uom, cs.recipe_uom, ing.density_g_per_ml);
+        qtyInRecipeUom = c.ok ? c.value : 0;
+      }
+    }
+    const lineCost = qtyInRecipeUom * unitCost;
+    return { line: l, ingredient: ing, lineCost, unitCost, qtyInRecipeUom };
   });
   const totalCogs = lineRows.reduce((s, r) => s + r.lineCost, 0);
 
-  const scenarioCogs = metrics.cost_per_serving * (1 + scenarioCostPct[0] / 100);
+  // Per-line scenario: scale every ingredient's unit cost uniformly
+  const costMul = 1 + scenarioCostPct[0] / 100;
+  const scenarioCogsTotal = lineRows.reduce(
+    (s, r) => s + r.qtyInRecipeUom * r.unitCost * costMul,
+    0,
+  );
+  const scenarioCogsPerServing = scenarioCogsTotal / Math.max(recipe.serving_qty, 1);
   const scenarioPrice = (recipe.menu_price ?? 0) * (1 + scenarioPricePct[0] / 100);
-  const scenarioGpm = computeGPM(scenarioPrice || null, scenarioCogs);
+  const scenarioGpm = computeGPM(scenarioPrice || null, scenarioCogsPerServing);
+  const scenarioGp =
+    scenarioPrice > 0 ? scenarioPrice - scenarioCogsPerServing : null;
+  const deltaGpm =
+    scenarioGpm !== null && metrics.gpm !== null ? scenarioGpm - metrics.gpm : null;
 
   const targets = [TARGET_GPM, 0.75, 0.8, 0.82];
 
@@ -254,18 +276,30 @@ function DishAnalysisPage() {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <Field label="Scenario COGS / serving" value={<UnitCostCell value={scenarioCogs} />} />
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+              <Field
+                label="Scenario COGS / serving"
+                value={<UnitCostCell value={scenarioCogsPerServing} />}
+              />
+              <Field label="Scenario GP" value={<MoneyCell value={scenarioGp} />} />
               <Field label="Scenario menu price" value={<MoneyCell value={scenarioPrice || null} />} />
               <Field label="Scenario GPM" value={<PercentCell value={scenarioGpm} />} />
               <Field
-                label="Scenario status"
-                value={
-                  <OnTargetBadge
-                    onTarget={(scenarioGpm ?? -1) >= TARGET_GPM}
-                  />
-                }
+                label="Δ vs current GPM"
+                value={<PpDeltaCell value={deltaGpm} />}
               />
+            </div>
+            <div>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  setScenarioCostPct([0]);
+                  setScenarioPricePct([0]);
+                }}
+              >
+                Reset scenario
+              </Button>
             </div>
           </CardContent>
         </Card>

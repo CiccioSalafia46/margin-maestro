@@ -67,7 +67,17 @@ function PriceTrendPage() {
   const current = entries[entries.length - 1]?.new_unit_cost ?? null;
   const absChange = first !== null && current !== null ? current - first : null;
   const pctChange = first !== null && current !== null && first !== 0 ? (current - first) / first : null;
-  const changeCount = entries.filter((e) => e.event === "change").length;
+  const changeEntries = entries.filter((e) => e.event === "change");
+  const changeCount = changeEntries.length;
+  const largestIncreasePct =
+    changeEntries.length > 0
+      ? changeEntries.reduce(
+          (m, e) => (e.pct_change !== null && e.pct_change > m ? e.pct_change : m),
+          -Infinity,
+        )
+      : null;
+  const largestIncrease =
+    largestIncreasePct !== null && Number.isFinite(largestIncreasePct) ? largestIncreasePct : null;
 
   const chartData = entries.map((e) => ({
     date: formatDate(e.timestamp),
@@ -96,7 +106,7 @@ function PriceTrendPage() {
       />
 
       <div className="space-y-6 p-6">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
           <KpiCard label="First recorded" value={<UnitCostCell value={first} decimals={6} />} />
           <KpiCard label="Current" value={<UnitCostCell value={current} decimals={6} />} />
           <KpiCard
@@ -110,6 +120,11 @@ function PriceTrendPage() {
             tone={pctChange !== null && pctChange > 0 ? "negative" : "positive"}
           />
           <KpiCard label="Number of changes" value={changeCount} />
+          <KpiCard
+            label="Largest increase"
+            value={<PercentCell value={largestIncrease} signed decimals={2} />}
+            tone={largestIncrease !== null && largestIncrease > 0 ? "negative" : "positive"}
+          />
         </div>
 
         <Card>
