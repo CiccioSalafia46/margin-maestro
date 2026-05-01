@@ -186,7 +186,7 @@ function AlertsPage() {
                 <Button
                   variant="outline"
                   onClick={() => {
-                    toast.info("Mock UI — acknowledge not persisted.");
+                    toast.info("Demo only — alert was not acknowledged.");
                   }}
                 >
                   Acknowledge
@@ -194,14 +194,14 @@ function AlertsPage() {
                 <Button
                   variant="outline"
                   onClick={() => {
-                    toast.success("Mock UI — resolve not persisted.");
+                    toast.success("Demo only — alert was not resolved.");
                   }}
                 >
                   Resolve
                 </Button>
                 <Button
                   onClick={() => {
-                    toast.info("Mock UI — navigation only.");
+                    toast.info("Demo only — navigation only in this build.");
                   }}
                 >
                   View affected dish

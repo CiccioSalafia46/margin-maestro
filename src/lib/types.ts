@@ -77,9 +77,12 @@ export interface PriceBatch {
   id: string;
   label: string;
   created_at: string;
+  /** @deprecated Static mock field. UI must read from getImpactCascadeBatchSummary(). */
   ingredients_changed: number;
+  /** @deprecated Static mock field. UI must read from getImpactCascadeBatchSummary(). */
   dishes_affected: number;
   dishes_newly_below_target: number;
+  /** @deprecated Static mock field. UI must read from getImpactCascadeBatchSummary(). */
   total_margin_impact_usd: number; // signed (negative = profit lost)
 }
 
@@ -110,9 +113,12 @@ export interface CascadeIngredientGroup {
 export interface ImpactCascadeRun {
   batch_id: string;
   created_at: string;
+  /** @deprecated Use getImpactCascadeBatchSummary().ingredients_changed_count. */
   ingredients_changed: number;
+  /** @deprecated Use getImpactCascadeBatchSummary().affected_dish_count_unique. */
   dishes_affected: number;
   dishes_newly_below_target: number;
+  /** @deprecated Use getImpactCascadeBatchSummary() margin metrics. */
   total_margin_impact_usd: number;
   groups: CascadeIngredientGroup[];
 }

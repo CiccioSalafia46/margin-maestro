@@ -333,7 +333,7 @@ function IngredientsPage() {
             </Button>
             <Button
               onClick={() => {
-                toast.info("Mock UI — ingredient was not saved.");
+                toast.info("Demo only — ingredient was not saved.");
                 setDrawerOpen(false);
               }}
             >

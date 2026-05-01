@@ -146,60 +146,68 @@ function PriceLogPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((p) => {
-                const batchLabel =
-                  priceBatches.find((b) => b.id === p.batch_id)?.label ?? p.batch_id;
-                return (
-                  <TableRow key={p.id}>
-                    <TableCell className="text-xs text-muted-foreground">
-                      {formatDateTime(p.timestamp)}
-                    </TableCell>
-                    <TableCell className="text-sm">{batchLabel}</TableCell>
-                    <TableCell className="font-medium">{p.name_at_time}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {p.supplier_at_time ?? "—"}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <UnitCostCell value={p.old_unit_cost} decimals={6} />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <UnitCostCell value={p.new_unit_cost} decimals={6} />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {p.event === "baseline" ? (
-                        <span className="text-muted-foreground">—</span>
-                      ) : (
-                        <SignedMoneyCell value={p.delta} />
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {p.pct_change === null ? (
-                        <span className="text-muted-foreground">—</span>
-                      ) : (
-                        <PercentCell value={p.pct_change} signed decimals={2} />
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant="outline"
-                        className={
-                          p.event === "baseline"
-                            ? "border-muted-foreground/30 text-muted-foreground capitalize"
-                            : "border-info/30 bg-info/10 text-info capitalize"
-                        }
-                      >
-                        {p.event}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right tabular-nums text-xs">
-                      v{p.baseline_version}
-                    </TableCell>
-                    <TableCell className="text-xs text-muted-foreground">
-                      {p.notes ?? ""}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+              {filtered.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={11} className="py-12 text-center text-sm text-muted-foreground">
+                    No Price Log entries match these filters. Try clearing filters or pick a different batch.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filtered.map((p) => {
+                  const batchLabel =
+                    priceBatches.find((b) => b.id === p.batch_id)?.label ?? p.batch_id;
+                  return (
+                    <TableRow key={p.id}>
+                      <TableCell className="text-xs text-muted-foreground">
+                        {formatDateTime(p.timestamp)}
+                      </TableCell>
+                      <TableCell className="text-sm">{batchLabel}</TableCell>
+                      <TableCell className="font-medium">{p.name_at_time}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {p.supplier_at_time ?? "—"}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <UnitCostCell value={p.old_unit_cost} decimals={6} />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <UnitCostCell value={p.new_unit_cost} decimals={6} />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {p.event === "baseline" ? (
+                          <span className="text-muted-foreground">—</span>
+                        ) : (
+                          <SignedMoneyCell value={p.delta} />
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {p.pct_change === null ? (
+                          <span className="text-muted-foreground">—</span>
+                        ) : (
+                          <PercentCell value={p.pct_change} signed decimals={2} />
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="outline"
+                          className={
+                            p.event === "baseline"
+                              ? "border-muted-foreground/30 text-muted-foreground capitalize"
+                              : "border-info/30 bg-info/10 text-info capitalize"
+                          }
+                        >
+                          {p.event}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums text-xs">
+                        v{p.baseline_version}
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground">
+                        {p.notes ?? ""}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
             </TableBody>
           </Table>
         </div>

@@ -332,18 +332,18 @@ export function DishAnalysisView({ initialDishId }: { initialDishId?: string }) 
               })}
             </div>
             <div className="flex flex-wrap gap-2 pt-2">
-              <Button onClick={() => toast.success("Mock UI — apply not persisted.")}>
+              <Button onClick={() => toast.success("Demo only — suggested price was not applied.")}>
                 <Check className="mr-1.5 h-4 w-4" /> Apply suggested price
               </Button>
               <Button
                 variant="outline"
-                onClick={() => toast.info("Mock UI — override flow not persisted.")}
+                onClick={() => toast.info("Demo only — override is UI-only in this build.")}
               >
                 <Pencil className="mr-1.5 h-4 w-4" /> Override
               </Button>
               <Button
                 variant="ghost"
-                onClick={() => toast.info("Mock UI — deferred (no persistence).")}
+                onClick={() => toast.info("Demo only — defer is UI-only in this build.")}
               >
                 Defer
               </Button>

@@ -92,7 +92,7 @@ function SettingsPage() {
                 />
                 <div />
                 <div className="md:col-span-2">
-                  <Button onClick={() => toast.info("Mock UI — settings not saved.")}>
+                  <Button onClick={() => toast.info("Demo only — settings were not saved.")}>
                     Save changes
                   </Button>
                 </div>
@@ -144,7 +144,7 @@ function SettingsPage() {
                 <Field label="Critical GPM gap (pp)" defaultValue="5" />
                 <Field label="Lookback window (days)" defaultValue="30" />
                 <div className="md:col-span-2">
-                  <Button onClick={() => toast.info("Mock UI — thresholds not saved.")}>
+                  <Button onClick={() => toast.info("Demo only — thresholds were not saved.")}>
                     Save thresholds
                   </Button>
                 </div>
@@ -188,23 +188,32 @@ function SettingsPage() {
             <CardTitle className="text-base">Developer QA</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
+            <p className="text-xs text-muted-foreground">
+              These checks validate calculation logic and mock data integrity
+              before backend integration.
+            </p>
             <div className="flex items-center justify-between gap-4">
               <p className="text-sm text-muted-foreground">
                 Pure-helper pass/fail checks for the calculation engine (UoM
-                conversions, ingredient costing, COGS, GP/GPM, suggested price,
-                cascade pathways).
+                conversions, ingredient costing, COGS, GP/GPM, Suggested Menu
+                Price, Impact Cascade pathways).
               </p>
               <Button asChild variant="outline" size="sm">
-                <Link to="/qa-calculations">Calculation QA</Link>
+                <Link to="/qa-calculations" aria-label="Open Calculation QA">
+                  Calculation QA
+                </Link>
               </Button>
             </div>
             <div className="flex items-center justify-between gap-4">
               <p className="text-sm text-muted-foreground">
                 Reference, uniqueness, and derived-data integrity checks
-                (recipes, ingredients, price log, snapshots, alerts, cascade).
+                (recipes, ingredients, Price Log, Snapshot, alerts, Impact
+                Cascade).
               </p>
               <Button asChild variant="outline" size="sm">
-                <Link to="/qa-data-integrity">Data Integrity QA</Link>
+                <Link to="/qa-data-integrity" aria-label="Open Data Integrity QA">
+                  Data Integrity QA
+                </Link>
               </Button>
             </div>
           </CardContent>

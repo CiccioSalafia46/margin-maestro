@@ -167,7 +167,7 @@ function RecipesPage() {
             </Button>
             <Button
               onClick={() => {
-                toast.info("Mock UI — recipe was not saved.");
+                toast.info("Demo only — recipe was not saved.");
                 setDrawerOpen(false);
               }}
             >

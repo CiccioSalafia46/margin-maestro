@@ -199,27 +199,35 @@ function PriceTrendPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {entries.map((e) => (
-                  <TableRow key={e.id}>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {formatDateTime(e.timestamp)}
-                    </TableCell>
-                    <TableCell className="text-sm capitalize">{e.event}</TableCell>
-                    <TableCell className="text-right">
-                      <UnitCostCell value={e.old_unit_cost} decimals={6} />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <UnitCostCell value={e.new_unit_cost} decimals={6} />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {e.pct_change === null ? (
-                        <span className="text-muted-foreground">—</span>
-                      ) : (
-                        <PercentCell value={e.pct_change} signed decimals={2} />
-                      )}
+                {entries.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="py-6 text-center text-sm text-muted-foreground">
+                      No price log entries for this ingredient yet.
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  entries.map((e) => (
+                    <TableRow key={e.id}>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {formatDateTime(e.timestamp)}
+                      </TableCell>
+                      <TableCell className="text-sm capitalize">{e.event}</TableCell>
+                      <TableCell className="text-right">
+                        <UnitCostCell value={e.old_unit_cost} decimals={6} />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <UnitCostCell value={e.new_unit_cost} decimals={6} />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {e.pct_change === null ? (
+                          <span className="text-muted-foreground">—</span>
+                        ) : (
+                          <PercentCell value={e.pct_change} signed decimals={2} />
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </CardContent>
