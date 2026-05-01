@@ -14,7 +14,8 @@ import type {
   PriceLogEntry,
   Recipe,
   RestaurantSettings,
-} from "./types";
+} from "@/lib/types";
+import { computeGP, computeGPM, isOnTarget, suggestedMenuPrice } from "@/lib/margin";
 
 export const restaurantSettings: RestaurantSettings = {
   restaurant_name: "Demo Italian Restaurant",
