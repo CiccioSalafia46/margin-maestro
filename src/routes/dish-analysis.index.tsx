@@ -167,7 +167,7 @@ function DishAnalysisPage() {
                   Δ vs last snapshot
                 </p>
                 <p className="mt-1 text-2xl font-semibold tabular-nums">
-                  <PpDeltaCell value={recipe.delta_gpm_vs_snapshot} />
+                  <PpDeltaCell value={derivedDeltaGpm} />
                 </p>
               </div>
             </div>
@@ -220,7 +220,7 @@ function DishAnalysisPage() {
               <p className="text-sm">
                 Margin shifted{" "}
                 <span className="font-semibold">
-                  <PpDeltaCell value={recipe.delta_gpm_vs_snapshot} />
+                  <PpDeltaCell value={derivedDeltaGpm} />
                 </span>{" "}
                 since the last confirmed snapshot.
               </p>
