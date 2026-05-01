@@ -90,7 +90,7 @@ export function deriveAlerts(input: DeriveAlertsInput): AlertItem[] {
     const affectedCount = countDishesForIngredient(c.ingredient_id, cascade);
     out.push({
       id: `alert-spike-${c.ingredient_id}-${c.timestamp}`,
-      severity: severityForSpike(c.pct_change),
+      severity: severityForSpike(c.pct_change, affectedCount),
       type: "ingredient_spike",
       status: "open",
       title: `${c.name_at_time} up ${formatPercent(c.pct_change, { decimals: 1, signed: true })}`,
