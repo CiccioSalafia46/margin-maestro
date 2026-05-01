@@ -276,18 +276,30 @@ function DishAnalysisPage() {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <Field label="Scenario COGS / serving" value={<UnitCostCell value={scenarioCogs} />} />
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+              <Field
+                label="Scenario COGS / serving"
+                value={<UnitCostCell value={scenarioCogsPerServing} />}
+              />
+              <Field label="Scenario GP" value={<MoneyCell value={scenarioGp} />} />
               <Field label="Scenario menu price" value={<MoneyCell value={scenarioPrice || null} />} />
               <Field label="Scenario GPM" value={<PercentCell value={scenarioGpm} />} />
               <Field
-                label="Scenario status"
-                value={
-                  <OnTargetBadge
-                    onTarget={(scenarioGpm ?? -1) >= TARGET_GPM}
-                  />
-                }
+                label="Δ vs current GPM"
+                value={<PpDeltaCell value={deltaGpm} />}
               />
+            </div>
+            <div>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  setScenarioCostPct([0]);
+                  setScenarioPricePct([0]);
+                }}
+              >
+                Reset scenario
+              </Button>
             </div>
           </CardContent>
         </Card>
