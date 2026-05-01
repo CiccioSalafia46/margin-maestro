@@ -43,7 +43,16 @@ export interface Recipe {
   on_menu: boolean;
   lines: RecipeLine[];
   linked_ingredient_id?: string; // for Intermediate recipes
-  delta_gpm_vs_snapshot?: number; // signed, fraction (e.g. -0.04 = -4pp)
+  estimated_monthly_units_sold?: number; // demo data: drives Profit-at-Risk if present
+}
+
+// Prior confirmed cost snapshot for an ingredient. Used to compute deltas
+// (COGS, GP, GPM) for derived menu analytics, without mutating live state.
+export interface IngredientSnapshot {
+  ingredient_id: string;
+  unit_cost: number; // cost in the ingredient's recipe_uom
+  taken_at: string; // ISO
+  baseline_version: number;
 }
 
 export type PriceLogEvent = "baseline" | "change";
