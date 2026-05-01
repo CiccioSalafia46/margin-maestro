@@ -7,7 +7,10 @@ import { restaurantSettings } from "@/data/mock";
 export function Topbar() {
   return (
     <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-3 border-b bg-card/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-card/80">
-      <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
+      <SidebarTrigger
+        aria-label="Toggle sidebar"
+        className="text-muted-foreground hover:text-foreground"
+      />
       <Separator orientation="vertical" className="h-6" />
       <div className="flex min-w-0 items-center gap-2">
         <p className="truncate text-sm font-semibold text-foreground">

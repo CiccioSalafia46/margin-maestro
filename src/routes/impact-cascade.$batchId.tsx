@@ -28,6 +28,16 @@ import { getImpactCascadeForBatch } from "@/data/selectors";
 import { formatDateTime } from "@/lib/format";
 
 export const Route = createFileRoute("/impact-cascade/$batchId")({
+  head: ({ params }) => ({
+    meta: [
+      { title: `Impact Cascade — Batch ${params.batchId}` },
+      {
+        name: "description",
+        content:
+          "Per-batch Impact Cascade: ingredients that changed, dishes affected, and margin impact.",
+      },
+    ],
+  }),
   component: BatchPage,
 });
 
