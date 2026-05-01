@@ -106,7 +106,7 @@ function PriceTrendPage() {
       />
 
       <div className="space-y-6 p-6">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
           <KpiCard label="First recorded" value={<UnitCostCell value={first} decimals={6} />} />
           <KpiCard label="Current" value={<UnitCostCell value={current} decimals={6} />} />
           <KpiCard
@@ -120,6 +120,11 @@ function PriceTrendPage() {
             tone={pctChange !== null && pctChange > 0 ? "negative" : "positive"}
           />
           <KpiCard label="Number of changes" value={changeCount} />
+          <KpiCard
+            label="Largest increase"
+            value={<PercentCell value={largestIncrease} signed decimals={2} />}
+            tone={largestIncrease !== null && largestIncrease > 0 ? "negative" : "positive"}
+          />
         </div>
 
         <Card>
