@@ -67,7 +67,17 @@ function PriceTrendPage() {
   const current = entries[entries.length - 1]?.new_unit_cost ?? null;
   const absChange = first !== null && current !== null ? current - first : null;
   const pctChange = first !== null && current !== null && first !== 0 ? (current - first) / first : null;
-  const changeCount = entries.filter((e) => e.event === "change").length;
+  const changeEntries = entries.filter((e) => e.event === "change");
+  const changeCount = changeEntries.length;
+  const largestIncreasePct =
+    changeEntries.length > 0
+      ? changeEntries.reduce(
+          (m, e) => (e.pct_change !== null && e.pct_change > m ? e.pct_change : m),
+          -Infinity,
+        )
+      : null;
+  const largestIncrease =
+    largestIncreasePct !== null && Number.isFinite(largestIncreasePct) ? largestIncreasePct : null;
 
   const chartData = entries.map((e) => ({
     date: formatDate(e.timestamp),
