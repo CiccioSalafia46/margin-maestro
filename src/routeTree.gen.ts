@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RecipesRouteImport } from './routes/recipes'
+import { Route as QaCalculationsRouteImport } from './routes/qa-calculations'
 import { Route as PriceTrendRouteImport } from './routes/price-trend'
 import { Route as PriceLogRouteImport } from './routes/price-log'
 import { Route as MenuAnalyticsRouteImport } from './routes/menu-analytics'
@@ -34,6 +35,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const RecipesRoute = RecipesRouteImport.update({
   id: '/recipes',
   path: '/recipes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QaCalculationsRoute = QaCalculationsRouteImport.update({
+  id: '/qa-calculations',
+  path: '/qa-calculations',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PriceTrendRoute = PriceTrendRouteImport.update({
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/menu-analytics': typeof MenuAnalyticsRoute
   '/price-log': typeof PriceLogRoute
   '/price-trend': typeof PriceTrendRoute
+  '/qa-calculations': typeof QaCalculationsRoute
   '/recipes': typeof RecipesRouteWithChildren
   '/settings': typeof SettingsRoute
   '/dish-analysis/$id': typeof DishAnalysisIdRoute
@@ -134,6 +141,7 @@ export interface FileRoutesByTo {
   '/menu-analytics': typeof MenuAnalyticsRoute
   '/price-log': typeof PriceLogRoute
   '/price-trend': typeof PriceTrendRoute
+  '/qa-calculations': typeof QaCalculationsRoute
   '/recipes': typeof RecipesRouteWithChildren
   '/settings': typeof SettingsRoute
   '/dish-analysis/$id': typeof DishAnalysisIdRoute
@@ -153,6 +161,7 @@ export interface FileRoutesById {
   '/menu-analytics': typeof MenuAnalyticsRoute
   '/price-log': typeof PriceLogRoute
   '/price-trend': typeof PriceTrendRoute
+  '/qa-calculations': typeof QaCalculationsRoute
   '/recipes': typeof RecipesRouteWithChildren
   '/settings': typeof SettingsRoute
   '/dish-analysis/$id': typeof DishAnalysisIdRoute
@@ -173,6 +182,7 @@ export interface FileRouteTypes {
     | '/menu-analytics'
     | '/price-log'
     | '/price-trend'
+    | '/qa-calculations'
     | '/recipes'
     | '/settings'
     | '/dish-analysis/$id'
@@ -190,6 +200,7 @@ export interface FileRouteTypes {
     | '/menu-analytics'
     | '/price-log'
     | '/price-trend'
+    | '/qa-calculations'
     | '/recipes'
     | '/settings'
     | '/dish-analysis/$id'
@@ -208,6 +219,7 @@ export interface FileRouteTypes {
     | '/menu-analytics'
     | '/price-log'
     | '/price-trend'
+    | '/qa-calculations'
     | '/recipes'
     | '/settings'
     | '/dish-analysis/$id'
@@ -227,6 +239,7 @@ export interface RootRouteChildren {
   MenuAnalyticsRoute: typeof MenuAnalyticsRoute
   PriceLogRoute: typeof PriceLogRoute
   PriceTrendRoute: typeof PriceTrendRoute
+  QaCalculationsRoute: typeof QaCalculationsRoute
   RecipesRoute: typeof RecipesRouteWithChildren
   SettingsRoute: typeof SettingsRoute
 }
@@ -245,6 +258,13 @@ declare module '@tanstack/react-router' {
       path: '/recipes'
       fullPath: '/recipes'
       preLoaderRoute: typeof RecipesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qa-calculations': {
+      id: '/qa-calculations'
+      path: '/qa-calculations'
+      fullPath: '/qa-calculations'
+      preLoaderRoute: typeof QaCalculationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/price-trend': {
@@ -407,6 +427,7 @@ const rootRouteChildren: RootRouteChildren = {
   MenuAnalyticsRoute: MenuAnalyticsRoute,
   PriceLogRoute: PriceLogRoute,
   PriceTrendRoute: PriceTrendRoute,
+  QaCalculationsRoute: QaCalculationsRoute,
   RecipesRoute: RecipesRouteWithChildren,
   SettingsRoute: SettingsRoute,
 }
