@@ -646,6 +646,64 @@ export function getDataIntegrityReport(): IntegrityReport {
       message: bad.length === 0 ? "OK" : bad.join(", "),
     });
   }
+  {
+    const cascade = getLatestImpactCascade();
+    const recById = new Map(recipes.map((r) => [r.id, r]));
+    const ingById = new Map(ingredients.map((i) => [i.id, i]));
+    const bad: string[] = [];
+    if (cascade) {
+      for (const g of cascade.groups) {
+        for (const d of g.affected_dishes) {
+          const path = d.impact_path;
+          if (!path || path.length < 2) {
+            bad.push(`${d.recipe_name}: empty path`);
+            continue;
+          }
+          if (path[0].kind !== "primary" || !path[0].ingredient_id || !ingById.has(path[0].ingredient_id)) {
+            bad.push(`${d.recipe_name}: bad primary head`);
+            continue;
+          }
+          const tail = path[path.length - 1];
+          if (tail.kind !== "dish" || !tail.recipe_id || !recById.has(tail.recipe_id)) {
+            bad.push(`${d.recipe_name}: bad dish tail`);
+            continue;
+          }
+          if (d.pathway === "indirect") {
+            const inter = path.find((s) => s.kind === "intermediate");
+            if (!inter || !inter.recipe_id || !recById.has(inter.recipe_id)) {
+              bad.push(`${d.recipe_name}: missing intermediate step`);
+            }
+          }
+        }
+      }
+    }
+    checks.push({
+      id: "cascade-paths",
+      name: "Impact Cascade rows have valid dependency paths",
+      severity: bad.length === 0 ? "pass" : "fail",
+      message: bad.length === 0 ? "OK" : bad.join("; "),
+    });
+  }
+  {
+    const recIds = new Set(recipes.map((r) => r.id));
+    const ingIds = new Set(ingredients.map((i) => i.id));
+    const bad: string[] = [];
+    for (const a of getAlerts()) {
+      const hasRecipe = a.affected_recipe_id && recIds.has(a.affected_recipe_id);
+      const hasIng = a.affected_ingredient_id && ingIds.has(a.affected_ingredient_id);
+      if (!hasRecipe && !hasIng) bad.push(a.id);
+      else {
+        if (a.affected_recipe_id && !recIds.has(a.affected_recipe_id)) bad.push(a.id);
+        if (a.affected_ingredient_id && !ingIds.has(a.affected_ingredient_id)) bad.push(a.id);
+      }
+    }
+    checks.push({
+      id: "alert-subjects",
+      name: "Derived alerts reference valid subjects",
+      severity: bad.length === 0 ? "pass" : "fail",
+      message: bad.length === 0 ? "OK" : `Bad alerts: ${bad.join(", ")}`,
+    });
+  }
 
   const passing = checks.filter((c) => c.severity === "pass").length;
   const warning = checks.filter((c) => c.severity === "warning").length;

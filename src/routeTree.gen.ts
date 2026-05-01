@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RecipesRouteImport } from './routes/recipes'
+import { Route as QaDataIntegrityRouteImport } from './routes/qa-data-integrity'
 import { Route as QaCalculationsRouteImport } from './routes/qa-calculations'
 import { Route as PriceTrendRouteImport } from './routes/price-trend'
 import { Route as PriceLogRouteImport } from './routes/price-log'
@@ -35,6 +36,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const RecipesRoute = RecipesRouteImport.update({
   id: '/recipes',
   path: '/recipes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QaDataIntegrityRoute = QaDataIntegrityRouteImport.update({
+  id: '/qa-data-integrity',
+  path: '/qa-data-integrity',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QaCalculationsRoute = QaCalculationsRouteImport.update({
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/price-log': typeof PriceLogRoute
   '/price-trend': typeof PriceTrendRoute
   '/qa-calculations': typeof QaCalculationsRoute
+  '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/recipes': typeof RecipesRouteWithChildren
   '/settings': typeof SettingsRoute
   '/dish-analysis/$id': typeof DishAnalysisIdRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/price-log': typeof PriceLogRoute
   '/price-trend': typeof PriceTrendRoute
   '/qa-calculations': typeof QaCalculationsRoute
+  '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/recipes': typeof RecipesRouteWithChildren
   '/settings': typeof SettingsRoute
   '/dish-analysis/$id': typeof DishAnalysisIdRoute
@@ -162,6 +170,7 @@ export interface FileRoutesById {
   '/price-log': typeof PriceLogRoute
   '/price-trend': typeof PriceTrendRoute
   '/qa-calculations': typeof QaCalculationsRoute
+  '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/recipes': typeof RecipesRouteWithChildren
   '/settings': typeof SettingsRoute
   '/dish-analysis/$id': typeof DishAnalysisIdRoute
@@ -183,6 +192,7 @@ export interface FileRouteTypes {
     | '/price-log'
     | '/price-trend'
     | '/qa-calculations'
+    | '/qa-data-integrity'
     | '/recipes'
     | '/settings'
     | '/dish-analysis/$id'
@@ -201,6 +211,7 @@ export interface FileRouteTypes {
     | '/price-log'
     | '/price-trend'
     | '/qa-calculations'
+    | '/qa-data-integrity'
     | '/recipes'
     | '/settings'
     | '/dish-analysis/$id'
@@ -220,6 +231,7 @@ export interface FileRouteTypes {
     | '/price-log'
     | '/price-trend'
     | '/qa-calculations'
+    | '/qa-data-integrity'
     | '/recipes'
     | '/settings'
     | '/dish-analysis/$id'
@@ -240,6 +252,7 @@ export interface RootRouteChildren {
   PriceLogRoute: typeof PriceLogRoute
   PriceTrendRoute: typeof PriceTrendRoute
   QaCalculationsRoute: typeof QaCalculationsRoute
+  QaDataIntegrityRoute: typeof QaDataIntegrityRoute
   RecipesRoute: typeof RecipesRouteWithChildren
   SettingsRoute: typeof SettingsRoute
 }
@@ -258,6 +271,13 @@ declare module '@tanstack/react-router' {
       path: '/recipes'
       fullPath: '/recipes'
       preLoaderRoute: typeof RecipesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qa-data-integrity': {
+      id: '/qa-data-integrity'
+      path: '/qa-data-integrity'
+      fullPath: '/qa-data-integrity'
+      preLoaderRoute: typeof QaDataIntegrityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/qa-calculations': {
@@ -428,6 +448,7 @@ const rootRouteChildren: RootRouteChildren = {
   PriceLogRoute: PriceLogRoute,
   PriceTrendRoute: PriceTrendRoute,
   QaCalculationsRoute: QaCalculationsRoute,
+  QaDataIntegrityRoute: QaDataIntegrityRoute,
   RecipesRoute: RecipesRouteWithChildren,
   SettingsRoute: SettingsRoute,
 }
