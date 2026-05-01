@@ -12,12 +12,14 @@ export async function listMyRestaurants(): Promise<RestaurantMembership[]> {
     .select("role, restaurants:restaurant_id(id, name, created_by, created_at, updated_at)")
     .order("created_at", { ascending: true });
   if (error) throw error;
-  return (data ?? [])
-    .map((row: { role: string; restaurants: Restaurant | null }) => {
-      if (!row.restaurants) return null;
+  type Row = { role: string; restaurants: Restaurant | Restaurant[] | null };
+  return ((data ?? []) as unknown as Row[])
+    .map((row) => {
+      const r = Array.isArray(row.restaurants) ? row.restaurants[0] : row.restaurants;
+      if (!r) return null;
       return {
         role: row.role as RestaurantRole,
-        restaurant: row.restaurants,
+        restaurant: r,
       } satisfies RestaurantMembership;
     })
     .filter((x): x is RestaurantMembership => x !== null);
