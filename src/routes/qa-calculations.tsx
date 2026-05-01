@@ -302,6 +302,173 @@ function runChecks(): CheckResult[] {
     });
   }
 
+  // K — Impact Cascade direct path
+  {
+    const cascade = getLatestImpactCascade();
+    let pass = false;
+    let detail = "no cascade";
+    if (cascade) {
+      // sundried tomatoes -> bruschetta is direct
+      const g = cascade.groups.find((g) => g.ingredient_id === "ing-sundried-tomatoes");
+      const d = g?.affected_dishes.find((d) => d.recipe_id === "rec-bruschetta");
+      if (d) {
+        const path = d.impact_path;
+        const tail = path[path.length - 1];
+        pass =
+          d.pathway === "direct" &&
+          path[0]?.kind === "primary" &&
+          path[0]?.ingredient_id === "ing-sundried-tomatoes" &&
+          tail.kind === "dish" &&
+          tail.recipe_id === "rec-bruschetta" &&
+          path.length === 2;
+        detail = `pathway=${d.pathway}, steps=${path.map((s) => s.kind).join(">")}`;
+      } else {
+        detail = "bruschetta row missing";
+      }
+    }
+    out.push({
+      id: "K",
+      name: "Impact Cascade direct path",
+      inputs: "Latest cascade — Sundried Tomatoes → Bruschetta",
+      expected: "pathway=direct, path=primary>dish, dish tail",
+      actual: detail,
+      pass,
+    });
+  }
+
+  // L — Impact Cascade indirect path
+  {
+    const cascade = getLatestImpactCascade();
+    // tomato change in batch-3 should propagate via marinara sauce into dishes
+    let pass = false;
+    let detail = "no cascade";
+    if (cascade) {
+      const g = cascade.groups.find((g) => g.ingredient_id === "ing-tomato");
+      const d = g?.affected_dishes.find((d) => d.pathway === "indirect");
+      if (d) {
+        const inter = d.impact_path.find((s) => s.kind === "intermediate");
+        const tail = d.impact_path[d.impact_path.length - 1];
+        const intermediateAsFinal = recipes
+          .filter((r) => r.type === "Intermediate")
+          .some((r) => r.id === tail.recipe_id);
+        pass =
+          d.pathway === "indirect" &&
+          !!inter &&
+          inter.recipe_id === "rec-marinara-sauce" &&
+          tail.kind === "dish" &&
+          !intermediateAsFinal &&
+          d.impact_path.length === 3;
+        detail = `pathway=${d.pathway}, steps=${d.impact_path.map((s) => s.kind).join(">")}`;
+      } else {
+        detail = "no indirect dish for tomato";
+      }
+    }
+    out.push({
+      id: "L",
+      name: "Impact Cascade indirect path",
+      inputs: "Latest cascade — Tomato → Marinara Sauce → Dish",
+      expected: "pathway=indirect, primary>intermediate>dish, no intermediate as final",
+      actual: detail,
+      pass,
+    });
+  }
+
+  // M — Off-menu dishes excluded from benchmarks
+  {
+    const rows = getMenuAnalyticsRows();
+    const bench = getMenuBenchmarks();
+    const onMenu = rows.filter((r) => r.recipe.on_menu);
+    const validGpms = onMenu.map((r) => r.gpm).filter((g): g is number => g !== null);
+    const expectedAvg = validGpms.length
+      ? validGpms.reduce((a, b) => a + b, 0) / validGpms.length
+      : null;
+    const pass =
+      bench.on_menu_count === onMenu.length &&
+      ((expectedAvg === null && bench.avg_gpm === null) ||
+        (expectedAvg !== null &&
+          bench.avg_gpm !== null &&
+          APPROX(bench.avg_gpm, expectedAvg, 1e-9)));
+    out.push({
+      id: "M",
+      name: "Off-menu dishes excluded from benchmarks",
+      inputs: "getMenuBenchmarks() vs on-menu rows",
+      expected: `avg_gpm from ${onMenu.length} on-menu only`,
+      actual: `avg_gpm=${bench.avg_gpm?.toFixed(6) ?? "null"}, on_menu_count=${bench.on_menu_count}`,
+      pass,
+    });
+  }
+
+  // N — Alerts match derived Menu Analytics
+  {
+    const rows = getMenuAnalyticsRows();
+    const alerts = getAlerts();
+    const marginAlerts = alerts.filter((a) => a.type === "dish_below_target");
+    const onMenuBelow = rows.filter((r) => r.recipe.on_menu && r.gpm !== null && !r.on_target);
+    const onMenuAbove = rows.filter((r) => r.recipe.on_menu && r.on_target);
+    const belowIds = new Set(onMenuBelow.map((r) => r.recipe.id));
+    const alertRecipeIds = new Set(
+      marginAlerts.map((a) => a.affected_recipe_id).filter(Boolean) as string[],
+    );
+    const allBelowAlerted = [...belowIds].every((id) => alertRecipeIds.has(id));
+    const noFalsePositive = onMenuAbove.every((r) => !alertRecipeIds.has(r.recipe.id));
+    const pass = allBelowAlerted && noFalsePositive;
+    out.push({
+      id: "N",
+      name: "Alerts match derived Menu Analytics",
+      inputs: "getAlerts() vs on-menu below/above target",
+      expected: "every below-target dish has margin alert; no above-target dish does",
+      actual: `below=${belowIds.size} alerted=${alertRecipeIds.size} false_pos=${
+        onMenuAbove.filter((r) => alertRecipeIds.has(r.recipe.id)).length
+      }`,
+      pass,
+    });
+  }
+
+  // O — Price Trend largest increase derived
+  {
+    const ingId = "ing-sundried-tomatoes";
+    const stats = getPriceTrendStats(ingId, { includeBaseline: false });
+    const changes = priceLog.filter(
+      (p) => p.ingredient_id === ingId && p.event === "change",
+    );
+    const expected = changes.reduce<number | null>(
+      (m, e) =>
+        e.pct_change !== null && e.pct_change > 0 && (m === null || e.pct_change > m)
+          ? e.pct_change
+          : m,
+      null,
+    );
+    const pass =
+      (expected === null && stats.largest_increase_pct === null) ||
+      (expected !== null &&
+        stats.largest_increase_pct !== null &&
+        APPROX(stats.largest_increase_pct, expected, 1e-9));
+    out.push({
+      id: "O",
+      name: "Price Trend largest increase derived",
+      inputs: `getPriceTrendStats('${ingId}', no baseline)`,
+      expected: `${expected === null ? "null" : expected.toFixed(6)}`,
+      actual: `${stats.largest_increase_pct === null ? "null" : stats.largest_increase_pct.toFixed(6)}`,
+      pass,
+    });
+  }
+
+  // P — Dashboard below-target count matches Menu Analytics
+  {
+    const rows = getMenuAnalyticsRows();
+    const k = getDashboardKpis();
+    const expected = rows.filter((r) => r.recipe.on_menu && !r.on_target).length;
+    const pass = k.below_target_count === expected;
+    out.push({
+      id: "P",
+      name: "Dashboard below-target count matches Menu Analytics",
+      inputs: "getDashboardKpis().below_target_count vs derived rows",
+      expected: `${expected}`,
+      actual: `${k.below_target_count}`,
+      pass,
+    });
+  }
+
   return out;
 }
 
