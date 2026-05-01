@@ -388,7 +388,7 @@ function DashboardPage() {
 
         <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Bell className="h-3 w-3" />
-          Build 0.3 — derived intelligence over a mock dataset. No persistence, no backend.
+          Build 0.4 — Margin Intelligence over a mock dataset. No persistence, no backend.
         </p>
       </div>
     </AppShell>
