@@ -5,8 +5,18 @@ import { PageHeader } from "@/components/common/PageHeader";
 import { EmptyState } from "@/components/common/EmptyState";
 import { Button } from "@/components/ui/button";
 import { recipes } from "@/data/mock";
+import { DishAnalysisView } from "@/components/dish-analysis/DishAnalysisView";
 
 export const Route = createFileRoute("/dish-analysis/$id")({
+  head: ({ params }) => ({
+    meta: [
+      { title: `Dish Analysis — ${params.id}` },
+      {
+        name: "description",
+        content: "Per-dish deep dive with the requested dish preselected.",
+      },
+    ],
+  }),
   component: DishAnalysisDeepLinkPage,
 });
 
@@ -31,23 +41,5 @@ function DishAnalysisDeepLinkPage() {
       </AppShell>
     );
   }
-  return (
-    <AppShell>
-      <PageHeader
-        title="Dish Analysis"
-        description="Open this dish from the selector on the main Dish Analysis page."
-        actions={
-          <Button asChild variant="outline" size="sm">
-            <Link to="/dish-analysis">Open dish analysis</Link>
-          </Button>
-        }
-      />
-      <div className="p-6">
-        <p className="text-sm text-muted-foreground">
-          Deep links to a specific dish are valid; the selector-driven page
-          will preselect this dish in a future iteration.
-        </p>
-      </div>
-    </AppShell>
-  );
+  return <DishAnalysisView initialDishId={id} />;
 }
