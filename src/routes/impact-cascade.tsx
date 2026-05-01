@@ -98,6 +98,7 @@ function ImpactCascadePage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Affected dish</TableHead>
+                    <TableHead>Pathway</TableHead>
                     <TableHead className="text-right">Old COGS</TableHead>
                     <TableHead className="text-right">New COGS</TableHead>
                     <TableHead className="text-right">Δ COGS</TableHead>
@@ -111,7 +112,19 @@ function ImpactCascadePage() {
                 <TableBody>
                   {g.affected_dishes.map((d) => (
                     <TableRow key={d.recipe_id}>
-                      <TableCell className="font-medium">{d.recipe_name}</TableCell>
+                      <TableCell className="font-medium">
+                        <Link
+                          to="/dish-analysis/$id"
+                          params={{ id: d.recipe_id }}
+                          className="hover:underline"
+                        >
+                          {d.recipe_name}
+                        </Link>
+                        <ImpactPath path={d.impact_path} />
+                      </TableCell>
+                      <TableCell>
+                        <PathwayBadge pathway={d.pathway} />
+                      </TableCell>
                       <TableCell className="text-right">
                         <MoneyCell value={d.old_cogs} />
                       </TableCell>
