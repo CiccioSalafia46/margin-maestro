@@ -332,6 +332,117 @@ export function getLatestImpactCascade(): DerivedImpactCascadeRun | null {
   return getImpactCascadeForBatch(b.id);
 }
 
+// ---------- Impact Cascade — unified batch summary ----------
+//
+// All consumers (Impact Cascade page, Batch History rows, Dashboard latest
+// batch summary) MUST use these selectors so numbers stay internally
+// consistent. Aggregation rules:
+//   - affected_dish_count_unique: unique final Dish recipes (no double count
+//     when multiple changed ingredients touch the same dish).
+//   - impact_row_count: raw ingredient→dish rows (informational).
+//   - total_cogs_delta_per_serving: Σ over UNIQUE dishes of (new_cogs − old_cogs).
+//   - total_margin_impact_per_serving: −total_cogs_delta_per_serving (negative
+//     = profit lost per serving).
+//   - total_estimated_monthly_margin_impact: Σ unique dishes of
+//     (−delta_cogs_per_serving × demo monthly units), only when sales exist.
+
+export interface ImpactCascadeBatchSummary {
+  batch_id: string;
+  batch_name: string;
+  latest_batch_timestamp: string;
+  ingredients_changed_count: number;
+  affected_dish_count_unique: number;
+  impact_row_count: number;
+  newly_below_target_count: number;
+  total_cogs_delta_per_serving: number;
+  total_margin_impact_per_serving: number;
+  total_estimated_monthly_margin_impact: number | null;
+  has_sales_data: boolean;
+}
+
+function summarizeCascade(
+  batch: PriceBatch,
+  cascade: DerivedImpactCascadeRun,
+): ImpactCascadeBatchSummary {
+  // Aggregate by unique dish across all ingredient groups.
+  const perDishDeltaCogs = new Map<string, number>();
+  const newlyBelow = new Set<string>();
+  let impactRowCount = 0;
+
+  for (const g of cascade.groups) {
+    for (const d of g.affected_dishes) {
+      impactRowCount++;
+      perDishDeltaCogs.set(
+        d.recipe_id,
+        (perDishDeltaCogs.get(d.recipe_id) ?? 0) + d.delta_cogs,
+      );
+      if (
+        d.menu_price !== null &&
+        d.old_gpm !== null &&
+        d.new_gpm !== null &&
+        d.old_gpm + 1e-9 >= restaurantSettings.target_gpm &&
+        d.new_gpm + 1e-9 < restaurantSettings.target_gpm
+      ) {
+        newlyBelow.add(d.recipe_id);
+      }
+    }
+  }
+
+  const totalCogsDeltaPerServing = Array.from(perDishDeltaCogs.values()).reduce(
+    (a, b) => a + b,
+    0,
+  );
+  const totalMarginImpactPerServing = -totalCogsDeltaPerServing;
+
+  const hasSales = Object.keys(estimatedMonthlyUnitsSold).length > 0;
+  let monthly: number | null = null;
+  if (hasSales) {
+    monthly = 0;
+    for (const [recipeId, deltaCogs] of perDishDeltaCogs) {
+      const units = estimatedMonthlyUnitsSold[recipeId] ?? 0;
+      monthly += -deltaCogs * units;
+    }
+  }
+
+  return {
+    batch_id: batch.id,
+    batch_name: batch.label,
+    latest_batch_timestamp: batch.created_at,
+    ingredients_changed_count: cascade.groups.length,
+    affected_dish_count_unique: perDishDeltaCogs.size,
+    impact_row_count: impactRowCount,
+    newly_below_target_count: newlyBelow.size,
+    total_cogs_delta_per_serving: totalCogsDeltaPerServing,
+    total_margin_impact_per_serving: totalMarginImpactPerServing,
+    total_estimated_monthly_margin_impact: monthly,
+    has_sales_data: hasSales,
+  };
+}
+
+export function getImpactCascadeBatchSummary(
+  batchId: string,
+): ImpactCascadeBatchSummary | null {
+  const batch = priceBatches.find((b) => b.id === batchId);
+  if (!batch) return null;
+  const cascade = getImpactCascadeForBatch(batchId);
+  if (!cascade) return null;
+  return summarizeCascade(batch, cascade);
+}
+
+export function getLatestImpactCascadeSummary(): ImpactCascadeBatchSummary | null {
+  const b = getLatestPriceBatch();
+  if (!b) return null;
+  return getImpactCascadeBatchSummary(b.id);
+}
+
+export function getImpactCascadeHistory(): ImpactCascadeBatchSummary[] {
+  return priceBatches
+    .filter((b) => b.id !== "batch-baseline")
+    .sort((a, b) => b.created_at.localeCompare(a.created_at))
+    .map((b) => getImpactCascadeBatchSummary(b.id))
+    .filter((s): s is ImpactCascadeBatchSummary => s !== null);
+}
+
 // ---------- Alerts ----------
 
 export function getAlerts(): AlertItem[] {
