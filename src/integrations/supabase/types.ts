@@ -14,13 +14,153 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      restaurant_members: {
+        Row: {
+          created_at: string
+          restaurant_id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          restaurant_id: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          restaurant_id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "restaurant_members_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      restaurant_settings: {
+        Row: {
+          created_at: string
+          currency_code: string
+          gp_floor_amount: number | null
+          gpm_drop_threshold_percent: number
+          ingredient_spike_threshold_percent: number
+          locale: string
+          restaurant_id: string
+          target_gpm: number
+          tax_mode: string
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency_code?: string
+          gp_floor_amount?: number | null
+          gpm_drop_threshold_percent?: number
+          ingredient_spike_threshold_percent?: number
+          locale?: string
+          restaurant_id: string
+          target_gpm?: number
+          tax_mode?: string
+          timezone?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency_code?: string
+          gp_floor_amount?: number | null
+          gpm_drop_threshold_percent?: number
+          ingredient_spike_threshold_percent?: number
+          locale?: string
+          restaurant_id?: string
+          target_gpm?: number
+          tax_mode?: string
+          timezone?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "restaurant_settings_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: true
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      restaurants: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_restaurant_with_owner: {
+        Args: { p_name: string }
+        Returns: string
+      }
+      has_restaurant_role: {
+        Args: { p_restaurant_id: string; p_roles: string[] }
+        Returns: boolean
+      }
+      is_restaurant_member: {
+        Args: { p_restaurant_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
