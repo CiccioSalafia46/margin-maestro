@@ -391,23 +391,29 @@ export const recipes: Recipe[] = [
   },
 ];
 
-// ---------- Live computed COGS / GPM (single source of truth for tables) ----------
+// ---------- Derived ingredient cost states (single source of truth) ----------
+//
+// Build 0.2: Primary ingredient recipe_unit_cost is derived from source fields
+// via the calculation core (UoM conversion + adjustment). Fixed flows through
+// the same helper. Intermediate ingredients are resolved from linked recipes.
+
+import { resolveIntermediateRecipeCosts } from "@/lib/cogs";
+import type { IngredientCostState } from "@/lib/ingredientCost";
+
+const { costStates: ingredientCostStates, errors: costResolutionErrors } =
+  resolveIntermediateRecipeCosts(recipes, ingredients);
+
+export { ingredientCostStates, costResolutionErrors };
+
+// Patch ingredients in place so legacy reads of `recipe_unit_cost` stay accurate.
+for (const ing of ingredients) {
+  const cs = ingredientCostStates.get(ing.id);
+  if (cs && cs.ok) {
+    ing.recipe_unit_cost = cs.recipe_unit_cost;
+  }
+}
 
 const ingredientById = new Map(ingredients.map((i) => [i.id, i]));
-
-/**
- * Convert a qty in source UoM to the ingredient's recipe UoM.
- * For mock simplicity: when recipe lines already use the same family as the
- * ingredient's recipe_uom, qty is taken at face value (the dataset is curated
- * so units match). Mass↔volume requires density and is handled where flagged.
- */
-function lineCostFor(ingredientId: string, qty: number): number {
-  const ing = ingredientById.get(ingredientId);
-  if (!ing) return 0;
-  // If line uom differs from recipe_uom in unit family, dataset is curated
-  // to match recipe_uom — so we trust qty as already in recipe_uom terms.
-  return qty * ing.recipe_unit_cost;
-}
 
 export interface RecipeMetrics {
   cogs: number;
@@ -416,23 +422,39 @@ export interface RecipeMetrics {
   gpm: number | null;
   on_target: boolean;
   suggested_menu_price: number | null;
+  errors: string[];
 }
 
-
+import { computeRecipeCOGS } from "@/lib/cogs";
 
 export function computeRecipeMetrics(recipe: Recipe, targetGpm = TARGET_GPM): RecipeMetrics {
-  const cogs = recipe.lines.reduce((sum, l) => sum + lineCostFor(l.ingredient_id, l.qty), 0);
-  const cps = cogs / Math.max(recipe.serving_qty, 1);
+  const result = computeRecipeCOGS(recipe, ingredients, ingredientCostStates);
+  const cps = result.cost_per_serving;
   const gp = computeGP(recipe.menu_price, cps);
   const gpm = computeGPM(recipe.menu_price, cps);
   return {
-    cogs,
+    cogs: result.cogs,
     cost_per_serving: cps,
     gp,
     gpm,
     on_target: isOnTarget(gpm, targetGpm),
     suggested_menu_price: suggestedMenuPrice(cps, targetGpm),
+    errors: result.errors,
   };
+}
+
+export function getRecipeLineCost(ingredientId: string, qty: number, uom: import("@/lib/types").UoM): number {
+  const ing = ingredientById.get(ingredientId);
+  const cs = ingredientCostStates.get(ingredientId);
+  if (!ing || !cs || !cs.ok) return 0;
+  if (uom === cs.recipe_uom) return qty * cs.recipe_unit_cost;
+  // Convert qty into the ingredient's recipe_uom
+  // (kept lazy-imported to avoid circular dep risk in mock module init)
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { convertQuantity } = require("@/lib/units") as typeof import("@/lib/units");
+  const c = convertQuantity(qty, uom, cs.recipe_uom, ing.density_g_per_ml);
+  if (!c.ok) return 0;
+  return c.value * cs.recipe_unit_cost;
 }
 
 export function getRecipeById(id: string) {
@@ -440,6 +462,9 @@ export function getRecipeById(id: string) {
 }
 export function getIngredientById(id: string) {
   return ingredientById.get(id);
+}
+export function getIngredientCostState(id: string): IngredientCostState | undefined {
+  return ingredientCostStates.get(id);
 }
 
 export function recipesUsingIngredient(ingredientId: string): Recipe[] {
