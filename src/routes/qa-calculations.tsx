@@ -25,7 +25,9 @@ import { calculationNotes } from "@/lib/calculationNotes";
 import {
   getAlerts,
   getDashboardKpis,
+  getImpactCascadeHistory,
   getLatestImpactCascade,
+  getLatestImpactCascadeSummary,
   getMenuAnalyticsRows,
   getMenuBenchmarks,
   getPriceTrendStats,
@@ -465,6 +467,103 @@ function runChecks(): CheckResult[] {
       inputs: "getDashboardKpis().below_target_count vs derived rows",
       expected: `${expected}`,
       actual: `${k.below_target_count}`,
+      pass,
+    });
+  }
+
+  // Q — Latest cascade summary matches batch history
+  {
+    const summary = getLatestImpactCascadeSummary();
+    const history = getImpactCascadeHistory();
+    const top = history[0] ?? null;
+    let pass = false;
+    let detail = "no summary";
+    if (summary && top) {
+      const metricSummary = summary.has_sales_data
+        ? summary.total_estimated_monthly_margin_impact
+        : summary.total_margin_impact_per_serving;
+      const metricTop = top.has_sales_data
+        ? top.total_estimated_monthly_margin_impact
+        : top.total_margin_impact_per_serving;
+      pass =
+        summary.batch_id === top.batch_id &&
+        summary.ingredients_changed_count === top.ingredients_changed_count &&
+        summary.affected_dish_count_unique === top.affected_dish_count_unique &&
+        ((metricSummary === null && metricTop === null) ||
+          (metricSummary !== null &&
+            metricTop !== null &&
+            APPROX(metricSummary, metricTop, 1e-9)));
+      detail = `summary(ing=${summary.ingredients_changed_count}, dishes=${summary.affected_dish_count_unique}, m=${metricSummary?.toFixed(4) ?? "null"}) vs top(ing=${top.ingredients_changed_count}, dishes=${top.affected_dish_count_unique}, m=${metricTop?.toFixed(4) ?? "null"})`;
+    }
+    out.push({
+      id: "Q",
+      name: "Latest cascade summary matches batch history",
+      inputs: "getLatestImpactCascadeSummary() vs getImpactCascadeHistory()[0]",
+      expected: "ingredients, unique dishes, and margin impact metric all match",
+      actual: detail,
+      pass,
+    });
+  }
+
+  // R — No ambiguous margin impact labels (selector exposes per-serving + monthly + has_sales_data)
+  {
+    const summary = getLatestImpactCascadeSummary();
+    const pass =
+      !!summary &&
+      typeof summary.total_margin_impact_per_serving === "number" &&
+      Number.isFinite(summary.total_margin_impact_per_serving) &&
+      typeof summary.has_sales_data === "boolean" &&
+      (summary.has_sales_data
+        ? summary.total_estimated_monthly_margin_impact !== null &&
+          Number.isFinite(summary.total_estimated_monthly_margin_impact)
+        : summary.total_estimated_monthly_margin_impact === null);
+    out.push({
+      id: "R",
+      name: "Margin impact labels are unambiguous",
+      inputs: "Selector exposes per-serving, monthly (when sales), and has_sales_data flag",
+      expected: "per-serving always present; monthly present iff has_sales_data",
+      actual: summary
+        ? `per_serving=${summary.total_margin_impact_per_serving.toFixed(4)}, monthly=${summary.total_estimated_monthly_margin_impact?.toFixed(2) ?? "null"}, has_sales=${summary.has_sales_data}`
+        : "no summary",
+      pass,
+    });
+  }
+
+  // S — No duplicate dish double-counting in batch summary
+  {
+    const summary = getLatestImpactCascadeSummary();
+    const cascade = getLatestImpactCascade();
+    let pass = false;
+    let detail = "no data";
+    if (summary && cascade) {
+      const perDishDelta = new Map<string, number>();
+      let rows = 0;
+      for (const g of cascade.groups) {
+        for (const d of g.affected_dishes) {
+          rows++;
+          perDishDelta.set(
+            d.recipe_id,
+            (perDishDelta.get(d.recipe_id) ?? 0) + d.delta_cogs,
+          );
+        }
+      }
+      const expectedPerServing = -Array.from(perDishDelta.values()).reduce(
+        (a, b) => a + b,
+        0,
+      );
+      pass =
+        summary.affected_dish_count_unique <= summary.impact_row_count &&
+        summary.affected_dish_count_unique === perDishDelta.size &&
+        summary.impact_row_count === rows &&
+        APPROX(summary.total_margin_impact_per_serving, expectedPerServing, 1e-9);
+      detail = `unique=${summary.affected_dish_count_unique}, rows=${summary.impact_row_count}, per_serving=${summary.total_margin_impact_per_serving.toFixed(6)} expected=${expectedPerServing.toFixed(6)}`;
+    }
+    out.push({
+      id: "S",
+      name: "No duplicate dish double-counting in batch summary",
+      inputs: "Aggregate cascade groups by unique dish_id",
+      expected: "unique ≤ rows; per-serving margin impact = −Σ unique-dish ΔCOGS",
+      actual: detail,
       pass,
     });
   }

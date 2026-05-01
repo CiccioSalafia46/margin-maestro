@@ -35,6 +35,7 @@ import { TARGET_GPM } from "@/data/mock";
 import {
   getAlerts,
   getDashboardKpis,
+  getLatestImpactCascadeSummary,
   getMenuAnalyticsRows,
   getPriceLogByBatch,
   suggestedMenuPrice,
@@ -57,6 +58,7 @@ export const Route = createFileRoute("/dashboard")({
 
 function DashboardPage() {
   const kpis = getDashboardKpis();
+  const latestSummary = getLatestImpactCascadeSummary();
   const allAlerts = getAlerts();
   const menuRows = getMenuAnalyticsRows();
   const belowTarget = menuRows.filter((r) => r.recipe.on_menu && !r.on_target);
@@ -336,25 +338,45 @@ function DashboardPage() {
               </Button>
             </CardHeader>
             <CardContent>
-              {kpis.latest_batch && kpis.latest_cascade ? (
+              {latestSummary ? (
                 <>
-                  <p className="text-sm font-medium">{kpis.latest_batch.label}</p>
+                  <p className="text-sm font-medium">{latestSummary.batch_name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {formatDateTime(kpis.latest_batch.created_at)}
+                    {formatDateTime(latestSummary.latest_batch_timestamp)}
                   </p>
                   <div className="mt-4 grid grid-cols-2 gap-3">
-                    <Stat label="Ingredients changed" value={kpis.latest_cascade.ingredients_changed} />
-                    <Stat label="Dishes affected" value={kpis.latest_cascade.dishes_affected} />
+                    <Stat
+                      label="Ingredients changed"
+                      value={latestSummary.ingredients_changed_count}
+                    />
+                    <Stat
+                      label="Dishes affected (unique)"
+                      value={latestSummary.affected_dish_count_unique}
+                    />
                     <Stat
                       label="Newly below target"
-                      value={kpis.latest_cascade.dishes_newly_below_target}
-                      negative
+                      value={latestSummary.newly_below_target_count}
+                      negative={latestSummary.newly_below_target_count > 0}
                     />
-                    <Stat
-                      label="Margin impact"
-                      value={formatMoney(-kpis.latest_cascade.total_margin_impact_usd)}
-                      negative
-                    />
+                    {latestSummary.has_sales_data ? (
+                      <Stat
+                        label="Margin impact — monthly, demo unit sales"
+                        value={formatMoney(
+                          latestSummary.total_estimated_monthly_margin_impact,
+                        )}
+                        negative={
+                          (latestSummary.total_estimated_monthly_margin_impact ?? 0) < 0
+                        }
+                      />
+                    ) : (
+                      <Stat
+                        label="Margin impact — per serving"
+                        value={formatMoney(
+                          latestSummary.total_margin_impact_per_serving,
+                        )}
+                        negative={latestSummary.total_margin_impact_per_serving < 0}
+                      />
+                    )}
                   </div>
                 </>
               ) : (

@@ -23,9 +23,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { priceBatches } from "@/data/mock";
-import { getLatestImpactCascade } from "@/data/selectors";
-import { formatDateTime } from "@/lib/format";
+import {
+  getImpactCascadeHistory,
+  getLatestImpactCascade,
+  getLatestImpactCascadeSummary,
+} from "@/data/selectors";
+import { formatDateTime, formatMoney } from "@/lib/format";
 
 export const Route = createFileRoute("/impact-cascade")({
   head: () => ({
@@ -42,7 +45,10 @@ export const Route = createFileRoute("/impact-cascade")({
 
 function ImpactCascadePage() {
   const latestCascade = getLatestImpactCascade();
-  if (!latestCascade) {
+  const latestSummary = getLatestImpactCascadeSummary();
+  const history = getImpactCascadeHistory();
+
+  if (!latestCascade || !latestSummary) {
     return (
       <AppShell>
         <PageHeader title="Impact Cascade" description="No batches yet." />
@@ -53,26 +59,53 @@ function ImpactCascadePage() {
     <AppShell>
       <PageHeader
         title="Impact Cascade"
-        description={`Latest batch: ${formatDateTime(latestCascade.created_at)}`}
+        description={`Latest batch: ${formatDateTime(latestSummary.latest_batch_timestamp)}`}
       />
       <div className="space-y-6 p-6">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <KpiCard
             label="Ingredients changed"
-            value={latestCascade.ingredients_changed}
+            value={latestSummary.ingredients_changed_count}
             icon={<Zap className="h-4 w-4" />}
           />
-          <KpiCard label="Dishes affected" value={latestCascade.dishes_affected} />
+          <KpiCard
+            label="Dishes affected"
+            value={latestSummary.affected_dish_count_unique}
+            hint="Unique dishes"
+          />
+          <KpiCard
+            label="Impact rows"
+            value={latestSummary.impact_row_count}
+            hint="Ingredient → dish rows"
+          />
           <KpiCard
             label="Newly below target"
-            value={latestCascade.dishes_newly_below_target}
-            tone={latestCascade.dishes_newly_below_target > 0 ? "negative" : "positive"}
+            value={latestSummary.newly_below_target_count}
+            tone={latestSummary.newly_below_target_count > 0 ? "negative" : "positive"}
           />
-          <KpiCard
-            label="Total margin impact"
-            value={<MoneyCell value={latestCascade.total_margin_impact_usd} />}
-            tone="negative"
-          />
+          {latestSummary.has_sales_data ? (
+            <KpiCard
+              label="Margin impact"
+              value={
+                <MoneyCell
+                  value={latestSummary.total_estimated_monthly_margin_impact}
+                />
+              }
+              hint="Monthly, demo unit sales"
+              tone={
+                (latestSummary.total_estimated_monthly_margin_impact ?? 0) < 0
+                  ? "negative"
+                  : "positive"
+              }
+            />
+          ) : (
+            <KpiCard
+              label="Margin impact"
+              value={<MoneyCell value={latestSummary.total_margin_impact_per_serving} />}
+              hint="Per serving (sum of unique dishes)"
+              tone={latestSummary.total_margin_impact_per_serving < 0 ? "negative" : "positive"}
+            />
+          )}
         </div>
 
         {latestCascade.groups.map((g) => (
@@ -160,6 +193,12 @@ function ImpactCascadePage() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Batch history</CardTitle>
+            <p className="text-xs text-muted-foreground">
+              All values derived from the same cascade selector. Margin impact{" "}
+              {latestSummary.has_sales_data
+                ? "shown as monthly (demo unit sales)."
+                : "shown per serving (unique dishes)."}
+            </p>
           </CardHeader>
           <CardContent className="p-0">
             <Table>
@@ -167,35 +206,55 @@ function ImpactCascadePage() {
                 <TableRow>
                   <TableHead>Batch</TableHead>
                   <TableHead>Date</TableHead>
-                  <TableHead className="text-right">Ingredients</TableHead>
-                  <TableHead className="text-right">Dishes</TableHead>
-                  <TableHead className="text-right">Margin impact</TableHead>
+                  <TableHead className="text-right">Ingredients changed</TableHead>
+                  <TableHead className="text-right">Dishes affected</TableHead>
+                  <TableHead className="text-right">
+                    {latestSummary.has_sales_data
+                      ? "Monthly margin impact (demo)"
+                      : "Per-serving margin impact"}
+                  </TableHead>
                   <TableHead></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {priceBatches.map((b) => (
-                  <TableRow key={b.id}>
-                    <TableCell className="font-medium">{b.label}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {formatDateTime(b.created_at)}
-                    </TableCell>
-                    <TableCell className="text-right tabular-nums">
-                      {b.ingredients_changed}
-                    </TableCell>
-                    <TableCell className="text-right tabular-nums">{b.dishes_affected}</TableCell>
-                    <TableCell className="text-right">
-                      <MoneyCell value={b.total_margin_impact_usd} />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button asChild variant="ghost" size="sm">
-                        <Link to="/impact-cascade/$batchId" params={{ batchId: b.id }}>
-                          Open <ArrowRight className="ml-1 h-3.5 w-3.5" />
-                        </Link>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {history.map((s) => {
+                  const metric = s.has_sales_data
+                    ? s.total_estimated_monthly_margin_impact
+                    : s.total_margin_impact_per_serving;
+                  return (
+                    <TableRow key={s.batch_id}>
+                      <TableCell className="font-medium">{s.batch_name}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {formatDateTime(s.latest_batch_timestamp)}
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {s.ingredients_changed_count}
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {s.affected_dish_count_unique}
+                      </TableCell>
+                      <TableCell
+                        className={
+                          (metric ?? 0) < 0
+                            ? "text-right tabular-nums text-destructive"
+                            : "text-right tabular-nums"
+                        }
+                      >
+                        {metric === null ? "—" : formatMoney(metric)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button asChild variant="ghost" size="sm">
+                          <Link
+                            to="/impact-cascade/$batchId"
+                            params={{ batchId: s.batch_id }}
+                          >
+                            Open <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                          </Link>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </CardContent>
