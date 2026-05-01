@@ -277,7 +277,6 @@ export const recipes: Recipe[] = [
     serving_uom: "Ct",
     menu_price: 18.0,
     on_menu: true,
-    delta_gpm_vs_snapshot: -0.005,
     lines: [
       { id: "l-mgh-1", ingredient_id: "ing-pizza-dough", qty: 1, uom: "Ct" }, // 0.59
       { id: "l-mgh-2", ingredient_id: "ing-marinara-sauce", qty: 120, uom: "Ml" }, // 0.85
@@ -297,7 +296,6 @@ export const recipes: Recipe[] = [
     serving_uom: "Ct",
     menu_price: 26.0,
     on_menu: true,
-    delta_gpm_vs_snapshot: -0.008,
     lines: [
       { id: "l-las-1", ingredient_id: "ing-ground-pork", qty: 0.45, uom: "Lb" }, // 3.08
       { id: "l-las-2", ingredient_id: "ing-marinara-sauce", qty: 180, uom: "Ml" }, // 1.28
@@ -318,7 +316,6 @@ export const recipes: Recipe[] = [
     serving_uom: "Ct",
     menu_price: 14.0,
     on_menu: true,
-    delta_gpm_vs_snapshot: -0.025, // post sundried-tomato spike
     lines: [
       { id: "l-bru-1", ingredient_id: "ing-flour", qty: 120, uom: "Gr" }, // 0.24
       { id: "l-bru-2", ingredient_id: "ing-tomato", qty: 80, uom: "Gr" }, // 0.45
@@ -340,7 +337,6 @@ export const recipes: Recipe[] = [
     serving_uom: "Ct",
     menu_price: 22.0,
     on_menu: true,
-    delta_gpm_vs_snapshot: -0.038,
     lines: [
       { id: "l-rav-1", ingredient_id: "ing-flour", qty: 110, uom: "Gr" }, // 0.22
       { id: "l-rav-2", ingredient_id: "ing-mozzarella", qty: 60, uom: "Gr" }, // 0.69
@@ -362,7 +358,6 @@ export const recipes: Recipe[] = [
     serving_uom: "Ct",
     menu_price: 32.0,
     on_menu: true,
-    delta_gpm_vs_snapshot: -0.042,
     lines: [
       { id: "l-sal-1", ingredient_id: "ing-ground-pork", qty: 0.55, uom: "Lb" }, // 3.76 (proxy for veal)
       { id: "l-sal-2", ingredient_id: "ing-asparagus", qty: 120, uom: "Gr" }, // 1.74
@@ -382,7 +377,6 @@ export const recipes: Recipe[] = [
     serving_uom: "Ct",
     menu_price: 19.0,
     on_menu: true,
-    delta_gpm_vs_snapshot: -0.061,
     lines: [
       { id: "l-ant-1", ingredient_id: "ing-mozzarella", qty: 90, uom: "Gr" }, // 1.04
       { id: "l-ant-2", ingredient_id: "ing-sundried-tomatoes", qty: 60, uom: "Gr" }, // 2.23
