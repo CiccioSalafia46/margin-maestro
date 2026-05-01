@@ -9,17 +9,41 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RecipesRouteImport } from './routes/recipes'
+import { Route as PriceTrendRouteImport } from './routes/price-trend'
+import { Route as PriceLogRouteImport } from './routes/price-log'
 import { Route as MenuAnalyticsRouteImport } from './routes/menu-analytics'
 import { Route as IngredientsRouteImport } from './routes/ingredients'
+import { Route as ImpactCascadeRouteImport } from './routes/impact-cascade'
+import { Route as DishAnalysisRouteImport } from './routes/dish-analysis'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as AlertsRouteImport } from './routes/alerts'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DishAnalysisIndexRouteImport } from './routes/dish-analysis.index'
 import { Route as RecipesIdRouteImport } from './routes/recipes.$id'
 import { Route as IngredientsIdRouteImport } from './routes/ingredients.$id'
+import { Route as ImpactCascadeBatchIdRouteImport } from './routes/impact-cascade.$batchId'
+import { Route as DishAnalysisIdRouteImport } from './routes/dish-analysis.$id'
 
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RecipesRoute = RecipesRouteImport.update({
   id: '/recipes',
   path: '/recipes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PriceTrendRoute = PriceTrendRouteImport.update({
+  id: '/price-trend',
+  path: '/price-trend',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PriceLogRoute = PriceLogRouteImport.update({
+  id: '/price-log',
+  path: '/price-log',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MenuAnalyticsRoute = MenuAnalyticsRouteImport.update({
@@ -32,15 +56,35 @@ const IngredientsRoute = IngredientsRouteImport.update({
   path: '/ingredients',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ImpactCascadeRoute = ImpactCascadeRouteImport.update({
+  id: '/impact-cascade',
+  path: '/impact-cascade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DishAnalysisRoute = DishAnalysisRouteImport.update({
+  id: '/dish-analysis',
+  path: '/dish-analysis',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AlertsRoute = AlertsRouteImport.update({
+  id: '/alerts',
+  path: '/alerts',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DishAnalysisIndexRoute = DishAnalysisIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DishAnalysisRoute,
 } as any)
 const RecipesIdRoute = RecipesIdRouteImport.update({
   id: '/$id',
@@ -52,80 +96,169 @@ const IngredientsIdRoute = IngredientsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => IngredientsRoute,
 } as any)
+const ImpactCascadeBatchIdRoute = ImpactCascadeBatchIdRouteImport.update({
+  id: '/$batchId',
+  path: '/$batchId',
+  getParentRoute: () => ImpactCascadeRoute,
+} as any)
+const DishAnalysisIdRoute = DishAnalysisIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => DishAnalysisRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/alerts': typeof AlertsRoute
   '/dashboard': typeof DashboardRoute
+  '/dish-analysis': typeof DishAnalysisRouteWithChildren
+  '/impact-cascade': typeof ImpactCascadeRouteWithChildren
   '/ingredients': typeof IngredientsRouteWithChildren
   '/menu-analytics': typeof MenuAnalyticsRoute
+  '/price-log': typeof PriceLogRoute
+  '/price-trend': typeof PriceTrendRoute
   '/recipes': typeof RecipesRouteWithChildren
+  '/settings': typeof SettingsRoute
+  '/dish-analysis/$id': typeof DishAnalysisIdRoute
+  '/impact-cascade/$batchId': typeof ImpactCascadeBatchIdRoute
   '/ingredients/$id': typeof IngredientsIdRoute
   '/recipes/$id': typeof RecipesIdRoute
+  '/dish-analysis/': typeof DishAnalysisIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/alerts': typeof AlertsRoute
   '/dashboard': typeof DashboardRoute
+  '/impact-cascade': typeof ImpactCascadeRouteWithChildren
   '/ingredients': typeof IngredientsRouteWithChildren
   '/menu-analytics': typeof MenuAnalyticsRoute
+  '/price-log': typeof PriceLogRoute
+  '/price-trend': typeof PriceTrendRoute
   '/recipes': typeof RecipesRouteWithChildren
+  '/settings': typeof SettingsRoute
+  '/dish-analysis/$id': typeof DishAnalysisIdRoute
+  '/impact-cascade/$batchId': typeof ImpactCascadeBatchIdRoute
   '/ingredients/$id': typeof IngredientsIdRoute
   '/recipes/$id': typeof RecipesIdRoute
+  '/dish-analysis': typeof DishAnalysisIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/alerts': typeof AlertsRoute
   '/dashboard': typeof DashboardRoute
+  '/dish-analysis': typeof DishAnalysisRouteWithChildren
+  '/impact-cascade': typeof ImpactCascadeRouteWithChildren
   '/ingredients': typeof IngredientsRouteWithChildren
   '/menu-analytics': typeof MenuAnalyticsRoute
+  '/price-log': typeof PriceLogRoute
+  '/price-trend': typeof PriceTrendRoute
   '/recipes': typeof RecipesRouteWithChildren
+  '/settings': typeof SettingsRoute
+  '/dish-analysis/$id': typeof DishAnalysisIdRoute
+  '/impact-cascade/$batchId': typeof ImpactCascadeBatchIdRoute
   '/ingredients/$id': typeof IngredientsIdRoute
   '/recipes/$id': typeof RecipesIdRoute
+  '/dish-analysis/': typeof DishAnalysisIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/alerts'
     | '/dashboard'
+    | '/dish-analysis'
+    | '/impact-cascade'
     | '/ingredients'
     | '/menu-analytics'
+    | '/price-log'
+    | '/price-trend'
     | '/recipes'
+    | '/settings'
+    | '/dish-analysis/$id'
+    | '/impact-cascade/$batchId'
     | '/ingredients/$id'
     | '/recipes/$id'
+    | '/dish-analysis/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/alerts'
     | '/dashboard'
+    | '/impact-cascade'
     | '/ingredients'
     | '/menu-analytics'
+    | '/price-log'
+    | '/price-trend'
     | '/recipes'
+    | '/settings'
+    | '/dish-analysis/$id'
+    | '/impact-cascade/$batchId'
     | '/ingredients/$id'
     | '/recipes/$id'
+    | '/dish-analysis'
   id:
     | '__root__'
     | '/'
+    | '/alerts'
     | '/dashboard'
+    | '/dish-analysis'
+    | '/impact-cascade'
     | '/ingredients'
     | '/menu-analytics'
+    | '/price-log'
+    | '/price-trend'
     | '/recipes'
+    | '/settings'
+    | '/dish-analysis/$id'
+    | '/impact-cascade/$batchId'
     | '/ingredients/$id'
     | '/recipes/$id'
+    | '/dish-analysis/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AlertsRoute: typeof AlertsRoute
   DashboardRoute: typeof DashboardRoute
+  DishAnalysisRoute: typeof DishAnalysisRouteWithChildren
+  ImpactCascadeRoute: typeof ImpactCascadeRouteWithChildren
   IngredientsRoute: typeof IngredientsRouteWithChildren
   MenuAnalyticsRoute: typeof MenuAnalyticsRoute
+  PriceLogRoute: typeof PriceLogRoute
+  PriceTrendRoute: typeof PriceTrendRoute
   RecipesRoute: typeof RecipesRouteWithChildren
+  SettingsRoute: typeof SettingsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/recipes': {
       id: '/recipes'
       path: '/recipes'
       fullPath: '/recipes'
       preLoaderRoute: typeof RecipesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/price-trend': {
+      id: '/price-trend'
+      path: '/price-trend'
+      fullPath: '/price-trend'
+      preLoaderRoute: typeof PriceTrendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/price-log': {
+      id: '/price-log'
+      path: '/price-log'
+      fullPath: '/price-log'
+      preLoaderRoute: typeof PriceLogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/menu-analytics': {
@@ -142,11 +275,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IngredientsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/impact-cascade': {
+      id: '/impact-cascade'
+      path: '/impact-cascade'
+      fullPath: '/impact-cascade'
+      preLoaderRoute: typeof ImpactCascadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dish-analysis': {
+      id: '/dish-analysis'
+      path: '/dish-analysis'
+      fullPath: '/dish-analysis'
+      preLoaderRoute: typeof DishAnalysisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/alerts': {
+      id: '/alerts'
+      path: '/alerts'
+      fullPath: '/alerts'
+      preLoaderRoute: typeof AlertsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -155,6 +309,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/dish-analysis/': {
+      id: '/dish-analysis/'
+      path: '/'
+      fullPath: '/dish-analysis/'
+      preLoaderRoute: typeof DishAnalysisIndexRouteImport
+      parentRoute: typeof DishAnalysisRoute
     }
     '/recipes/$id': {
       id: '/recipes/$id'
@@ -170,8 +331,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IngredientsIdRouteImport
       parentRoute: typeof IngredientsRoute
     }
+    '/impact-cascade/$batchId': {
+      id: '/impact-cascade/$batchId'
+      path: '/$batchId'
+      fullPath: '/impact-cascade/$batchId'
+      preLoaderRoute: typeof ImpactCascadeBatchIdRouteImport
+      parentRoute: typeof ImpactCascadeRoute
+    }
+    '/dish-analysis/$id': {
+      id: '/dish-analysis/$id'
+      path: '/$id'
+      fullPath: '/dish-analysis/$id'
+      preLoaderRoute: typeof DishAnalysisIdRouteImport
+      parentRoute: typeof DishAnalysisRoute
+    }
   }
 }
+
+interface DishAnalysisRouteChildren {
+  DishAnalysisIdRoute: typeof DishAnalysisIdRoute
+  DishAnalysisIndexRoute: typeof DishAnalysisIndexRoute
+}
+
+const DishAnalysisRouteChildren: DishAnalysisRouteChildren = {
+  DishAnalysisIdRoute: DishAnalysisIdRoute,
+  DishAnalysisIndexRoute: DishAnalysisIndexRoute,
+}
+
+const DishAnalysisRouteWithChildren = DishAnalysisRoute._addFileChildren(
+  DishAnalysisRouteChildren,
+)
+
+interface ImpactCascadeRouteChildren {
+  ImpactCascadeBatchIdRoute: typeof ImpactCascadeBatchIdRoute
+}
+
+const ImpactCascadeRouteChildren: ImpactCascadeRouteChildren = {
+  ImpactCascadeBatchIdRoute: ImpactCascadeBatchIdRoute,
+}
+
+const ImpactCascadeRouteWithChildren = ImpactCascadeRoute._addFileChildren(
+  ImpactCascadeRouteChildren,
+)
 
 interface IngredientsRouteChildren {
   IngredientsIdRoute: typeof IngredientsIdRoute
@@ -198,10 +399,16 @@ const RecipesRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AlertsRoute: AlertsRoute,
   DashboardRoute: DashboardRoute,
+  DishAnalysisRoute: DishAnalysisRouteWithChildren,
+  ImpactCascadeRoute: ImpactCascadeRouteWithChildren,
   IngredientsRoute: IngredientsRouteWithChildren,
   MenuAnalyticsRoute: MenuAnalyticsRoute,
+  PriceLogRoute: PriceLogRoute,
+  PriceTrendRoute: PriceTrendRoute,
   RecipesRoute: RecipesRouteWithChildren,
+  SettingsRoute: SettingsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
