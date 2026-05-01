@@ -12,6 +12,7 @@ import {
   SignedMoneyCell,
   UnitCostCell,
 } from "@/components/common/badges";
+import { PathwayBadge, ImpactPath } from "@/components/impact-cascade/PathwayBadge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
