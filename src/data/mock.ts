@@ -418,7 +418,7 @@ export interface RecipeMetrics {
   suggested_menu_price: number | null;
 }
 
-import { computeGP, computeGPM, isOnTarget, suggestedMenuPrice } from "./margin";
+
 
 export function computeRecipeMetrics(recipe: Recipe, targetGpm = TARGET_GPM): RecipeMetrics {
   const cogs = recipe.lines.reduce((sum, l) => sum + lineCostFor(l.ingredient_id, l.qty), 0);
