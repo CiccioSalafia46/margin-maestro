@@ -23,6 +23,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
+import type { Recipe } from "@/lib/types";
 import {
   computeRecipeMetrics,
   getIngredientById,
