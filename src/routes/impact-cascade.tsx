@@ -22,7 +22,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { latestCascade, priceBatches } from "@/data/mock";
+import { priceBatches } from "@/data/mock";
+import { getLatestImpactCascade } from "@/data/selectors";
 import { formatDateTime } from "@/lib/format";
 
 export const Route = createFileRoute("/impact-cascade")({
@@ -39,6 +40,14 @@ export const Route = createFileRoute("/impact-cascade")({
 });
 
 function ImpactCascadePage() {
+  const latestCascade = getLatestImpactCascade();
+  if (!latestCascade) {
+    return (
+      <AppShell>
+        <PageHeader title="Impact Cascade" description="No batches yet." />
+      </AppShell>
+    );
+  }
   return (
     <AppShell>
       <PageHeader
