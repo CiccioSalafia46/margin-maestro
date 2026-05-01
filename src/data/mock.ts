@@ -401,8 +401,6 @@ export const recipes: Recipe[] = [
 // via the calculation core (UoM conversion + adjustment). Fixed flows through
 // the same helper. Intermediate ingredients are resolved from linked recipes.
 
-import { resolveIntermediateRecipeCosts } from "@/lib/cogs";
-import type { IngredientCostState } from "@/lib/ingredientCost";
 
 const { costStates: ingredientCostStates, errors: costResolutionErrors } =
   resolveIntermediateRecipeCosts(recipes, ingredients);
@@ -429,7 +427,7 @@ export interface RecipeMetrics {
   errors: string[];
 }
 
-import { computeRecipeCOGS } from "@/lib/cogs";
+
 
 export function computeRecipeMetrics(recipe: Recipe, targetGpm = TARGET_GPM): RecipeMetrics {
   const result = computeRecipeCOGS(recipe, ingredients, ingredientCostStates);
@@ -447,15 +445,11 @@ export function computeRecipeMetrics(recipe: Recipe, targetGpm = TARGET_GPM): Re
   };
 }
 
-export function getRecipeLineCost(ingredientId: string, qty: number, uom: import("@/lib/types").UoM): number {
+export function getRecipeLineCost(ingredientId: string, qty: number, uom: UoM): number {
   const ing = ingredientById.get(ingredientId);
   const cs = ingredientCostStates.get(ingredientId);
   if (!ing || !cs || !cs.ok) return 0;
   if (uom === cs.recipe_uom) return qty * cs.recipe_unit_cost;
-  // Convert qty into the ingredient's recipe_uom
-  // (kept lazy-imported to avoid circular dep risk in mock module init)
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { convertQuantity } = require("@/lib/units") as typeof import("@/lib/units");
   const c = convertQuantity(qty, uom, cs.recipe_uom, ing.density_g_per_ml);
   if (!c.ok) return 0;
   return c.value * cs.recipe_unit_cost;
