@@ -495,19 +495,28 @@ function QaSettingsAdminPage() {
   return (
     <AppShell>
       <PageHeader
-        title="QA — Settings/Admin Reference"
-        description="Verifies the Build 1.1 reference layer: units, conversions, menu categories, suppliers, and settings RLS."
+        title="QA — Settings/Admin Acceptance"
+        description="Build 1.1A acceptance pass: units, conversions, menu categories, suppliers, settings, RLS, and role behavior."
       />
       <div className="space-y-6 p-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-base">Overall</CardTitle>
+            <CardTitle className="text-base">Overall acceptance status</CardTitle>
             <OverallBadge status={summary.overall} />
           </CardHeader>
-          <CardContent className="grid grid-cols-3 gap-3 text-sm">
-            <Stat label="Pass" value={summary.pass} tone="pass" />
-            <Stat label="Warning" value={summary.warn} tone="warn" />
-            <Stat label="Fail" value={summary.fail} tone="fail" />
+          <CardContent className="space-y-4 text-sm">
+            <div className="grid grid-cols-3 gap-3">
+              <Stat label="Pass" value={summary.pass} tone="pass" />
+              <Stat label="Warning" value={summary.warn} tone="warn" />
+              <Stat label="Fail" value={summary.fail} tone="fail" />
+            </div>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-5">
+              <SectionStat label="Auth / Tenant" status={summary.sections.authTenant} />
+              <SectionStat label="Settings" status={summary.sections.settings} />
+              <SectionStat label="Reference data" status={summary.sections.reference} />
+              <SectionStat label="RLS / Security" status={summary.sections.rls} />
+              <SectionStat label="Role behavior" status={summary.sections.roles} />
+            </div>
           </CardContent>
         </Card>
 
@@ -561,8 +570,40 @@ function QaSettingsAdminPage() {
           </CardContent>
         </Card>
 
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Manual acceptance checklist</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            <p className="text-xs text-muted-foreground">
+              Static guidance for human verification. Not persisted.
+            </p>
+            <ul className="space-y-1.5">
+              {[
+                "Owner can open Settings.",
+                "Owner can update General settings (currency, locale, tax mode, timezone, target GPM).",
+                "Owner can update Alert Thresholds (spike %, GPM drop %, GP floor).",
+                "Owner can add, edit, and deactivate a Menu Category.",
+                "Owner can add, edit, and deactivate a Supplier.",
+                "Units & Conversions tab is read-only (global reference).",
+                "Team tab is placeholder/read-only.",
+                "Duplicate menu category names are handled gracefully (friendly error, no crash).",
+                "Duplicate supplier names are handled gracefully (friendly error, no crash).",
+                "Manager can manage Categories/Suppliers but cannot update General/Thresholds.",
+                "Viewer is read-only across all Settings tabs.",
+                "Operational pages (/dashboard, /ingredients, /recipes, /menu-analytics, /dish-analysis, /impact-cascade, /price-trend, /price-log, /alerts) still render mock data.",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-2">
+                  <Circle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+
         <p className="text-[11px] text-muted-foreground">
-          No tokens or secrets are displayed. Build 1.1 — Settings/Admin Reference.
+          No tokens or secrets are displayed. Build 1.1A — Settings/Admin Accepted.
         </p>
       </div>
     </AppShell>
