@@ -673,3 +673,22 @@ function Stat({
     </div>
   );
 }
+
+function SectionStat({ label, status }: { label: string; status: CheckStatus }) {
+  const tone =
+    status === "pass"
+      ? "border-success/30 bg-success/10 text-success"
+      : status === "warn"
+        ? "border-warning/30 bg-warning/10 text-warning"
+        : status === "fail"
+          ? "border-destructive/30 bg-destructive/10 text-destructive"
+          : "border-muted bg-muted text-muted-foreground";
+  const text =
+    status === "pass" ? "Pass" : status === "warn" ? "Warning" : status === "fail" ? "Fail" : "…";
+  return (
+    <div className={`rounded-md border px-3 py-2 ${tone}`}>
+      <p className="text-[11px] uppercase tracking-wider opacity-80">{label}</p>
+      <p className="text-sm font-semibold">{text}</p>
+    </div>
+  );
+}
