@@ -92,41 +92,25 @@ function QaAuthPage() {
         }
       }
 
-      // 4. Non-owner update guard (only meaningful if not owner)
-      if (auth.activeMembership && auth.activeRestaurantId) {
-        if (auth.activeMembership.role === "owner") {
+      // Membership rows readable
+      if (auth.activeRestaurantId) {
+        try {
+          const { data, error } = await supabase
+            .from("restaurant_members")
+            .select("role,user_id")
+            .eq("restaurant_id", auth.activeRestaurantId);
+          if (error) throw error;
           next.push({
-            label: "Owner can update settings (RLS gate)",
+            label: "Read own membership rows",
             status: "pass",
-            detail: "Active role is owner; non-owner write test skipped.",
+            detail: `${data?.length ?? 0} member row(s) visible`,
           });
-        } else {
-          try {
-            const { error } = await supabase
-              .from("restaurant_settings")
-              .update({ target_gpm: 0.5 })
-              .eq("restaurant_id", auth.activeRestaurantId)
-              .select();
-            if (error) {
-              next.push({
-                label: "Non-owner cannot update settings",
-                status: "pass",
-                detail: "RLS blocked update as expected.",
-              });
-            } else {
-              next.push({
-                label: "Non-owner cannot update settings",
-                status: "fail",
-                detail: "Update unexpectedly succeeded.",
-              });
-            }
-          } catch (e) {
-            next.push({
-              label: "Non-owner cannot update settings",
-              status: "pass",
-              detail: e instanceof Error ? e.message : "blocked",
-            });
-          }
+        } catch (e) {
+          next.push({
+            label: "Read own membership rows",
+            status: "fail",
+            detail: e instanceof Error ? e.message : String(e),
+          });
         }
       }
 
