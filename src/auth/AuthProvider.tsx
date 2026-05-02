@@ -11,8 +11,12 @@ import {
 import type { Session } from "@supabase/supabase-js";
 
 import { supabase } from "@/data/api/supabaseClient";
-import { listMyRestaurants } from "@/data/api/tenantApi";
-import type { Profile, RestaurantMembership } from "@/data/api/types";
+import { getRestaurantSettings, listMyRestaurants } from "@/data/api/tenantApi";
+import type {
+  Profile,
+  RestaurantMembership,
+  RestaurantSettingsRow,
+} from "@/data/api/types";
 
 interface AuthContextValue {
   status: "loading" | "unauthenticated" | "authenticated";
@@ -23,7 +27,9 @@ interface AuthContextValue {
   memberships: RestaurantMembership[];
   activeRestaurantId: string | null;
   activeMembership: RestaurantMembership | null;
+  activeRestaurantSettings: RestaurantSettingsRow | null;
   setActiveRestaurantId: (id: string) => void;
+  refreshAuth: () => Promise<Session | null>;
   refreshTenants: () => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -35,13 +41,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [memberships, setMemberships] = useState<RestaurantMembership[]>([]);
+  const [activeRestaurantSettings, setActiveRestaurantSettings] =
+    useState<RestaurantSettingsRow | null>(null);
   const [activeRestaurantId, setActiveRestaurantIdState] = useState<string | null>(null);
   const userIdRef = useRef<string | null>(null);
+  const activeRestaurantIdRef = useRef<string | null>(null);
+
+  const loadRestaurantSettings = useCallback(async (restaurantId: string | null) => {
+    if (!restaurantId) {
+      setActiveRestaurantSettings(null);
+      return;
+    }
+
+    try {
+      const settings = await getRestaurantSettings(restaurantId);
+      setActiveRestaurantSettings(settings);
+    } catch (e) {
+      console.error("[auth] failed to load restaurant settings", e);
+      setActiveRestaurantSettings(null);
+    }
+  }, []);
 
   const loadTenantData = useCallback(async (uid: string | null) => {
     if (!uid) {
       setProfile(null);
       setMemberships([]);
+      setActiveRestaurantSettings(null);
+      activeRestaurantIdRef.current = null;
       setActiveRestaurantIdState(null);
       return;
     }
@@ -56,15 +82,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ]);
       setProfile((profileRow as Profile | null) ?? null);
       setMemberships(mems);
-      const valid = mems[0]?.restaurant.id ?? null;
-      setActiveRestaurantIdState(valid);
+      const nextActiveId =
+        mems.find((membership) => membership.restaurant.id === activeRestaurantIdRef.current)?.restaurant
+          .id ?? mems[0]?.restaurant.id ?? null;
+      activeRestaurantIdRef.current = nextActiveId;
+      setActiveRestaurantIdState(nextActiveId);
+      await loadRestaurantSettings(nextActiveId);
     } catch (e) {
       console.error("[auth] failed to load tenant data", e);
       setProfile(null);
       setMemberships([]);
+      setActiveRestaurantSettings(null);
+      activeRestaurantIdRef.current = null;
       setActiveRestaurantIdState(null);
     }
-  }, []);
+  }, [loadRestaurantSettings]);
 
   useEffect(() => {
     // Auth state listener FIRST, then getSession.
@@ -91,8 +123,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [loadTenantData]);
 
   const setActiveRestaurantId = useCallback((id: string) => {
+    activeRestaurantIdRef.current = id;
     setActiveRestaurantIdState(id);
-  }, []);
+    void loadRestaurantSettings(id);
+  }, [loadRestaurantSettings]);
+
+  const refreshAuth = useCallback(async () => {
+    const { data, error } = await supabase.auth.getSession();
+    if (error) throw error;
+
+    const nextSession = data.session;
+    const uid = nextSession?.user?.id ?? null;
+
+    setSession(nextSession);
+    userIdRef.current = uid;
+
+    await loadTenantData(uid);
+
+    if (!hydrated) {
+      setHydrated(true);
+    }
+
+    return nextSession;
+  }, [hydrated, loadTenantData]);
 
   const refreshTenants = useCallback(async () => {
     await loadTenantData(userIdRef.current);
@@ -105,6 +158,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(null);
       setProfile(null);
       setMemberships([]);
+      setActiveRestaurantSettings(null);
+      activeRestaurantIdRef.current = null;
       setActiveRestaurantIdState(null);
     }
   }, []);
@@ -126,7 +181,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       memberships,
       activeRestaurantId,
       activeMembership,
+        activeRestaurantSettings,
       setActiveRestaurantId,
+        refreshAuth,
       refreshTenants,
       signOut: signOutFn,
     };
@@ -136,7 +193,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     profile,
     memberships,
     activeRestaurantId,
+    activeRestaurantSettings,
     setActiveRestaurantId,
+    refreshAuth,
     refreshTenants,
     signOutFn,
   ]);

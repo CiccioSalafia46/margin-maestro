@@ -3,7 +3,7 @@ import { useNavigate, useRouterState } from "@tanstack/react-router";
 
 import { useAuth } from "./AuthProvider";
 
-const PUBLIC_PATHS = new Set(["/login", "/signup", "/auth/callback"]);
+const PUBLIC_PATHS = new Set(["/login", "/signup", "/auth/callback", "/qa-auth"]);
 const ONBOARDING_PATH = "/onboarding/create-restaurant";
 
 /**

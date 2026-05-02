@@ -1,11 +1,13 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, AlertTriangle, XCircle, Circle } from "lucide-react";
 
 import { AppShell } from "@/components/layout/AppShell";
 import { PageHeader } from "@/components/common/PageHeader";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/auth/AuthProvider";
 import { supabase } from "@/data/api/supabaseClient";
 import { getRestaurantSettings } from "@/data/api/tenantApi";
@@ -32,9 +34,29 @@ function QaAuthPage() {
   const [rlsChecks, setRlsChecks] = useState<Check[]>([]);
   const [settings, setSettings] = useState<RestaurantSettingsRow | null>(null);
   const [done, setDone] = useState(false);
+  const isAuthenticated = auth.status === "authenticated";
+  const hasRestaurant = auth.memberships.length > 0 && !!auth.activeMembership;
 
   useEffect(() => {
-    if (auth.status !== "authenticated") return;
+    if (auth.status === "unauthenticated") {
+      setSettings(null);
+      setRlsChecks([]);
+      setDone(true);
+      return;
+    }
+
+    if (auth.status !== "authenticated") {
+      setDone(false);
+      return;
+    }
+
+    if (!auth.activeRestaurantId) {
+      setSettings(null);
+      setRlsChecks([]);
+      setDone(true);
+      return;
+    }
+
     let cancelled = false;
     (async () => {
       const next: Check[] = [];
@@ -134,18 +156,19 @@ function QaAuthPage() {
     () => [
       {
         label: "Session present",
-        status: auth.status === "authenticated" ? "pass" : "fail",
-        detail: auth.status,
+        status: auth.status === "authenticated" ? "pass" : auth.status === "loading" ? "pending" : "warn",
+        detail:
+          auth.status === "unauthenticated" ? "sign in required before auth QA can run" : auth.status,
       },
       {
         label: "User id available",
-        status: auth.userId ? "pass" : "fail",
-        detail: auth.userId ? "yes" : "no",
+        status: auth.userId ? "pass" : auth.status === "unauthenticated" ? "warn" : "fail",
+        detail: auth.userId ? "yes" : auth.status === "unauthenticated" ? "sign in required" : "no",
       },
       {
         label: "Profile loaded",
-        status: auth.profile ? "pass" : "fail",
-        detail: auth.profile ? "yes" : "no",
+        status: auth.profile ? "pass" : auth.status === "unauthenticated" ? "warn" : "fail",
+        detail: auth.profile ? "yes" : auth.status === "unauthenticated" ? "sign in required" : "no",
       },
     ],
     [auth.status, auth.userId, auth.profile],
@@ -155,26 +178,45 @@ function QaAuthPage() {
     () => [
       {
         label: "At least one membership",
-        status: auth.memberships.length > 0 ? "pass" : "fail",
-        detail: `${auth.memberships.length} membership(s)`,
+        status:
+          auth.memberships.length > 0
+            ? "pass"
+            : auth.status === "authenticated"
+              ? "warn"
+              : "warn",
+        detail:
+          auth.status === "authenticated"
+            ? `${auth.memberships.length} membership(s)`
+            : "sign in required",
       },
       {
         label: "Active restaurant selected",
-        status: auth.activeMembership ? "pass" : "fail",
-        detail: auth.activeMembership?.restaurant.name ?? "—",
+        status: auth.activeMembership ? "pass" : auth.status === "authenticated" ? "warn" : "warn",
+        detail:
+          auth.activeMembership?.restaurant.name ??
+          (auth.status === "authenticated" ? "create a restaurant to finish onboarding" : "sign in required"),
       },
       {
         label: "Active role known",
-        status: auth.activeMembership ? "pass" : "fail",
-        detail: auth.activeMembership?.role ?? "—",
+        status: auth.activeMembership ? "pass" : auth.status === "authenticated" ? "warn" : "warn",
+        detail:
+          auth.activeMembership?.role ??
+          (auth.status === "authenticated" ? "awaiting onboarding" : "sign in required"),
       },
       {
         label: "Restaurant settings loaded",
-        status: settings ? "pass" : "fail",
-        detail: settings ? `target_gpm=${settings.target_gpm}` : "—",
+        status: settings ? "pass" : auth.status === "authenticated" && hasRestaurant ? "fail" : "warn",
+        detail:
+          settings
+            ? `target_gpm=${settings.target_gpm}`
+            : auth.status === "authenticated"
+              ? hasRestaurant
+                ? "settings missing"
+                : "settings load waits for restaurant creation"
+              : "sign in required",
       },
     ],
-    [auth.memberships.length, auth.activeMembership, settings],
+    [auth.memberships.length, auth.activeMembership, auth.status, hasRestaurant, settings],
   );
 
   const securityChecks: Check[] = useMemo(
@@ -216,13 +258,18 @@ function QaAuthPage() {
     (c) => c.status === "fail" && !c.nonCritical,
   ).length;
 
-  const overall: CheckStatus = !done
-    ? "pending"
-    : failCount > 0
-      ? "fail"
-      : warnCount > 0
-        ? "warn"
-        : "pass";
+  const overall: CheckStatus = !done ? "pending" : failCount > 0 ? "fail" : warnCount > 0 ? "warn" : "pass";
+  const overallDetail = !done
+    ? "Running auth QA checks…"
+    : !isAuthenticated
+      ? "Not ready — sign in required"
+      : !hasRestaurant
+        ? "Warning — authenticated but no restaurant yet"
+        : overall === "pass"
+          ? "Auth and tenant runtime checks passed"
+          : overall === "warn"
+            ? "Auth runtime usable with non-blocking warnings"
+            : "Auth runtime has blocking failures";
 
   return (
     <AppShell>
@@ -237,12 +284,46 @@ function QaAuthPage() {
             <CardTitle className="text-base">Overall status</CardTitle>
             <OverallBadge status={overall} />
           </CardHeader>
-          <CardContent className="grid grid-cols-3 gap-3 text-sm">
-            <SummaryStat label="Pass" value={passCount} tone="pass" />
-            <SummaryStat label="Warning" value={warnCount} tone="warn" />
-            <SummaryStat label="Fail" value={failCount} tone="fail" />
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">{overallDetail}</p>
+            <div className="grid grid-cols-3 gap-3 text-sm">
+              <SummaryStat label="Pass" value={passCount} tone="pass" />
+              <SummaryStat label="Warning" value={warnCount} tone="warn" />
+              <SummaryStat label="Fail" value={failCount} tone="fail" />
+            </div>
           </CardContent>
         </Card>
+
+        {!isAuthenticated && (
+          <Alert>
+            <AlertTitle>Auth QA requires sign in</AlertTitle>
+            <AlertDescription className="space-y-3">
+              <p>Not signed in. Sign in first to run Auth QA.</p>
+              <div className="flex flex-wrap gap-2">
+                <Button asChild size="sm">
+                  <Link to="/login">Go to Login</Link>
+                </Button>
+                <Button asChild size="sm" variant="outline">
+                  <Link to="/signup">Create Account</Link>
+                </Button>
+              </div>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {isAuthenticated && !hasRestaurant && (
+          <Alert>
+            <AlertTitle>Authenticated but no restaurant yet</AlertTitle>
+            <AlertDescription className="space-y-3">
+              <p>Create a restaurant to complete onboarding and unlock tenant checks.</p>
+              <div>
+                <Button asChild size="sm">
+                  <Link to="/onboarding/create-restaurant">Open onboarding</Link>
+                </Button>
+              </div>
+            </AlertDescription>
+          </Alert>
+        )}
 
         {/* Session info (no tokens) */}
         <Card>
@@ -291,7 +372,7 @@ function QaAuthPage() {
 
         <p className="text-[11px] text-muted-foreground">
           No access tokens, refresh tokens, service-role keys, or raw session JSON are displayed.
-          Build 1.0B — Auth/RLS Accepted.
+          Build 1.0C — Login/Signup/Onboarding Recovery.
         </p>
       </div>
     </AppShell>

@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { Loader2 } from "lucide-react";
 
 import { useAuth } from "@/auth/AuthProvider";
 
@@ -11,18 +12,35 @@ export const Route = createFileRoute("/auth/callback")({
 });
 
 function AuthCallback() {
-  const { status } = useAuth();
+  const { status, refreshAuth } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (status !== "loading") {
-      navigate({ to: "/", replace: true });
-    }
-  }, [status, navigate]);
+    let cancelled = false;
+
+    const completeCallback = async () => {
+      try {
+        await refreshAuth();
+      } finally {
+        if (!cancelled && status !== "loading") {
+          navigate({ to: "/", replace: true });
+        }
+      }
+    };
+
+    void completeCallback();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [status, refreshAuth, navigate]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
-      <p className="text-sm text-muted-foreground">Completing sign-in…</p>
+      <p className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        Completing sign-in…
+      </p>
     </div>
   );
 }
