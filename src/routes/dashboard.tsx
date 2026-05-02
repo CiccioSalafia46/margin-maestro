@@ -388,7 +388,7 @@ function DashboardPage() {
 
         <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Bell className="h-3 w-3" />
-          Build 1.0B — Auth/RLS Accepted. Operational data still mock; auth + tenant live in backend.
+          Build 1.1 — Settings/Admin Reference now backed by Supabase. Operational pages still use mock data.
         </p>
       </div>
     </AppShell>
