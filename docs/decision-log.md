@@ -46,9 +46,9 @@ Architectural decisions and rationale for Margin IQ.
 
 ### D06 — Official Supabase Auth session persistence is acceptable
 
-**Decision:** Use Supabase's built-in `persistSession: true` with `storage: localStorage` for session persistence.
+**Decision:** Use Supabase's built-in `persistSession: true` for session persistence. Do not set `storage` explicitly — let `@supabase/supabase-js` use its built-in default (localStorage in browser, in-memory on server).
 
-**Rationale:** Supabase's auth library handles token storage, refresh, and expiration. Using the official mechanism avoids custom session management complexity. Only the auth session tokens are stored in localStorage — no application state.
+**Rationale:** Supabase's auth library handles token storage, refresh, and expiration. Using the official mechanism avoids custom session management complexity. Only the auth session tokens are stored in localStorage — no application state. Explicitly setting `storage` caused a bug in SSR (Build 1.0E); the library's default handles both environments correctly.
 
 ---
 
