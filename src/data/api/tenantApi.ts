@@ -44,16 +44,3 @@ export async function getRestaurantSettings(
   if (error) throw error;
   return (data as RestaurantSettingsRow | null) ?? null;
 }
-
-const ACTIVE_RESTAURANT_KEY = "marginiq.activeRestaurantId";
-
-export function getStoredActiveRestaurantId(): string | null {
-  if (typeof window === "undefined") return null;
-  return window.localStorage.getItem(ACTIVE_RESTAURANT_KEY);
-}
-
-export function setStoredActiveRestaurantId(id: string | null) {
-  if (typeof window === "undefined") return;
-  if (id) window.localStorage.setItem(ACTIVE_RESTAURANT_KEY, id);
-  else window.localStorage.removeItem(ACTIVE_RESTAURANT_KEY);
-}
