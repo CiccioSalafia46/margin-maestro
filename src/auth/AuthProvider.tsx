@@ -123,8 +123,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [loadTenantData]);
 
   const setActiveRestaurantId = useCallback((id: string) => {
+    activeRestaurantIdRef.current = id;
     setActiveRestaurantIdState(id);
-  }, []);
+    void loadRestaurantSettings(id);
+  }, [loadRestaurantSettings]);
+
+  const refreshAuth = useCallback(async () => {
+    const { data, error } = await supabase.auth.getSession();
+    if (error) throw error;
+
+    const nextSession = data.session;
+    const uid = nextSession?.user?.id ?? null;
+
+    setSession(nextSession);
+    userIdRef.current = uid;
+
+    await loadTenantData(uid);
+
+    if (!hydrated) {
+      setHydrated(true);
+    }
+
+    return nextSession;
+  }, [hydrated, loadTenantData]);
 
   const refreshTenants = useCallback(async () => {
     await loadTenantData(userIdRef.current);
@@ -137,6 +158,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(null);
       setProfile(null);
       setMemberships([]);
+      setActiveRestaurantSettings(null);
+      activeRestaurantIdRef.current = null;
       setActiveRestaurantIdState(null);
     }
   }, []);
@@ -158,7 +181,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       memberships,
       activeRestaurantId,
       activeMembership,
+        activeRestaurantSettings,
       setActiveRestaurantId,
+        refreshAuth,
       refreshTenants,
       signOut: signOutFn,
     };
@@ -168,7 +193,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     profile,
     memberships,
     activeRestaurantId,
+    activeRestaurantSettings,
     setActiveRestaurantId,
+    refreshAuth,
     refreshTenants,
     signOutFn,
   ]);
