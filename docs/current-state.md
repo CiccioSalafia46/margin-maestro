@@ -1,28 +1,15 @@
 # Current State
 
 **Date:** 2026-05-03
-**Build:** 1.2A — Ingredients Accepted
-**Branch:** `build-1.2-ingredients-database`
+**Build:** 1.3 — Recipes
+**Branch:** `build-1.3-recipes`
 **Backend:** Self-owned Supabase project `margin-maestro-dev`
 
 ---
 
 ## Actual State
 
-**Ingredients module uses Supabase.** `/ingredients` and `/ingredients/$id` read/write real tenant-scoped data. Cost states are calculated client-side and persisted via RLS. All other operational pages remain mock-based.
-
-**Backend migrated from Lovable Cloud to self-owned Supabase project** (`margin-maestro-dev`). All migrations (1.0 through 1.2) applied successfully.
-
-## Accepted Baseline
-
-**Build 1.2A — Ingredients Accepted.**
-
-- Auth session persistence works (Build 1.0F).
-- Settings/Admin reference data accepted (Build 1.1A).
-- Ingredients database accepted (Build 1.2A).
-- Primary ingredient cost state: calculated, valid.
-- Fixed ingredient cost state: manual, valid.
-- Intermediate ingredient cost state: pending (awaiting Build 1.3 Recipes).
+**Ingredients and Recipes now use Supabase.** `/ingredients`, `/ingredients/$id`, `/recipes`, and `/recipes/$id` read/write real tenant-scoped data. Recipe line editor with live COGS computation. Intermediate recipe cost propagation to linked ingredients. Cycle detection. All other operational pages remain mock-based.
 
 ## Backend Scope (Supabase, live)
 
@@ -38,22 +25,21 @@
 | `suppliers` | 1.1 | Accepted |
 | `ingredients` | 1.2 | Accepted |
 | `ingredient_cost_state` | 1.2 | Accepted |
+| `recipes` | 1.3 | **New** |
+| `recipe_lines` | 1.3 | **New** |
 
 ## What Remains Mock
 
-Dashboard, recipes, menu analytics, dish analysis, impact cascade, price trend, price log, alerts — all read from `src/data/mock.ts`.
+Dashboard, menu analytics, dish analysis, impact cascade, price trend, price log, alerts.
 
 ## Next Task
 
-**Build 1.3 — Recipes.** Introduce `recipes`, `recipe_lines`, `recipe_dependency_edges`.
+**Build 1.4 — Menu Analytics.** Introduce `menu_items` and `menu_profitability_snapshots`.
 
 ## Known Limitations
 
-- Cost state computed client-side (server-side in future build)
-- Intermediate ingredient costs pending until Build 1.3
-- Edit ingredient form is placeholder only
-- Price Log/Snapshot pending until Build 1.5
-- Dashboard still uses mock ingredient data
+- Cost state computed client-side (server-side in future)
+- Menu Analytics awaits Build 1.4
+- Price Log/Snapshot awaits Build 1.5
+- Dashboard uses mock data
 - Google OAuth not enabled
-- Team management placeholder
-- Restaurant switcher in-memory only

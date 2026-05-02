@@ -237,3 +237,28 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - `/qa-auth` operational data warning updated to reflect partial migration.
 - `/qa-ingredients` warnings clarified as manual/role-dependent, not product failures.
 - Build label updated to "Build 1.2A — Ingredients Accepted".
+
+---
+
+## Build 1.3 — Recipes
+
+**Status:** Implemented
+
+- **Migration:** `recipes` and `recipe_lines` tables with RLS, updated_at triggers, case-insensitive unique name index.
+- **API:** `src/data/api/recipesApi.ts` — getRecipes, getRecipeById, createRecipe, updateRecipe, deactivateRecipe, replaceRecipeLines, calculateRecipeMetrics, updateLinkedIntermediateIngredientCostState, detectCycle.
+- **Types:** `RecipeRow`, `RecipeLineRow`, `RecipeWithLines`, `RecipeMetrics`, `RecipeLineCost`, `RecipeInput`, `RecipePatch`, `RecipeLineInput` in `types.ts`.
+- **Generated types:** `src/integrations/supabase/types.ts` updated with recipes + recipe_lines.
+- **Routes:** `/recipes` and `/recipes/$id` rewritten from mock to Supabase.
+- **Recipe list:** Tabs (Dishes / Intermediates) with COGS, cost/serving, GPM, on-target.
+- **Recipe detail:** Line editor (add/remove/edit ingredient lines), live totals panel, cycle detection.
+- **Intermediate propagation:** Saving an intermediate recipe updates linked ingredient's cost_state.
+- **Cycle detection:** Blocks circular intermediate dependencies before save.
+- **QA:** `/qa-recipes` with checks A–V.
+- **Developer QA link:** Added to Settings → Developer QA.
+- **RLS:** Members select, owner/manager insert/update. Lines also allow delete.
+
+**Limitations:**
+- Menu Analytics (menu_items) awaits Build 1.4.
+- Price Log/Snapshot awaits Build 1.5.
+- Dashboard and other operational pages still use mock data.
+- Full recipe edit form (name, category, serving) is future scope.

@@ -160,6 +160,151 @@ export type Database = {
           },
         ]
       }
+      recipe_lines: {
+        Row: {
+          id: string
+          restaurant_id: string
+          recipe_id: string
+          ingredient_id: string
+          quantity: number
+          uom_code: string
+          sort_order: number
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          restaurant_id: string
+          recipe_id: string
+          ingredient_id: string
+          quantity: number
+          uom_code: string
+          sort_order?: number
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          restaurant_id?: string
+          recipe_id?: string
+          ingredient_id?: string
+          quantity?: number
+          uom_code?: string
+          sort_order?: number
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_lines_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipe_lines_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "ingredients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipe_lines_uom_code_fkey"
+            columns: ["uom_code"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "recipe_lines_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recipes: {
+        Row: {
+          id: string
+          restaurant_id: string
+          name: string
+          kind: string
+          menu_category_id: string | null
+          serving_quantity: number
+          serving_uom_code: string
+          menu_price: number | null
+          linked_intermediate_ingredient_id: string | null
+          notes: string | null
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          restaurant_id: string
+          name: string
+          kind: string
+          menu_category_id?: string | null
+          serving_quantity?: number
+          serving_uom_code: string
+          menu_price?: number | null
+          linked_intermediate_ingredient_id?: string | null
+          notes?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          restaurant_id?: string
+          name?: string
+          kind?: string
+          menu_category_id?: string | null
+          serving_quantity?: number
+          serving_uom_code?: string
+          menu_price?: number | null
+          linked_intermediate_ingredient_id?: string | null
+          notes?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipes_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipes_menu_category_id_fkey"
+            columns: ["menu_category_id"]
+            isOneToOne: false
+            referencedRelation: "menu_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipes_serving_uom_code_fkey"
+            columns: ["serving_uom_code"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "recipes_linked_intermediate_ingredient_id_fkey"
+            columns: ["linked_intermediate_ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "ingredients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       menu_categories: {
         Row: {
           created_at: string

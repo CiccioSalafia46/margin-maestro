@@ -13,6 +13,7 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RecipesRouteImport } from './routes/recipes'
 import { Route as QaSettingsAdminRouteImport } from './routes/qa-settings-admin'
+import { Route as QaRecipesRouteImport } from './routes/qa-recipes'
 import { Route as QaIngredientsRouteImport } from './routes/qa-ingredients'
 import { Route as QaDataIntegrityRouteImport } from './routes/qa-data-integrity'
 import { Route as QaCalculationsRouteImport } from './routes/qa-calculations'
@@ -53,6 +54,11 @@ const RecipesRoute = RecipesRouteImport.update({
 const QaSettingsAdminRoute = QaSettingsAdminRouteImport.update({
   id: '/qa-settings-admin',
   path: '/qa-settings-admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QaRecipesRoute = QaRecipesRouteImport.update({
+  id: '/qa-recipes',
+  path: '/qa-recipes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QaIngredientsRoute = QaIngredientsRouteImport.update({
@@ -177,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/qa-calculations': typeof QaCalculationsRoute
   '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/qa-ingredients': typeof QaIngredientsRoute
+  '/qa-recipes': typeof QaRecipesRoute
   '/qa-settings-admin': typeof QaSettingsAdminRoute
   '/recipes': typeof RecipesRouteWithChildren
   '/settings': typeof SettingsRoute
@@ -203,6 +210,7 @@ export interface FileRoutesByTo {
   '/qa-calculations': typeof QaCalculationsRoute
   '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/qa-ingredients': typeof QaIngredientsRoute
+  '/qa-recipes': typeof QaRecipesRoute
   '/qa-settings-admin': typeof QaSettingsAdminRoute
   '/recipes': typeof RecipesRouteWithChildren
   '/settings': typeof SettingsRoute
@@ -231,6 +239,7 @@ export interface FileRoutesById {
   '/qa-calculations': typeof QaCalculationsRoute
   '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/qa-ingredients': typeof QaIngredientsRoute
+  '/qa-recipes': typeof QaRecipesRoute
   '/qa-settings-admin': typeof QaSettingsAdminRoute
   '/recipes': typeof RecipesRouteWithChildren
   '/settings': typeof SettingsRoute
@@ -260,6 +269,7 @@ export interface FileRouteTypes {
     | '/qa-calculations'
     | '/qa-data-integrity'
     | '/qa-ingredients'
+    | '/qa-recipes'
     | '/qa-settings-admin'
     | '/recipes'
     | '/settings'
@@ -286,6 +296,7 @@ export interface FileRouteTypes {
     | '/qa-calculations'
     | '/qa-data-integrity'
     | '/qa-ingredients'
+    | '/qa-recipes'
     | '/qa-settings-admin'
     | '/recipes'
     | '/settings'
@@ -313,6 +324,7 @@ export interface FileRouteTypes {
     | '/qa-calculations'
     | '/qa-data-integrity'
     | '/qa-ingredients'
+    | '/qa-recipes'
     | '/qa-settings-admin'
     | '/recipes'
     | '/settings'
@@ -341,6 +353,7 @@ export interface RootRouteChildren {
   QaCalculationsRoute: typeof QaCalculationsRoute
   QaDataIntegrityRoute: typeof QaDataIntegrityRoute
   QaIngredientsRoute: typeof QaIngredientsRoute
+  QaRecipesRoute: typeof QaRecipesRoute
   QaSettingsAdminRoute: typeof QaSettingsAdminRoute
   RecipesRoute: typeof RecipesRouteWithChildren
   SettingsRoute: typeof SettingsRoute
@@ -377,6 +390,13 @@ declare module '@tanstack/react-router' {
       path: '/qa-settings-admin'
       fullPath: '/qa-settings-admin'
       preLoaderRoute: typeof QaSettingsAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qa-recipes': {
+      id: '/qa-recipes'
+      path: '/qa-recipes'
+      fullPath: '/qa-recipes'
+      preLoaderRoute: typeof QaRecipesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/qa-ingredients': {
@@ -593,6 +613,7 @@ const rootRouteChildren: RootRouteChildren = {
   QaCalculationsRoute: QaCalculationsRoute,
   QaDataIntegrityRoute: QaDataIntegrityRoute,
   QaIngredientsRoute: QaIngredientsRoute,
+  QaRecipesRoute: QaRecipesRoute,
   QaSettingsAdminRoute: QaSettingsAdminRoute,
   RecipesRoute: RecipesRouteWithChildren,
   SettingsRoute: SettingsRoute,

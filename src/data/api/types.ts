@@ -1,5 +1,5 @@
-// Build 1.2 — Auth + tenant + settings/admin + ingredients API types.
-// Recipes/menu/price log/cascade/alerts remain mock for now.
+// Build 1.3 — Auth + tenant + settings/admin + ingredients + recipes API types.
+// Menu analytics/price log/cascade/alerts remain mock for now.
 
 export type RestaurantRole = "owner" | "manager" | "viewer";
 
@@ -149,6 +149,86 @@ export type IngredientInput = {
 };
 
 export type IngredientPatch = Partial<IngredientInput> & { is_active?: boolean };
+
+// ---------------- Recipes (Build 1.3) ----------------
+
+export type RecipeKind = "intermediate" | "dish";
+
+export interface RecipeRow {
+  id: string;
+  restaurant_id: string;
+  name: string;
+  kind: RecipeKind;
+  menu_category_id: string | null;
+  serving_quantity: number;
+  serving_uom_code: string;
+  menu_price: number | null;
+  linked_intermediate_ingredient_id: string | null;
+  notes: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RecipeLineRow {
+  id: string;
+  restaurant_id: string;
+  recipe_id: string;
+  ingredient_id: string;
+  quantity: number;
+  uom_code: string;
+  sort_order: number;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RecipeWithLines extends RecipeRow {
+  lines: RecipeLineRow[];
+  category_name: string | null;
+}
+
+export interface RecipeMetrics {
+  cogs: number;
+  cost_per_serving: number;
+  gp: number | null;
+  gpm: number | null;
+  on_target: boolean | null;
+  suggested_menu_price: number | null;
+  line_costs: RecipeLineCost[];
+  errors: string[];
+}
+
+export interface RecipeLineCost {
+  line_id: string;
+  ingredient_id: string;
+  ingredient_name: string;
+  qty_in_recipe_uom: number;
+  unit_cost: number;
+  line_cost: number;
+  error: string | null;
+}
+
+export type RecipeInput = {
+  name: string;
+  kind: RecipeKind;
+  menu_category_id?: string | null;
+  serving_quantity: number;
+  serving_uom_code: string;
+  menu_price?: number | null;
+  linked_intermediate_ingredient_id?: string | null;
+  notes?: string | null;
+};
+
+export type RecipePatch = Partial<RecipeInput> & { is_active?: boolean };
+
+export type RecipeLineInput = {
+  ingredient_id: string;
+  quantity: number;
+  uom_code: string;
+  sort_order?: number;
+  notes?: string | null;
+};
 
 export interface ApiError {
   code: "auth" | "permission" | "duplicate" | "validation" | "not_found" | "unknown";
