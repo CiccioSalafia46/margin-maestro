@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      menu_categories: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          restaurant_id: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          restaurant_id: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          restaurant_id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_categories_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -144,6 +182,131 @@ export type Database = {
         }
         Relationships: []
       }
+      suppliers: {
+        Row: {
+          contact_name: string | null
+          created_at: string
+          email: string | null
+          id: string
+          is_active: boolean
+          name: string
+          notes: string | null
+          phone: string | null
+          restaurant_id: string
+          updated_at: string
+        }
+        Insert: {
+          contact_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          notes?: string | null
+          phone?: string | null
+          restaurant_id: string
+          updated_at?: string
+        }
+        Update: {
+          contact_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          restaurant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suppliers_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      unit_conversions: {
+        Row: {
+          created_at: string
+          factor: number
+          from_unit_code: string
+          id: string
+          is_active: boolean
+          requires_density: boolean
+          to_unit_code: string
+        }
+        Insert: {
+          created_at?: string
+          factor: number
+          from_unit_code: string
+          id?: string
+          is_active?: boolean
+          requires_density?: boolean
+          to_unit_code: string
+        }
+        Update: {
+          created_at?: string
+          factor?: number
+          from_unit_code?: string
+          id?: string
+          is_active?: boolean
+          requires_density?: boolean
+          to_unit_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "unit_conversions_from_unit_code_fkey"
+            columns: ["from_unit_code"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "unit_conversions_to_unit_code_fkey"
+            columns: ["to_unit_code"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      units: {
+        Row: {
+          base_unit_code: string | null
+          code: string
+          created_at: string
+          family: string
+          is_active: boolean
+          label: string
+          sort_order: number
+          to_base_factor: number | null
+        }
+        Insert: {
+          base_unit_code?: string | null
+          code: string
+          created_at?: string
+          family: string
+          is_active?: boolean
+          label: string
+          sort_order?: number
+          to_base_factor?: number | null
+        }
+        Update: {
+          base_unit_code?: string | null
+          code?: string
+          created_at?: string
+          family?: string
+          is_active?: boolean
+          label?: string
+          sort_order?: number
+          to_base_factor?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -156,6 +319,10 @@ export type Database = {
       has_restaurant_role: {
         Args: { p_restaurant_id: string; p_roles: string[] }
         Returns: boolean
+      }
+      initialize_restaurant_reference_data: {
+        Args: { p_restaurant_id: string }
+        Returns: undefined
       }
       is_restaurant_member: {
         Args: { p_restaurant_id: string }
