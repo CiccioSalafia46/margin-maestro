@@ -1,7 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,22 +22,34 @@ export const Route = createFileRoute("/onboarding/create-restaurant")({
 });
 
 function CreateRestaurantPage() {
-  const { refreshTenants, signOut, email, status } = useAuth();
+  const { refreshTenants, signOut, email, status, activeMembership } = useAuth();
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (status === "authenticated" && activeMembership) {
+      navigate({ to: "/dashboard", replace: true });
+    }
+  }, [status, activeMembership, navigate]);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setMessage(null);
     if (status !== "authenticated") {
-      toast.error("Please sign in to create a restaurant.");
+      const msg = "Please sign in to create a restaurant.";
+      setMessage(msg);
+      toast.error(msg);
       navigate({ to: "/login", replace: true });
       return;
     }
 
     const trimmed = name.trim();
     if (!trimmed) {
-      toast.error("Restaurant name is required.");
+      const msg = "Restaurant name is required.";
+      setMessage(msg);
+      toast.error(msg);
       return;
     }
     setSubmitting(true);
@@ -47,11 +61,12 @@ function CreateRestaurantPage() {
     } catch (err) {
       const raw = err instanceof Error ? err.message : "Could not create restaurant";
       const msg =
-        raw === "not authenticated"
+        /not authenticated/i.test(raw)
           ? "Your session expired. Please sign in again."
-          : raw === "restaurant name required"
+          : /restaurant name required/i.test(raw)
             ? "Restaurant name is required."
-            : "Could not create restaurant. Please try again.";
+            : "Could not create the restaurant. Please try again.";
+      setMessage(msg);
       toast.error(msg);
     } finally {
       setSubmitting(false);
@@ -65,6 +80,12 @@ function CreateRestaurantPage() {
           <CardTitle>Create your restaurant</CardTitle>
         </CardHeader>
         <CardContent className="space-y-5">
+          {message && (
+            <Alert variant="destructive">
+              <AlertTitle>Couldn’t finish onboarding</AlertTitle>
+              <AlertDescription>{message}</AlertDescription>
+            </Alert>
+          )}
           <p className="text-sm text-muted-foreground">
             Welcome{email ? `, ${email}` : ""}. Set up your restaurant workspace to continue.
           </p>
@@ -81,7 +102,14 @@ function CreateRestaurantPage() {
               />
             </div>
             <Button type="submit" className="w-full" disabled={submitting}>
-              {submitting ? "Creating…" : "Create restaurant"}
+              {submitting ? (
+                <span className="inline-flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Creating…
+                </span>
+              ) : (
+                "Create restaurant"
+              )}
             </Button>
           </form>
           <button
