@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/auth/AuthProvider";
-import { supabase } from "@/data/api/supabaseClient";
+import { AUTH_SESSION_CONFIG, supabase } from "@/data/api/supabaseClient";
 import { getRestaurantSettings } from "@/data/api/tenantApi";
 import type { RestaurantSettingsRow } from "@/data/api/types";
 
@@ -181,6 +181,25 @@ function QaAuthPage() {
                 : "no",
       },
       {
+        label: "Session restored from getSession",
+        status:
+          auth.status === "loading"
+            ? "pending"
+            : auth.sessionRestored
+              ? "pass"
+              : auth.status === "unauthenticated"
+                ? "warn"
+                : "fail",
+        detail:
+          auth.status === "loading"
+            ? "waiting for browser session restore"
+            : auth.sessionRestored
+              ? "yes"
+              : auth.status === "unauthenticated"
+                ? "no session restored"
+                : "session missing after restore",
+      },
+      {
         label: "Profile loaded",
         status:
           auth.profile
@@ -258,11 +277,19 @@ function QaAuthPage() {
         detail: "no VITE_SUPABASE_SERVICE_ROLE_KEY in client env",
       },
       {
-        label: "Sessions are in-memory only (no localStorage)",
-        status: "warn",
-        nonCritical: true,
-        detail:
-          "persistSession=false; production session persistence is a future task.",
+        label: "persistSession enabled",
+        status: AUTH_SESSION_CONFIG.persistSession ? "pass" : "fail",
+        detail: AUTH_SESSION_CONFIG.persistSession ? "yes" : "no",
+      },
+      {
+        label: "autoRefreshToken enabled",
+        status: AUTH_SESSION_CONFIG.autoRefreshToken ? "pass" : "fail",
+        detail: AUTH_SESSION_CONFIG.autoRefreshToken ? "yes" : "no",
+      },
+      {
+        label: "auth state source",
+        status: "pass",
+        detail: `Supabase Auth (${auth.lastAuthEvent})`,
       },
       {
         label: "Google OAuth enabled",
@@ -371,6 +398,11 @@ function QaAuthPage() {
           </CardHeader>
           <CardContent className="grid grid-cols-1 gap-2 text-sm md:grid-cols-2">
             <Row label="Status" value={auth.status} />
+            <Row label="persistSession enabled" value={AUTH_SESSION_CONFIG.persistSession ? "yes" : "no"} />
+            <Row label="autoRefreshToken enabled" value={AUTH_SESSION_CONFIG.autoRefreshToken ? "yes" : "no"} />
+            <Row label="detectSessionInUrl" value={AUTH_SESSION_CONFIG.detectSessionInUrl ? "yes" : "no"} />
+            <Row label="Session restored from getSession" value={auth.sessionRestored ? "yes" : "no"} />
+            <Row label="Auth state source" value={`Supabase Auth (${auth.lastAuthEvent})`} />
             <Row label="User id" value={auth.userId ? `${auth.userId.slice(0, 8)}…` : "—"} />
             <Row label="Email" value={auth.email ?? "—"} />
             <Row label="Profile loaded" value={auth.profile ? "yes" : "no"} />
@@ -411,7 +443,7 @@ function QaAuthPage() {
 
         <p className="text-[11px] text-muted-foreground">
           No access tokens, refresh tokens, service-role keys, or raw session JSON are displayed.
-          Build 1.0C — Login/Signup/Onboarding Recovery.
+          Build 1.0E — Persistent Supabase Session Hard Fix.
         </p>
       </div>
     </AppShell>
