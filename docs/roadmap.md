@@ -1,0 +1,258 @@
+# Roadmap
+
+Forward implementation plan for Margin IQ — Restaurant Margin Intelligence SaaS.
+
+---
+
+## Build 1.0E — Persistent Supabase Session Hard Fix
+
+**Goal:** Fix official Supabase Auth session persistence so sessions survive page refresh and navigation.
+
+**Scope:**
+- Fix Supabase client initialization to guarantee `storage: localStorage` on the browser
+- Replace or fix the Proxy singleton pattern in `src/integrations/supabase/client.ts`
+- Verify AuthProvider session restoration flow
+- Verify AuthGate does not redirect prematurely during SSR hydration
+- Update `AUTH_SESSION_CONFIG` display constant to match reality
+
+**Acceptance criteria:**
+- `/login` renders and accepts credentials
+- Login creates a session visible in `/qa-auth`
+- Refreshing `/qa-auth` keeps the session (PASS on "Session restored from getSession")
+- Navigating `/dashboard` → `/settings` → `/qa-auth` keeps the session
+- Sign out clears the session and redirects to `/login`
+- After sign out, `/qa-auth` shows "Sign in required"
+- No `activeRestaurantId`, role, membership, or settings in `localStorage`
+- No service-role key exposed to client
+
+**Out of scope:** New tables, schema changes, operational data migration, app redesign.
+
+---
+
+## Build 1.0F — Auth Acceptance Final
+
+**Goal:** Full acceptance pass of the Auth + Tenant foundation.
+
+**Scope:**
+- Run complete `/qa-auth` acceptance suite — all checks PASS
+- Verify signup → email confirmation → login → onboarding → dashboard flow
+- Verify restaurant creation via `create_restaurant_with_owner`
+- Verify profile auto-creation via trigger
+- Verify restaurant switcher behavior (in-memory only)
+- Update `docs/current-state.md`
+
+**Acceptance criteria:**
+- All `/qa-auth` checks PASS (session, profile, membership, RLS smoke, security)
+- Manual checklist items verified
+- No regressions in `/qa-calculations` or `/qa-data-integrity`
+
+**Out of scope:** New tables, settings changes, operational data.
+
+---
+
+## Build 1.1A — Settings/Admin Acceptance
+
+**Goal:** Re-verify Settings/Admin reference data layer after Auth is stable.
+
+**Scope:**
+- Run `/qa-settings-admin` full suite — all checks PASS
+- Verify units, unit_conversions, menu_categories, suppliers
+- Verify role-based access (owner/manager/viewer)
+- Verify RLS tenant scoping
+- Update `docs/current-state.md`
+
+**Acceptance criteria:**
+- All `/qa-settings-admin` checks A through U PASS
+- Settings tabs render and save correctly
+- Reference data is correctly seeded for new restaurants
+- No cross-tenant data leakage
+
+**Out of scope:** Ingredients, recipes, operational data.
+
+---
+
+## Build 1.2 — Ingredients Database
+
+**Goal:** Introduce `ingredients` and `ingredient_cost_state` tables in Supabase.
+
+**Scope:**
+- Migration: `ingredients` table with RLS
+- Migration: `ingredient_cost_state` table (server-managed)
+- API layer: CRUD for ingredients
+- Supplier linkage (FK to `suppliers`)
+- Swap `/ingredients` page from mock to Supabase
+- Server-side `recalculate_ingredient_unit_cost()` function
+- `/qa-ingredients` acceptance page
+
+**Acceptance criteria:**
+- Ingredients CRUD works with RLS enforcement
+- Supplier selection from existing suppliers
+- Unit conversion validation (family checks, density requirement)
+- Adjustment validation (`adjustment !== -1`)
+- `recipe_unit_cost` computed server-side
+- Existing QA routes still pass
+
+**Out of scope:** Recipes, menu items, price log, snapshots, cascade, alerts, billing.
+
+---
+
+## Build 1.3 — Recipes
+
+**Goal:** Introduce `recipes`, `recipe_lines`, `recipe_dependency_edges` in Supabase.
+
+**Scope:**
+- Migration: `recipes`, `recipe_lines`, `recipe_dependency_edges` tables
+- Intermediate recipe resolution (Intermediate ingredient ↔ Intermediate recipe linkage)
+- Cycle detection in recipe dependency graph
+- Server-side `recalculate_recipe_cogs()` function
+- Swap `/recipes` page from mock to Supabase
+
+**Acceptance criteria:**
+- Recipe CRUD with recipe lines
+- Intermediate recipe propagation works
+- Circular dependency detection prevents cycles
+- COGS per serving computed server-side
+- Existing QA routes still pass
+
+**Out of scope:** Menu items, price log, snapshots, cascade, alerts, billing.
+
+---
+
+## Build 1.4 — Menu Analytics
+
+**Goal:** Persist dish/menu analytics with `menu_items` and `menu_profitability_snapshots`.
+
+**Scope:**
+- Migration: `menu_items`, `menu_profitability_snapshots` tables
+- Swap `/menu-analytics` page from mock to Supabase
+- GP, GPM, on-target status from server-side calculations
+- `recalculate_restaurant_costs()` orchestrator function
+
+**Acceptance criteria:**
+- Menu items linked to Dish recipes
+- Menu price, on/off menu status
+- GP and GPM computed server-side
+- Profitability snapshots taken
+- Existing QA routes still pass
+
+**Out of scope:** Price log, snapshots, cascade, alerts, billing.
+
+---
+
+## Build 1.5 — Price Log + Snapshot
+
+**Goal:** Append-only price log and non-destructive snapshot/baseline model.
+
+**Scope:**
+- Migration: `ingredient_price_log`, `ingredient_snapshots`, `price_update_batches` tables
+- Append-only INSERT policy on price log (no UPDATE, no DELETE, ever)
+- `initialize_restaurant_baseline()` function
+- `reset_baseline_non_destructive()` function (bumps version, adds rows, never deletes)
+- Swap `/price-log` and `/price-trend` pages from mock to Supabase
+
+**Acceptance criteria:**
+- Price log is append-only — no mutations possible
+- Baseline reset is non-destructive — history preserved
+- Batch grouping works
+- Prior/current cost deltas compute correctly
+- Existing QA routes still pass
+
+**Out of scope:** Impact cascade persistence, alerts persistence, billing.
+
+---
+
+## Build 1.6 — Recalculation Cascade
+
+**Goal:** Server-side recalculation of ingredient costs, intermediate recipes, and dish COGS on price changes.
+
+**Scope:**
+- `run_price_update_batch()` orchestrator: price log → cost state → recalculate → snapshot
+- Full server-side cost propagation: ingredient → intermediate → dish
+- No new tables (orchestrates existing tables from Builds 1.2–1.5)
+
+**Acceptance criteria:**
+- Price update batch commits atomically
+- Cost propagation follows dependency edges
+- Intermediate recipe costs update linked ingredient costs
+- Menu profitability snapshots taken after batch
+- Rollback on failure
+
+**Out of scope:** Impact cascade persistence, alerts persistence, billing.
+
+---
+
+## Build 1.7 — Impact Cascade Persistence
+
+**Goal:** Persist impact cascade runs and items in Supabase.
+
+**Scope:**
+- Migration: `impact_cascade_runs`, `impact_cascade_items` tables
+- `generate_impact_cascade(batch_id)` function
+- Swap `/impact-cascade` page from mock to Supabase
+
+**Acceptance criteria:**
+- Cascade generated for each committed batch
+- Direct and indirect pathways tracked
+- Per-dish COGS/GPM impact computed
+- Cascade idempotent per batch_id
+- Existing QA routes still pass
+
+**Out of scope:** Alerts persistence, billing.
+
+---
+
+## Build 1.8 — Alerts Persistence
+
+**Goal:** Persist alerts and status workflows in Supabase.
+
+**Scope:**
+- Migration: `alerts`, `audit_events` tables
+- `generate_alerts_for_restaurant()` function
+- Alert status workflow: open → acknowledged → resolved
+- Swap `/alerts` page from mock to Supabase
+
+**Acceptance criteria:**
+- Alerts generated on batch commit
+- Four alert types: dish_below_target, ingredient_spike, dish_needs_price_review, intermediate_cost_shift
+- Status transitions enforced (only status fields writable by owner/manager)
+- Audit trail for membership changes, baseline resets, batch commits
+- Existing QA routes still pass
+
+**Out of scope:** CSV import/export, billing.
+
+---
+
+## Build 1.9 — CSV Import/Export
+
+**Goal:** Safe import/export workflows for ingredients, recipes, and price updates.
+
+**Scope:**
+- Streaming CSV import with validation
+- CSV export for ingredients, recipes, menu analytics
+- Error reporting per row
+
+**Acceptance criteria:**
+- Import validates data before committing
+- Duplicate names handled
+- Unit validation enforced
+- Export includes all relevant fields
+
+**Out of scope:** Billing.
+
+---
+
+## Build 2.0 — Billing
+
+**Goal:** Subscription billing via Stripe, Paddle, or selected provider.
+
+**Scope:**
+- Billing provider integration
+- Subscription tiers
+- Webhook server routes
+- `subscriptions` mirror table
+
+**Acceptance criteria:**
+- Payment flow works end-to-end
+- Subscription status enforced
+- Webhook handles events reliably
+- No billing data leakage across tenants

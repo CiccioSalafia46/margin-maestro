@@ -1,8 +1,17 @@
-# Supabase Architecture Plan — Build 0.5B (Planning Only)
+# Supabase Architecture Plan
 
-> **Status:** Planning artifact. No Supabase project, no schema, no auth, no
-> RLS, no Edge Functions, and no app behavior changes are introduced by
-> this build. Frontend remains the Build 0.5A mock.
+> **Origin:** Build 0.5B (planning only). Updated 2026-05-02 with current
+> implementation status.
+>
+> **Implemented:** Builds 1.0 (Auth + Tenant) and 1.1 (Settings/Admin).
+> Tables: profiles, restaurants, restaurant_members, restaurant_settings,
+> units, unit_conversions, menu_categories, suppliers.
+>
+> **Current blocker:** Auth session persistence (Build 1.0E).
+>
+> **Not yet implemented:** Ingredients through Billing (Builds 1.2–2.0).
+> The schema, function, and risk sections below remain the authoritative
+> plan for those future builds.
 
 This document defines the phased path from the current frontend-only mock
 to a multi-tenant, RLS-protected Supabase backend for the Restaurant Margin
@@ -513,4 +522,59 @@ After implementation, report:
 6. Confirmation that no Edge Functions, no payments, no CSV, no ingredient
    /recipe/price tables, and no service-role key in client code were added.
 7. Remaining limitations and what Build 1.1 will tackle.
+```
+
+---
+
+## 9. Current Implementation Status (2026-05-02)
+
+### Implemented
+
+| Build | Tables | Functions | Status |
+|-------|--------|-----------|--------|
+| 1.0 | profiles, restaurants, restaurant_members, restaurant_settings | is_restaurant_member, has_restaurant_role, create_restaurant_with_owner, on_auth_user_created trigger, protect_sole_owner trigger | Implemented, session persistence broken |
+| 1.1 | units, unit_conversions, menu_categories, suppliers | initialize_restaurant_reference_data | Implemented, pending re-acceptance |
+
+### Not yet implemented
+
+| Build | Tables | Functions |
+|-------|--------|-----------|
+| 1.2 | ingredients, ingredient_cost_state | recalculate_ingredient_unit_cost |
+| 1.3 | recipes, recipe_lines, recipe_dependency_edges | recalculate_recipe_cogs, cycle guard |
+| 1.4 | menu_items, menu_profitability_snapshots | recalculate_restaurant_costs |
+| 1.5 | ingredient_price_log, ingredient_snapshots, price_update_batches | initialize_restaurant_baseline, reset_baseline_non_destructive |
+| 1.6 | (none) | run_price_update_batch orchestrator |
+| 1.7 | impact_cascade_runs, impact_cascade_items | generate_impact_cascade |
+| 1.8 | alerts, audit_events | generate_alerts_for_restaurant |
+| 1.9 | (none) | CSV import/export server functions |
+| 2.0 | subscriptions | Billing webhook server routes |
+
+### Server-side implementation approach
+
+The project currently uses:
+- **PL/pgSQL SECURITY DEFINER functions** for transactional operations (create_restaurant_with_owner, initialize_restaurant_reference_data)
+- **TanStack Start createServerFn**: Not yet used for business operations (auth-middleware.ts exists but no server functions consume it)
+- **Edge Functions**: Not used. Per project conventions, TanStack Start `createServerFn` is preferred.
+
+Future server-side operations (Builds 1.2+) will use `createServerFn` handlers backed by PL/pgSQL helpers for multi-table transactional writes.
+
+### Risks — current status
+
+| Risk | Status |
+|------|--------|
+| R1: RLS leakage | Mitigated — all tenant tables have RLS via SECURITY DEFINER helpers |
+| R2: Recursive RLS | Mitigated — membership checks via helpers, not inline subqueries |
+| R3: Duplicate names | Not yet applicable — ingredients/recipes not in Supabase |
+| R4: Circular dependencies | Not yet applicable — recipes not in Supabase |
+| R5: Volume↔mass without density | Frontend helpers enforce — server enforcement in Build 1.2 |
+| R6: adjustment = -1 | Frontend helpers enforce — server enforcement in Build 1.2 |
+| R7: Delete ingredient in use | Not yet applicable |
+| R8: Price log mutation | Not yet applicable — price log not in Supabase |
+| R9: Destructive baseline | Not yet applicable |
+| R10: FE/server drift | Not yet applicable — no server calculations |
+| R11: Role mistakes | Mitigated — roles only in restaurant_members |
+| R12: Sole-owner removal | Mitigated — trigger enforced |
+| R13: Long batch timeout | Not yet applicable |
+| R14: Webhook abuse | Not yet applicable |
+| R15: Service key leakage | Mitigated — no VITE_* alias, client.server.ts not imported in components |
 ```
