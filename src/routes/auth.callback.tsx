@@ -12,7 +12,7 @@ export const Route = createFileRoute("/auth/callback")({
 });
 
 function AuthCallback() {
-  const { status, refreshAuth } = useAuth();
+  const { refreshAuth } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,7 +22,7 @@ function AuthCallback() {
       try {
         await refreshAuth();
       } finally {
-        if (!cancelled && status !== "loading") {
+        if (!cancelled) {
           navigate({ to: "/", replace: true });
         }
       }
@@ -33,7 +33,7 @@ function AuthCallback() {
     return () => {
       cancelled = true;
     };
-  }, [status, refreshAuth, navigate]);
+  }, [refreshAuth, navigate]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
