@@ -486,7 +486,13 @@ function StatusBadge({ status }: { status: CheckStatus }) {
   return <Badge variant="outline">…</Badge>;
 }
 
-function OverallBadge({ status }: { status: CheckStatus }) {
+function OverallBadge({ status }: { status: OverallStatus }) {
+  if (status === "blocked")
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-md bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground">
+        <Circle className="h-3.5 w-3.5" /> SIGN IN REQUIRED
+      </span>
+    );
   if (status === "pass")
     return (
       <span className="inline-flex items-center gap-1.5 rounded-md bg-success/15 px-2.5 py-1 text-xs font-semibold text-success">
