@@ -21,6 +21,7 @@ export const Route = createFileRoute("/qa-auth")({
 });
 
 type CheckStatus = "pass" | "warn" | "fail" | "pending";
+type OverallStatus = CheckStatus | "blocked";
 interface Check {
   label: string;
   status: CheckStatus;
@@ -162,13 +163,41 @@ function QaAuthPage() {
       },
       {
         label: "User id available",
-        status: auth.userId ? "pass" : auth.status === "unauthenticated" ? "warn" : "fail",
-        detail: auth.userId ? "yes" : auth.status === "unauthenticated" ? "sign in required" : "no",
+        status:
+          auth.userId
+            ? "pass"
+            : auth.status === "loading"
+              ? "pending"
+              : auth.status === "unauthenticated"
+                ? "warn"
+                : "fail",
+        detail:
+          auth.userId
+            ? "yes"
+            : auth.status === "loading"
+              ? "waiting for auth hydration"
+              : auth.status === "unauthenticated"
+                ? "sign in required"
+                : "no",
       },
       {
         label: "Profile loaded",
-        status: auth.profile ? "pass" : auth.status === "unauthenticated" ? "warn" : "fail",
-        detail: auth.profile ? "yes" : auth.status === "unauthenticated" ? "sign in required" : "no",
+        status:
+          auth.profile
+            ? "pass"
+            : auth.status === "loading"
+              ? "pending"
+              : auth.status === "unauthenticated"
+                ? "warn"
+                : "fail",
+        detail:
+          auth.profile
+            ? "yes"
+            : auth.status === "loading"
+              ? "waiting for auth hydration"
+              : auth.status === "unauthenticated"
+                ? "sign in required"
+                : "no",
       },
     ],
     [auth.status, auth.userId, auth.profile],
@@ -252,17 +281,27 @@ function QaAuthPage() {
   );
 
   const allChecks = [...authChecks, ...tenantChecks, ...rlsChecks, ...securityChecks];
-  const passCount = allChecks.filter((c) => c.status === "pass").length;
-  const warnCount = allChecks.filter((c) => c.status === "warn").length;
-  const failCount = allChecks.filter(
-    (c) => c.status === "fail" && !c.nonCritical,
-  ).length;
+  const authenticatedChecks = [...authChecks, ...tenantChecks, ...rlsChecks, ...securityChecks].filter(
+    (check) => check.status !== "pending",
+  );
+  const activeChecks = isAuthenticated ? authenticatedChecks : [];
+  const passCount = activeChecks.filter((c) => c.status === "pass").length;
+  const warnCount = activeChecks.filter((c) => c.status === "warn").length;
+  const failCount = activeChecks.filter((c) => c.status === "fail" && !c.nonCritical).length;
 
-  const overall: CheckStatus = !done ? "pending" : failCount > 0 ? "fail" : warnCount > 0 ? "warn" : "pass";
-  const overallDetail = !done
-    ? "Running auth QA checks…"
-    : !isAuthenticated
-      ? "Not ready — sign in required"
+  const overall: OverallStatus = auth.status === "unauthenticated"
+    ? "blocked"
+    : !done || auth.status === "loading"
+      ? "pending"
+      : failCount > 0
+        ? "fail"
+        : warnCount > 0
+          ? "warn"
+          : "pass";
+  const overallDetail = overall === "blocked"
+    ? "Not ready — sign in required"
+    : overall === "pending"
+      ? "Loading auth QA checks…"
       : !hasRestaurant
         ? "Warning — authenticated but no restaurant yet"
         : overall === "pass"
@@ -447,7 +486,13 @@ function StatusBadge({ status }: { status: CheckStatus }) {
   return <Badge variant="outline">…</Badge>;
 }
 
-function OverallBadge({ status }: { status: CheckStatus }) {
+function OverallBadge({ status }: { status: OverallStatus }) {
+  if (status === "blocked")
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-md bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground">
+        <Circle className="h-3.5 w-3.5" /> SIGN IN REQUIRED
+      </span>
+    );
   if (status === "pass")
     return (
       <span className="inline-flex items-center gap-1.5 rounded-md bg-success/15 px-2.5 py-1 text-xs font-semibold text-success">

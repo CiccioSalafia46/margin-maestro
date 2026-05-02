@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { Topbar } from "./Topbar";
-import { Toaster } from "@/components/ui/sonner";
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -14,7 +13,6 @@ export function AppShell({ children }: { children: ReactNode }) {
           <main className="flex-1 overflow-x-hidden">{children}</main>
         </SidebarInset>
       </div>
-      <Toaster position="top-right" richColors closeButton />
     </SidebarProvider>
   );
 }
