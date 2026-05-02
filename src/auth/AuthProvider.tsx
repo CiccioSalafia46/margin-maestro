@@ -11,11 +11,7 @@ import {
 import type { Session } from "@supabase/supabase-js";
 
 import { supabase } from "@/data/api/supabaseClient";
-import {
-  getStoredActiveRestaurantId,
-  listMyRestaurants,
-  setStoredActiveRestaurantId,
-} from "@/data/api/tenantApi";
+import { listMyRestaurants } from "@/data/api/tenantApi";
 import type { Profile, RestaurantMembership } from "@/data/api/types";
 
 interface AuthContextValue {
@@ -60,13 +56,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ]);
       setProfile((profileRow as Profile | null) ?? null);
       setMemberships(mems);
-      const stored = getStoredActiveRestaurantId();
-      const valid =
-        stored && mems.some((m) => m.restaurant.id === stored)
-          ? stored
-          : mems[0]?.restaurant.id ?? null;
+      const valid = mems[0]?.restaurant.id ?? null;
       setActiveRestaurantIdState(valid);
-      if (valid !== stored) setStoredActiveRestaurantId(valid);
     } catch (e) {
       console.error("[auth] failed to load tenant data", e);
       setProfile(null);
@@ -101,7 +92,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const setActiveRestaurantId = useCallback((id: string) => {
     setActiveRestaurantIdState(id);
-    setStoredActiveRestaurantId(id);
   }, []);
 
   const refreshTenants = useCallback(async () => {
@@ -109,8 +99,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [loadTenantData]);
 
   const signOutFn = useCallback(async () => {
-    await supabase.auth.signOut();
-    setStoredActiveRestaurantId(null);
+    try {
+      await supabase.auth.signOut();
+    } finally {
+      setSession(null);
+      setProfile(null);
+      setMemberships([]);
+      setActiveRestaurantIdState(null);
+    }
   }, []);
 
   const value = useMemo<AuthContextValue>(() => {
