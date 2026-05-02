@@ -1,46 +1,59 @@
-# Current State — Build 0.5A
+# Current State — Build 1.0B
 
-**Phase:** Frontend-only mock UI shell with derived intelligence + UX polish.
-GitHub Checkpoint Verification — project structure, docs, and QA validated
-after the GitHub connection. No new functionality; baseline is Build 0.4.
-**Backend:** None. No Supabase, no Auth, no schema, no Edge Functions, no
-billing, no API calls, no `localStorage` persistence.
+**Phase:** Auth + tenant foundation accepted. Operational data is still
+the frontend mock dataset.
 
-## What is implemented
+**Backend scope (Supabase, live):**
+- Authentication (email/password)
+- `profiles`
+- `restaurants`
+- `restaurant_members`
+- `restaurant_settings`
 
-- Premium SaaS layout: collapsible sidebar, sticky topbar, demo badge.
-- All MVP routes render against an Italian-restaurant mock dataset.
-- Pure-helper calculation engine (`src/lib/`).
-- Derived intelligence selectors (`src/data/selectors.ts`) feed the
-  Dashboard, Menu Analytics, Impact Cascade, Alerts, Price Trend, and Dish
-  Analysis.
-- Two QA routes (`/qa-calculations` A–S, `/qa-data-integrity`).
-- Documentation under `docs/`.
+**Backend scope (NOT yet implemented):**
+- ingredients
+- recipes / recipe lines
+- menu_items
+- price log
+- ingredient snapshots
+- impact cascade persistence
+- alerts persistence
+- billing / subscriptions
+- CSV import/export
+- Edge Functions
 
-## Routes implemented
+## Auth / tenant behavior
 
-| Route | Purpose |
-|---|---|
-| `/` | Redirects to `/dashboard` |
-| `/dashboard` | Alert-first overview with derived KPIs |
-| `/ingredients`, `/ingredients/$id` | Ingredient database + detail |
-| `/recipes`, `/recipes/$id` | Recipes list + line-level editor view |
-| `/menu-analytics` | Per-dish GPM, GP, COGS, Δ vs snapshot |
-| `/dish-analysis`, `/dish-analysis/$id` | Per-dish deep dive + scenario |
-| `/impact-cascade`, `/impact-cascade/$batchId` | Latest cascade + history |
-| `/price-trend` | Per-ingredient unit-cost history |
-| `/price-log` | Append-only log (read-only UI) |
-| `/alerts` | Derived alerts from selectors |
-| `/settings` | Restaurant config + Developer QA links |
-| `/qa-calculations` | Calculation engine pass/fail (A–S) |
-| `/qa-data-integrity` | Reference & integrity checks |
+- Sign in with email + password.
+- New users are routed to `/onboarding/create-restaurant`.
+- `create_restaurant_with_owner` creates the restaurant, owner membership,
+  and default `restaurant_settings` row in one transaction.
+- After onboarding, users land on `/dashboard` and see the Italian mock
+  dataset, scoped to the active restaurant in the topbar switcher.
 
-## Known limitations
+## Sessions
 
-- All write actions are UI-only and toast "Demo only — …".
-- "Run Price Update" is intentionally disabled until backend exists.
-- Alerts cannot be acknowledged/resolved (no persistence).
-- Snapshots are static — no "baseline reset" workflow.
-- Price Log cannot be appended through the UI.
-- No multi-restaurant tenancy, no auth, no roles.
+- Sessions are currently **in-memory only** (`persistSession: false`,
+  `storage: undefined`) to comply with the no-localStorage rule of this build
+  phase. Hard reload requires re-login.
+- **Production session persistence is a future task** (cookie-based or
+  approved storage). Tracked as a Build 1.x item, not in 1.0.
+
+## Operational pages (still mock)
+
+`/dashboard`, `/ingredients`, `/recipes`, `/menu-analytics`,
+`/dish-analysis`, `/impact-cascade`, `/price-trend`, `/price-log`,
+`/alerts`, `/settings`, `/qa-calculations`, `/qa-data-integrity` continue
+to read from `src/data/mock.ts` and the derived selectors. No writes hit
+Supabase from these pages.
+
+## Known limitations carried from earlier builds
+
+- All write actions on operational pages are UI-only ("Demo only").
+- "Run Price Update" intentionally disabled.
+- Alerts cannot be acknowledged/resolved.
+- Snapshot reset / Price Log append not wired to any backend.
+- No multi-tenant data scoping in mock pages — switching restaurants in the
+  topbar does not change the displayed mock data yet.
+- Google OAuth is not enabled.
 - Mobile is functional but not polished.
