@@ -298,10 +298,10 @@ function QaAuthPage() {
         detail: "Email/password only in Build 1.0B.",
       },
       {
-        label: "Operational data still mock",
+        label: "Operational data partially migrated",
         status: "warn",
         nonCritical: true,
-        detail: "Ingredients/recipes/etc. not in Supabase yet.",
+        detail: "Ingredients in Supabase (Build 1.2). Recipes, menu analytics, price log, snapshots, impact cascade, and alerts remain mock/future.",
       },
     ],
     [],
@@ -443,7 +443,7 @@ function QaAuthPage() {
 
         <p className="text-[11px] text-muted-foreground">
           No access tokens, refresh tokens, service-role keys, or raw session JSON are displayed.
-          Build 1.1A — Settings/Admin Accepted.
+          Build 1.2 — Ingredients Database.
         </p>
       </div>
     </AppShell>

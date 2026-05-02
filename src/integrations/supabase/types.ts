@@ -14,6 +14,152 @@ export type Database = {
   }
   public: {
     Tables: {
+      ingredient_cost_state: {
+        Row: {
+          ingredient_id: string
+          restaurant_id: string
+          cost_source: string
+          original_unit_cost: number | null
+          recipe_quantity: number | null
+          recipe_unit_cost: number | null
+          calculation_status: string
+          calculation_error: string | null
+          last_calculated_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          ingredient_id: string
+          restaurant_id: string
+          cost_source?: string
+          original_unit_cost?: number | null
+          recipe_quantity?: number | null
+          recipe_unit_cost?: number | null
+          calculation_status?: string
+          calculation_error?: string | null
+          last_calculated_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          ingredient_id?: string
+          restaurant_id?: string
+          cost_source?: string
+          original_unit_cost?: number | null
+          recipe_quantity?: number | null
+          recipe_unit_cost?: number | null
+          calculation_status?: string
+          calculation_error?: string | null
+          last_calculated_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ingredient_cost_state_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: true
+            referencedRelation: "ingredients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ingredient_cost_state_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ingredients: {
+        Row: {
+          id: string
+          restaurant_id: string
+          supplier_id: string | null
+          name: string
+          type: string
+          total_cost: number | null
+          original_quantity: number | null
+          original_uom_code: string | null
+          conversion_on: boolean
+          recipe_uom_code: string | null
+          adjustment: number
+          density_g_per_ml: number | null
+          manual_recipe_unit_cost: number | null
+          notes: string | null
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          restaurant_id: string
+          supplier_id?: string | null
+          name: string
+          type: string
+          total_cost?: number | null
+          original_quantity?: number | null
+          original_uom_code?: string | null
+          conversion_on?: boolean
+          recipe_uom_code?: string | null
+          adjustment?: number
+          density_g_per_ml?: number | null
+          manual_recipe_unit_cost?: number | null
+          notes?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          restaurant_id?: string
+          supplier_id?: string | null
+          name?: string
+          type?: string
+          total_cost?: number | null
+          original_quantity?: number | null
+          original_uom_code?: string | null
+          conversion_on?: boolean
+          recipe_uom_code?: string | null
+          adjustment?: number
+          density_g_per_ml?: number | null
+          manual_recipe_unit_cost?: number | null
+          notes?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ingredients_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ingredients_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ingredients_original_uom_code_fkey"
+            columns: ["original_uom_code"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "ingredients_recipe_uom_code_fkey"
+            columns: ["recipe_uom_code"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
       menu_categories: {
         Row: {
           created_at: string

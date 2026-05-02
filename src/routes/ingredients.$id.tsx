@@ -1,225 +1,263 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, Package } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { ArrowLeft, Loader2, Package, Pencil } from "lucide-react";
+import { toast } from "sonner";
 
 import { AppShell } from "@/components/layout/AppShell";
 import { PageHeader } from "@/components/common/PageHeader";
 import {
   IngredientTypeBadge,
-  PercentCell,
-  SpikeBadge,
-  UnitCostCell,
   UomBadge,
 } from "@/components/common/badges";
 import { EmptyState } from "@/components/common/EmptyState";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
-import { getIngredientById, priceLog, recipesUsingIngredient } from "@/data/mock";
-import { formatDateTime, formatMoney } from "@/lib/format";
+import { useAuth } from "@/auth/AuthProvider";
+import { getIngredientById } from "@/data/api/ingredientsApi";
+import type { IngredientWithCostState } from "@/data/api/types";
+import { formatMoney, formatUnitCost } from "@/lib/format";
 
 export const Route = createFileRoute("/ingredients/$id")({
-  loader: ({ params }) => {
-    const ingredient = getIngredientById(params.id);
-    if (!ingredient) throw notFound();
-    return { ingredient };
-  },
-  head: ({ loaderData }) => ({
+  head: () => ({
     meta: [
-      { title: `${loaderData?.ingredient.name ?? "Ingredient"} — Margin IQ` },
-      {
-        name: "description",
-        content: `Ingredient detail, cost, price history, and recipes that consume ${loaderData?.ingredient.name ?? "this ingredient"}.`,
-      },
+      { title: "Ingredient — Margin IQ" },
+      { name: "description", content: "Ingredient detail and cost breakdown." },
     ],
   }),
   component: IngredientDetailPage,
-  errorComponent: ({ error }) => (
-    <AppShell>
-      <div className="p-6">
-        <EmptyState title="Failed to load ingredient" description={error.message} />
-      </div>
-    </AppShell>
-  ),
-  notFoundComponent: () => (
-    <AppShell>
-      <div className="p-6">
-        <EmptyState
-          title="Ingredient not found"
-          description="It may have been removed or the link is invalid."
-          action={
-            <Button asChild variant="outline" size="sm">
-              <Link to="/ingredients">Back to ingredients</Link>
-            </Button>
-          }
-        />
-      </div>
-    </AppShell>
-  ),
 });
 
+function errMsg(e: unknown): string {
+  if (e && typeof e === "object" && "message" in e) return String((e as { message?: unknown }).message);
+  return e instanceof Error ? e.message : "Something went wrong.";
+}
+
 function IngredientDetailPage() {
-  const { ingredient } = Route.useLoaderData();
-  const usedIn = recipesUsingIngredient(ingredient.id);
-  const history = priceLog
-    .filter((p) => p.ingredient_id === ingredient.id)
-    .sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+  const { id } = Route.useParams();
+  const { activeRestaurantId, activeMembership } = useAuth();
+  const [ingredient, setIngredient] = useState<IngredientWithCostState | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const canManage = activeMembership?.role === "owner" || activeMembership?.role === "manager";
+
+  useEffect(() => {
+    if (!activeRestaurantId) return;
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    getIngredientById(activeRestaurantId, id)
+      .then((data) => {
+        if (cancelled) return;
+        if (!data) {
+          setError("Ingredient not found.");
+        } else {
+          setIngredient(data);
+        }
+      })
+      .catch((e) => !cancelled && setError(errMsg(e)))
+      .finally(() => !cancelled && setLoading(false));
+    return () => { cancelled = true; };
+  }, [activeRestaurantId, id]);
+
+  if (loading) {
+    return (
+      <AppShell>
+        <div className="flex items-center justify-center gap-2 p-12 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" /> Loading ingredient…
+        </div>
+      </AppShell>
+    );
+  }
+
+  if (error || !ingredient) {
+    return (
+      <AppShell>
+        <div className="p-6">
+          <EmptyState
+            title="Ingredient not found"
+            description={error ?? "It may have been removed or the link is invalid."}
+            action={
+              <Button asChild variant="outline" size="sm">
+                <Link to="/ingredients">Back to ingredients</Link>
+              </Button>
+            }
+          />
+        </div>
+      </AppShell>
+    );
+  }
+
+  const cs = ingredient.cost_state;
 
   return (
     <AppShell>
       <PageHeader
         title={ingredient.name}
-        description={ingredient.supplier ?? "Internal preparation"}
+        description={ingredient.supplier_name ?? "No supplier assigned"}
         actions={
-          <Button variant="outline" size="sm" asChild>
-            <Link to="/ingredients">
-              <ArrowLeft className="mr-1.5 h-4 w-4" />
-              Back
-            </Link>
-          </Button>
+          <div className="flex gap-2">
+            {canManage && (
+              <Button variant="outline" size="sm" onClick={() => toast.info("Edit form arrives in a future iteration.")}>
+                <Pencil className="mr-1.5 h-4 w-4" /> Edit
+              </Button>
+            )}
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/ingredients">
+                <ArrowLeft className="mr-1.5 h-4 w-4" /> Back
+              </Link>
+            </Button>
+          </div>
         }
       />
 
       <div className="space-y-6 p-6">
         <div className="flex flex-wrap items-center gap-2">
-          <IngredientTypeBadge type={ingredient.type} />
-          <SpikeBadge active={ingredient.spike} />
-          <UomBadge uom={ingredient.recipe_uom} />
+          <IngredientTypeBadge type={ingredient.type as "Primary" | "Intermediate" | "Fixed"} />
+          {!ingredient.is_active && <Badge variant="outline">Inactive</Badge>}
+          {ingredient.recipe_uom_code && <UomBadge uom={ingredient.recipe_uom_code as "Gr"} />}
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          {/* Cost card */}
           <Card className="lg:col-span-2">
             <CardHeader className="pb-3">
               <CardTitle className="text-base">Cost</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                <Field label="Original quantity" value={`${ingredient.original_qty} ${ingredient.original_uom}`} />
-                <Field label="Total cost" value={formatMoney(ingredient.total_cost)} />
-                <Field
-                  label="Adjustment"
-                  value={
-                    ingredient.adjustment === 0
-                      ? "0%"
-                      : `${(ingredient.adjustment * 100).toFixed(1)}%`
-                  }
-                />
-                <Field label="Recipe UoM" value={ingredient.recipe_uom} />
-                <Field label="Conversion" value={ingredient.conversion_on ? "On" : "Off"} />
-                <Field
-                  label="Density"
-                  value={
-                    ingredient.density_g_per_ml
-                      ? `${ingredient.density_g_per_ml} g/ml`
-                      : "—"
-                  }
-                />
-              </div>
-              <Separator className="my-4" />
-              <div className="flex items-baseline justify-between">
-                <span className="text-xs uppercase tracking-wider text-muted-foreground">
-                  Recipe unit cost
-                </span>
-                <span className="text-2xl font-semibold tabular-nums">
-                  <UnitCostCell value={ingredient.recipe_unit_cost} decimals={6} />{" "}
-                  <span className="text-sm font-normal text-muted-foreground">
-                    / {ingredient.recipe_uom}
-                  </span>
-                </span>
-              </div>
+              {ingredient.type === "intermediate" ? (
+                <p className="text-sm text-muted-foreground">
+                  Intermediate ingredient costs are calculated from recipes in Build 1.3.
+                </p>
+              ) : (
+                <>
+                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                    <Field
+                      label="Original quantity"
+                      value={
+                        ingredient.original_quantity != null
+                          ? `${Number(ingredient.original_quantity)} ${ingredient.original_uom_code ?? ""}`
+                          : "—"
+                      }
+                    />
+                    <Field
+                      label="Total cost"
+                      value={ingredient.total_cost != null ? formatMoney(Number(ingredient.total_cost)) : "—"}
+                    />
+                    <Field
+                      label="Adjustment"
+                      value={
+                        Number(ingredient.adjustment) === 0
+                          ? "0%"
+                          : `${(Number(ingredient.adjustment) * 100).toFixed(1)}%`
+                      }
+                    />
+                    <Field label="Recipe UoM" value={ingredient.recipe_uom_code ?? "—"} />
+                    <Field label="Conversion" value={ingredient.conversion_on ? "On" : "Off"} />
+                    <Field
+                      label="Density"
+                      value={ingredient.density_g_per_ml ? `${ingredient.density_g_per_ml} g/ml` : "—"}
+                    />
+                    {ingredient.type === "fixed" && (
+                      <Field
+                        label="Manual cost"
+                        value={
+                          ingredient.manual_recipe_unit_cost != null
+                            ? formatUnitCost(Number(ingredient.manual_recipe_unit_cost))
+                            : "—"
+                        }
+                      />
+                    )}
+                  </div>
+                  <Separator className="my-4" />
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                      Recipe unit cost
+                    </span>
+                    <span className="text-2xl font-semibold tabular-nums">
+                      {cs?.recipe_unit_cost != null ? formatUnitCost(Number(cs.recipe_unit_cost), 6) : "—"}
+                      {ingredient.recipe_uom_code && (
+                        <span className="text-sm font-normal text-muted-foreground">
+                          {" "}/ {ingredient.recipe_uom_code}
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
 
+          {/* Cost state card */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base">Price history</CardTitle>
+              <CardTitle className="text-base">Calculation status</CardTitle>
             </CardHeader>
-            <CardContent>
-              {history.length === 0 ? (
-                <EmptyState title="No price history" />
-              ) : (
-                <ul className="space-y-2">
-                  {history.map((p) => (
-                    <li
-                      key={p.id}
-                      className="flex items-center justify-between border-b border-dashed pb-2 text-sm last:border-0 last:pb-0"
-                    >
-                      <div>
-                        <p className="font-medium tabular-nums">
-                          <UnitCostCell value={p.new_unit_cost} />
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {formatDateTime(p.timestamp)}
-                        </p>
-                      </div>
-                      {p.event === "baseline" ? (
-                        <span className="text-xs text-muted-foreground">baseline</span>
-                      ) : (
-                        <PercentCell value={p.pct_change} signed decimals={2} />
-                      )}
-                    </li>
-                  ))}
-                </ul>
+            <CardContent className="space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">Status:</span>
+                <CalcStatusBadge status={cs?.calculation_status ?? "pending"} />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">Source:</span>
+                <span className="text-xs font-medium">{cs?.cost_source ?? "—"}</span>
+              </div>
+              {cs?.calculation_error && (
+                <p className="text-xs text-destructive">{cs.calculation_error}</p>
               )}
-              <Button variant="outline" size="sm" className="mt-4 w-full" asChild>
-                <Link to="/price-trend">Open in Price Trend</Link>
-              </Button>
             </CardContent>
           </Card>
         </div>
 
+        {/* Placeholder cards for future features */}
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Recipes that use this ingredient</CardTitle>
           </CardHeader>
-          <CardContent className="p-0">
-            {usedIn.length === 0 ? (
-              <div className="p-6">
-                <EmptyState
-                  icon={<Package className="h-5 w-5" />}
-                  title="Not yet used in any recipe"
-                />
-              </div>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Recipe</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Category</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {usedIn.map((r) => (
-                    <TableRow key={r.id}>
-                      <TableCell className="font-medium">
-                        <Link
-                          to="/recipes/$id"
-                          params={{ id: r.id }}
-                          className="hover:underline"
-                        >
-                          {r.name}
-                        </Link>
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">{r.type}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground">{r.category}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
+          <CardContent>
+            <div className="p-4">
+              <EmptyState
+                icon={<Package className="h-5 w-5" />}
+                title="Recipe usage available after Build 1.3"
+                description="Recipe lines will reference ingredients once the Recipes module is implemented."
+              />
+            </div>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Price history</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              Price Log and Price Trend persistence arrive in Build 1.5.
+            </p>
+          </CardContent>
+        </Card>
+
+        {ingredient.notes && (
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Notes</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm">{ingredient.notes}</p>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </AppShell>
   );
+}
+
+function CalcStatusBadge({ status }: { status: string }) {
+  if (status === "valid") return <Badge className="bg-success text-success-foreground">Valid</Badge>;
+  if (status === "warning") return <Badge className="bg-warning text-warning-foreground">Warning</Badge>;
+  if (status === "error") return <Badge className="bg-destructive text-destructive-foreground">Error</Badge>;
+  return <Badge variant="outline">Pending</Badge>;
 }
 
 function Field({ label, value }: { label: string; value: React.ReactNode }) {

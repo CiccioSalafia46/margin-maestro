@@ -1,5 +1,5 @@
-// Build 1.1 — Auth + tenant + settings/admin reference API types.
-// Operational data (ingredients/recipes/etc.) remains mock for now.
+// Build 1.2 — Auth + tenant + settings/admin + ingredients API types.
+// Recipes/menu/price log/cascade/alerts remain mock for now.
 
 export type RestaurantRole = "owner" | "manager" | "viewer";
 
@@ -89,6 +89,66 @@ export type SettingsPatch = Partial<{
   gpm_drop_threshold_percent: number;
   gp_floor_amount: number | null;
 }>;
+
+// ---------------- Ingredients (Build 1.2) ----------------
+
+export type IngredientType = "primary" | "intermediate" | "fixed";
+export type CostSource = "calculated" | "manual" | "intermediate_pending" | "error";
+export type CostStatus = "valid" | "warning" | "error" | "pending";
+
+export interface IngredientRow {
+  id: string;
+  restaurant_id: string;
+  supplier_id: string | null;
+  name: string;
+  type: IngredientType;
+  total_cost: number | null;
+  original_quantity: number | null;
+  original_uom_code: string | null;
+  conversion_on: boolean;
+  recipe_uom_code: string | null;
+  adjustment: number;
+  density_g_per_ml: number | null;
+  manual_recipe_unit_cost: number | null;
+  notes: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface IngredientCostStateRow {
+  ingredient_id: string;
+  restaurant_id: string;
+  cost_source: CostSource;
+  original_unit_cost: number | null;
+  recipe_quantity: number | null;
+  recipe_unit_cost: number | null;
+  calculation_status: CostStatus;
+  calculation_error: string | null;
+  last_calculated_at: string | null;
+}
+
+export interface IngredientWithCostState extends IngredientRow {
+  cost_state: IngredientCostStateRow | null;
+  supplier_name: string | null;
+}
+
+export type IngredientInput = {
+  name: string;
+  type: IngredientType;
+  supplier_id?: string | null;
+  total_cost?: number | null;
+  original_quantity?: number | null;
+  original_uom_code?: string | null;
+  conversion_on?: boolean;
+  recipe_uom_code?: string | null;
+  adjustment?: number;
+  density_g_per_ml?: number | null;
+  manual_recipe_unit_cost?: number | null;
+  notes?: string | null;
+};
+
+export type IngredientPatch = Partial<IngredientInput> & { is_active?: boolean };
 
 export interface ApiError {
   code: "auth" | "permission" | "duplicate" | "validation" | "not_found" | "unknown";

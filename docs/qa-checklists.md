@@ -133,7 +133,7 @@ Validates:
 | R | RLS | menu_categories are tenant-scoped |
 | S | RLS | Suppliers are tenant-scoped |
 | T | Security | Service-role key not exposed to client |
-| U | Security | No operational tables created |
+| U | Security | Only expected Build 1.2 operational tables present |
 
 **Expected:** All PASS for owner role. Some role-specific checks show WARN if current role cannot exercise them.
 
@@ -160,7 +160,7 @@ Validates:
 - [ ] Manual no-op write smoke test passes for owner
 - [ ] No cross-tenant data visible (RLS verified by checks R and S)
 - [ ] No service-role key exposed (verified by check T)
-- [ ] No operational tables created (verified by check U)
+- [ ] Only expected Build 1.2 tables present (verified by check U)
 - [ ] Operational pages still render mock data
 
 ---

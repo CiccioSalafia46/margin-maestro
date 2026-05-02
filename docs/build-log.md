@@ -195,3 +195,29 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - Team management is placeholder — no invites or role changes.
 - Restaurant switcher limited to in-memory re-pointing.
 - Google OAuth not enabled.
+
+---
+
+## Build 1.2 — Ingredients Database
+
+**Status:** Implemented
+
+- **Migration:** `ingredients` and `ingredient_cost_state` tables with RLS, updated_at triggers, case-insensitive unique name index.
+- **API:** `src/data/api/ingredientsApi.ts` — getIngredients, getIngredientById, createIngredient, updateIngredient, deactivateIngredient, calculateCostState, upsertIngredientCostState, getIngredientCostStates.
+- **Types:** `IngredientRow`, `IngredientCostStateRow`, `IngredientWithCostState`, `IngredientInput`, `IngredientPatch` in `types.ts`.
+- **Generated types:** `src/integrations/supabase/types.ts` updated with new tables.
+- **Routes:** `/ingredients` and `/ingredients/$id` rewritten from mock to Supabase.
+- **Add form:** Drawer with type-conditional fields (Primary/Fixed/Intermediate).
+- **Cost calculation:** Uses existing pure helpers from `src/lib/ingredientCost.ts` and `src/lib/units.ts`, persists result to `ingredient_cost_state`.
+- **QA:** `/qa-ingredients` with checks A–T.
+- **Developer QA link:** Added to Settings → Developer QA.
+- **RLS:** Members select, owner/manager insert/update. No delete policy (soft delete via `is_active`).
+- Suppliers linked via FK to `suppliers` table.
+- Deactivation via `is_active = false`.
+
+**Limitations:**
+- Cost state computed client-side (server-side source of truth in future build).
+- Intermediate ingredient costs pending (awaiting Build 1.3 Recipes).
+- Price Log/Snapshot not yet available (Build 1.5).
+- Edit form not yet implemented (placeholder).
+- Dashboard and other operational pages still use mock data.

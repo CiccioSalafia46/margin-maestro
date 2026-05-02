@@ -900,6 +900,7 @@ function DeveloperQa() {
         <QaLink to="/qa-data-integrity" label="Data Integrity QA" />
         <QaLink to="/qa-auth" label="Auth & Tenancy QA" />
         <QaLink to="/qa-settings-admin" label="Settings/Admin Reference QA" />
+        <QaLink to="/qa-ingredients" label="Ingredients Database QA" />
       </CardContent>
     </Card>
   );

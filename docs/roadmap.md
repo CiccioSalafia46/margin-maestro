@@ -41,26 +41,9 @@ Forward implementation plan for Margin IQ — Restaurant Margin Intelligence Saa
 
 ## Build 1.2 — Ingredients Database
 
+**Status:** Implemented.
+
 **Goal:** Introduce `ingredients` and `ingredient_cost_state` tables in Supabase.
-
-**Scope:**
-- Migration: `ingredients` table with RLS
-- Migration: `ingredient_cost_state` table (server-managed)
-- API layer: CRUD for ingredients
-- Supplier linkage (FK to `suppliers`)
-- Swap `/ingredients` page from mock to Supabase
-- Server-side `recalculate_ingredient_unit_cost()` function
-- `/qa-ingredients` acceptance page
-
-**Acceptance criteria:**
-- Ingredients CRUD works with RLS enforcement
-- Supplier selection from existing suppliers
-- Unit conversion validation (family checks, density requirement)
-- Adjustment validation (`adjustment !== -1`)
-- `recipe_unit_cost` computed server-side
-- Existing QA routes still pass
-
-**Out of scope:** Recipes, menu items, price log, snapshots, cascade, alerts, billing.
 
 ---
 

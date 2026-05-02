@@ -399,12 +399,13 @@ function QaSettingsAdminPage() {
         detail: "no VITE_SUPABASE_SERVICE_ROLE_KEY in client env",
       });
 
-      // U. no operational tables created (probe should return relation-not-found / 404)
+      // U. only expected Build 1.2 operational tables present
+      // ingredients and ingredient_cost_state are expected after Build 1.2.
+      // Future tables (recipes, menu_items, price_log, etc.) should NOT exist yet.
       try {
-        const opTables = ["ingredients", "recipes", "menu_items", "ingredient_price_log"] as const;
+        const futureOnly = ["recipes", "recipe_lines", "menu_items", "ingredient_price_log", "ingredient_snapshots", "impact_cascade_runs", "alerts"] as const;
         const probes = await Promise.all(
-          opTables.map(async (t) => {
-            // Cast to any: these tables intentionally don't exist in the schema yet.
+          futureOnly.map(async (t) => {
             const { error } = await (supabase as unknown as {
               from: (t: string) => {
                 select: (s: string) => { limit: (n: number) => Promise<{ error: unknown }> };
@@ -416,20 +417,20 @@ function QaSettingsAdminPage() {
             return { t, error };
           }),
         );
-        const present = probes.filter((p) => !p.error).map((p) => p.t);
+        const unexpected = probes.filter((p) => !p.error).map((p) => p.t);
         next.push({
-          label: "U. no operational tables created",
-          status: present.length === 0 ? "pass" : "fail",
+          label: "U. only expected Build 1.2 operational tables present",
+          status: unexpected.length === 0 ? "pass" : "fail",
           detail:
-            present.length === 0
-              ? "ingredients/recipes/menu_items/price_log absent"
-              : `unexpected tables present: ${present.join(", ")}`,
+            unexpected.length === 0
+              ? "ingredients/ingredient_cost_state expected; no future tables found"
+              : `unexpected tables present: ${unexpected.join(", ")}`,
         });
       } catch {
         next.push({
-          label: "U. no operational tables created",
+          label: "U. only expected Build 1.2 operational tables present",
           status: "pass",
-          detail: "probe rejected (tables absent)",
+          detail: "probe rejected (future tables absent)",
         });
       }
 
