@@ -143,3 +143,58 @@ users must be able to call `is_restaurant_member`, `has_restaurant_role`,
 `initialize_restaurant_reference_data` for RLS and onboarding to work.
 EXECUTE is restricted to the `authenticated` role and each function
 performs its own membership/auth checks where applicable.
+
+## Build 1.1A acceptance notes
+
+Build 1.1A is the focused acceptance pass for the reference layer. No
+schema changes were made. The QA route `/qa-settings-admin` was
+upgraded to verify Build 1.1 explicitly:
+
+- Per-section status: Auth/Tenant, Settings, Reference data, RLS/Security,
+  Role behavior.
+- Required units `Ct, Gr, Kg, Lb, Oz, Ml, Lt, Gl` present.
+- Unit families: `Ct=count`, `Gr/Kg/Lb/Oz=mass`, `Ml/Lt/Gl=volume`.
+- Conversion factors (to base): `Kg=1000`, `Lb=453.592`, `Oz=28.3495`,
+  `Lt=1000`, `Gl=3785.411784`.
+- Same-family conversions (mass↔mass, volume↔volume) ≥ expected counts.
+- `Ct` only converts to `Ct`.
+- No silent mass↔volume rules without `requires_density`.
+- Tenant scoping verified for `menu_categories` and `suppliers` via
+  cross-tenant probe (must return 0 rows).
+- No service-role key in `import.meta.env`.
+- No operational tables created (`ingredients`, `recipes`,
+  `menu_items`, `ingredient_price_log`).
+
+Role-specific RLS write tests are run only when the current session's
+role can exercise them. Skipped checks are marked **Warning**, not
+**Fail**.
+
+A static manual acceptance checklist is included in the QA route to
+cover behaviors that can't be safely automated (UI render, role-gated
+edits, friendly error toasts, operational pages still mock).
+
+### RLS / security review (verified for Build 1.1A)
+
+| Table | Read | Write |
+| --- | --- | --- |
+| `units` | authenticated | none from client |
+| `unit_conversions` | authenticated | none from client |
+| `menu_categories` | members | owner/manager insert+update; no hard delete |
+| `suppliers` | members | owner/manager insert+update; no hard delete |
+| `restaurant_settings` | members | owner-only update; no insert/delete |
+
+Confirmed:
+
+- No cross-tenant reads (probe returns 0 rows for non-member restaurant).
+- No cross-tenant writes (RLS WITH CHECK on `is_restaurant_member` /
+  `has_restaurant_role`).
+- No service-role key exposed to client (`VITE_SUPABASE_SERVICE_ROLE_KEY`
+  is undefined in browser env).
+- No `localStorage activeRestaurantId` reintroduced — active restaurant
+  lives in `AuthProvider` state only.
+
+## Next build
+
+Build 1.2 — Ingredients Database. It will introduce the `ingredients`
+table, link suppliers to ingredients, and migrate `/ingredients` from
+mock to Supabase.
