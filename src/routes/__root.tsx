@@ -3,6 +3,7 @@ import { Outlet, createRootRoute, HeadContent, Scripts } from "@tanstack/react-r
 import appCss from "../styles.css?url";
 import { AuthProvider } from "@/auth/AuthProvider";
 import { AuthGate } from "@/auth/AuthGate";
+import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -63,6 +64,7 @@ function RootComponent() {
       <AuthGate>
         <Outlet />
       </AuthGate>
+      <Toaster position="top-right" richColors closeButton />
     </AuthProvider>
   );
 }
