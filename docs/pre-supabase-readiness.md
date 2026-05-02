@@ -1,20 +1,24 @@
 # Pre-Supabase Readiness
 
-Build 0.4 is the last fully frontend-only build. The next phase will
-introduce Lovable Cloud (Supabase under the hood) for persistence,
-auth, and server-side calculation.
+Build 0.4 was the last fully frontend-only build. Build 1.0 introduced
+auth + tenant tables; Build 1.1 introduced the Settings/Admin reference
+layer. This document tracks what is **already in Supabase** vs. what is
+**still mock**.
 
-## Future tables (target schema)
+## Already in Supabase
 
 `profiles`, `restaurants`, `restaurant_members`, `restaurant_settings`,
-`units`, `unit_conversions`, `menu_categories`, `suppliers`,
+`units`, `unit_conversions`, `menu_categories`, `suppliers`.
+
+## Still mock (target schema for later builds)
+
 `ingredients`, `ingredient_cost_state`, `ingredient_price_log`,
 `ingredient_snapshots`, `price_update_batches`, `recipes`,
 `recipe_lines`, `recipe_dependency_edges`, `menu_items`,
 `menu_profitability_snapshots`, `impact_cascade_runs`,
 `impact_cascade_items`, `alerts`, `audit_events`.
 
-Every tenant-owned record carries `restaurant_id` and is RLS-protected.
+Every tenant-owned record will carry `restaurant_id` and be RLS-protected.
 
 ## Future Edge Functions (server-side)
 
