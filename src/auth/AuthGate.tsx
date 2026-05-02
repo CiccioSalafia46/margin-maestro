@@ -3,7 +3,15 @@ import { useNavigate, useRouterState } from "@tanstack/react-router";
 
 import { useAuth } from "./AuthProvider";
 
-const PUBLIC_PATHS = new Set(["/login", "/signup", "/auth/callback", "/qa-auth"]);
+/** Routes that do NOT require authentication. */
+const PUBLIC_PATHS = new Set(["/login", "/signup", "/auth/callback"]);
+
+/**
+ * Routes that authenticated users should be bounced away from — these are
+ * login/signup flows that make no sense once you're signed in.
+ */
+const AUTH_FLOW_PATHS = PUBLIC_PATHS;
+
 const ONBOARDING_PATH = "/onboarding/create-restaurant";
 
 /**
@@ -34,8 +42,9 @@ export function AuthGate({ children }: { children: ReactNode }) {
       return;
     }
 
-    // authenticated + has restaurant
-    if (isPublic || isOnboarding || pathname === "/") {
+    // authenticated + has restaurant — redirect away from auth-flow pages
+    // and root, but NOT from app routes like /qa-auth or /settings.
+    if (AUTH_FLOW_PATHS.has(pathname) || isOnboarding || pathname === "/") {
       navigate({ to: "/dashboard", replace: true });
     }
     void activeRestaurantId; // referenced for re-eval when switching tenants
