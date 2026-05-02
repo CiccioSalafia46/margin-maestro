@@ -156,26 +156,27 @@ function QaIngredientsPage() {
         next.push({ label: "G. ingredient_cost_state readable", status: "fail", detail: msg(e) });
       }
 
-      // K-N: validation checks (static — rely on form/API validation)
+      // K-N: validation checks — tested at form/helper level, not via destructive DB writes.
+      // These are manual/role-dependent warnings, not product failures.
       next.push({
-        label: "K. Ct→non-Ct blocked by form validation",
+        label: "K. Ct→non-Ct conversion blocked",
         status: "warn",
-        detail: "Validated at form level; manual DB test not automated.",
+        detail: "Manual/role-dependent — validated by form and calculation helpers. No automated destructive DB test.",
       });
       next.push({
         label: "L. mass↔volume without density blocked",
         status: "warn",
-        detail: "Validated at calculation level; manual DB test not automated.",
+        detail: "Manual/role-dependent — validated by calculation helpers. No automated destructive DB test.",
       });
       next.push({
         label: "M. fixed ingredient manual cost validation",
         status: "warn",
-        detail: "Validated at form level; check manually.",
+        detail: "Manual/role-dependent — verified via Add Ingredient form (type = fixed).",
       });
       next.push({
         label: "N. intermediate ingredient pending status",
         status: "warn",
-        detail: "Intermediate ingredients show pending until Build 1.3 recipes.",
+        detail: "Manual/role-dependent — intermediate ingredients show cost_source = intermediate_pending until Build 1.3.",
       });
 
       // P. viewer write blocked

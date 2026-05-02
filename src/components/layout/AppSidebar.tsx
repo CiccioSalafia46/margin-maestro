@@ -138,7 +138,7 @@ export function AppSidebar() {
       <SidebarFooter className="border-t">
         {!collapsed && (
           <p className="px-2 py-1 text-[10px] text-muted-foreground">
-            Build 1.2 — Ingredients Database
+            Build 1.2A — Ingredients Accepted
           </p>
         )}
       </SidebarFooter>

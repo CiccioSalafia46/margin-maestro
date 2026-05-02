@@ -221,3 +221,19 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - Price Log/Snapshot not yet available (Build 1.5).
 - Edit form not yet implemented (placeholder).
 - Dashboard and other operational pages still use mock data.
+
+---
+
+## Build 1.2A — Ingredients Acceptance
+
+**Status:** Accepted
+
+- Verified on self-owned Supabase project `margin-maestro-dev` (migrated from Lovable Cloud).
+- All migrations (1.0 through 1.2) applied successfully to the new project.
+- Primary ingredient cost state: calculated, valid.
+- Fixed ingredient cost state: manual, valid.
+- Intermediate ingredient cost state: pending (awaiting Build 1.3).
+- `/qa-settings-admin` check U updated to accept Build 1.2 tables (ingredients, ingredient_cost_state).
+- `/qa-auth` operational data warning updated to reflect partial migration.
+- `/qa-ingredients` warnings clarified as manual/role-dependent, not product failures.
+- Build label updated to "Build 1.2A — Ingredients Accepted".

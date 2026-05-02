@@ -388,7 +388,7 @@ function DashboardPage() {
 
         <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Bell className="h-3 w-3" />
-          Build 1.2 — Ingredients Database. Ingredients use Supabase; other operational pages still use mock data.
+          Build 1.2A — Ingredients Accepted. Ingredients use Supabase; other operational pages still use mock data.
         </p>
       </div>
     </AppShell>

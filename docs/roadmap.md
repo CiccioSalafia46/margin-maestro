@@ -39,11 +39,11 @@ Forward implementation plan for Margin IQ — Restaurant Margin Intelligence Saa
 
 ---
 
-## Build 1.2 — Ingredients Database
+## Build 1.2 / 1.2A — Ingredients Database
 
-**Status:** Implemented.
+**Status:** Accepted.
 
-**Goal:** Introduce `ingredients` and `ingredient_cost_state` tables in Supabase.
+**Goal:** Introduce `ingredients` and `ingredient_cost_state` tables in Supabase. Verified on self-owned Supabase project `margin-maestro-dev`.
 
 ---
 
