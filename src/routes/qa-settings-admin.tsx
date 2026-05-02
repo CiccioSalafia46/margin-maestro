@@ -454,7 +454,22 @@ function QaSettingsAdminPage() {
         : warn > 0
           ? "warn"
           : "pass";
-    return { pass, warn, fail, overall };
+
+    const sectionStatus = (prefixes: string[]): CheckStatus => {
+      const subset = checks.filter((c) => prefixes.some((p) => c.label.startsWith(p)));
+      if (subset.length === 0) return "pending";
+      if (subset.some((c) => c.status === "fail")) return "fail";
+      if (subset.some((c) => c.status === "warn")) return "warn";
+      return "pass";
+    };
+    const sections = {
+      authTenant: sectionStatus(["A.", "B.", "C."]),
+      settings: sectionStatus(["D.", "P."]),
+      reference: sectionStatus(["E.", "E2.", "E3.", "F.", "G.", "H.", "J.", "K.", "L.", "N."]),
+      rls: sectionStatus(["R.", "S.", "T.", "U."]),
+      roles: sectionStatus(["M.", "O.", "P.", "Q."]),
+    };
+    return { pass, warn, fail, overall, sections };
   }, [checks, done]);
 
   const runManualWrite = async () => {
