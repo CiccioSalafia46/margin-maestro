@@ -35,10 +35,24 @@ Manual and automated QA checklists for Margin IQ.
 - [ ] After onboarding, `/dashboard` renders
 - [ ] Topbar shows active restaurant name
 - [ ] Sign out redirects to `/login`
-- [ ] Refresh preserves session (Build 1.0E)
-- [ ] Navigation preserves session (Build 1.0E)
+- [ ] Refresh preserves session
+- [ ] Navigation preserves session
 - [ ] `/qa-calculations` renders after login
 - [ ] `/qa-data-integrity` renders after login
+
+### Build 1.0F Final Acceptance Checklist
+
+- [ ] Login works — credentials accepted, session created
+- [ ] `/qa-auth` shows authenticated diagnostics after login
+- [ ] Refresh `/qa-auth` (F5) — session survives, page stays on `/qa-auth`
+- [ ] Navigate `/dashboard` → `/settings` → `/qa-auth` — session persists throughout
+- [ ] Sign out — clears session, redirects to `/login`
+- [ ] `/qa-auth` after sign out — shows "Auth QA requires sign in" with 0 fails
+- [ ] Browser DevTools → Application → Local Storage: no `activeRestaurantId` key
+- [ ] Browser DevTools → Application → Local Storage: no `role` key
+- [ ] Browser DevTools → Application → Local Storage: no `membership` key
+- [ ] Browser DevTools → Application → Local Storage: no `restaurant_settings` key
+- [ ] No `VITE_SUPABASE_SERVICE_ROLE_KEY` in client env (verified by `/qa-auth` security check)
 
 ---
 

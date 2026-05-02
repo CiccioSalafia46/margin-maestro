@@ -131,16 +131,41 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - API layer: `src/data/api/settingsApi.ts` — CRUD for settings, units, categories, suppliers
 - `/qa-settings-admin` checks A through U
 
-**Note:** Build 1.1 is implemented but should be re-accepted only after Auth session persistence (Build 1.0E) is fixed. Do not assume Settings/Admin is fully accepted until `/qa-auth` passes and session survives refresh.
+**Note:** Build 1.1 is implemented. Re-acceptance (Build 1.1A) is next now that Auth works.
 
 ---
 
-## Current Blocker
+## Build 1.0E — Persistent Supabase Session Hard Fix
 
-**Supabase Auth session is lost on refresh and page navigation.**
+**Status:** Accepted (merged into 1.0F)
 
-- After login, navigating or refreshing loses the session
-- `/qa-auth` shows "Auth QA requires sign in"
-- Root cause: Supabase client Proxy singleton with SSR-conditional `storage` configuration
-- Branch `build-1.0e-auth-session-fix` has the fix attempt in progress
-- Commit `c1cede9` changed `persistSession` to `true` but issue persists due to Proxy/SSR interaction
+- Removed Proxy singleton from `src/integrations/supabase/client.ts`
+- Removed explicit `storage: typeof window !== 'undefined' ? localStorage : undefined` — was passing `storage: undefined` during SSR, overriding Supabase's built-in localStorage default
+- Now uses Supabase's default storage detection (localStorage in browser, in-memory on server)
+- Added `detectSessionInUrl: true` explicitly
+- Auth config: `persistSession: true`, `autoRefreshToken: true`, `detectSessionInUrl: true`
+
+---
+
+## Build 1.0E-A — Auth QA Loading and Route Guard Fix
+
+**Status:** Accepted (merged into 1.0F)
+
+- Removed `/qa-auth` from `PUBLIC_PATHS` in AuthGate
+- `/qa-auth` was being treated as an auth-flow page, causing authenticated users to be redirected to `/dashboard`
+- Now only `/login`, `/signup`, `/auth/callback` redirect authenticated users away
+- `/qa-auth` is a protected route: unauthenticated → `/login`, authenticated → stays on page
+
+---
+
+## Build 1.0F — Auth Acceptance Final
+
+**Status:** Accepted
+
+- Build label updated to "Build 1.0F — Auth Accepted"
+- Session persistence verified: survives refresh and navigation
+- Sign out clears session and redirects to `/login`
+- `/qa-auth` accessible as protected diagnostic route
+- No `activeRestaurantId`, role, membership, or settings in localStorage
+- Documentation updated
+- Previous blocker resolved

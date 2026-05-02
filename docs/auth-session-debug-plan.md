@@ -1,6 +1,27 @@
-# Auth Session Debug Plan — Build 1.0E
+# Auth Session Debug Plan — Build 1.0E (RESOLVED)
 
-Plan to fix the Supabase Auth session persistence bug.
+> **Status:** Fixed in Build 1.0E/1.0F. Session persistence works.
+> Auth accepted as of Build 1.0F.
+
+Original plan to fix the Supabase Auth session persistence bug.
+
+## Resolution
+
+**Root cause:** Two issues in `src/integrations/supabase/client.ts`:
+1. Explicit `storage: typeof window !== 'undefined' ? localStorage : undefined` passed `storage: undefined` during SSR, overriding Supabase's built-in localStorage default.
+2. Proxy singleton with wrong `Reflect.get` receiver could break internal Supabase methods.
+
+**Fix applied:**
+- Removed the Proxy singleton wrapper.
+- Removed the explicit `storage` option — Supabase now uses its built-in default (localStorage on browser, in-memory on server).
+- Added `detectSessionInUrl: true` explicitly.
+- Removed `/qa-auth` from AuthGate's `PUBLIC_PATHS` so authenticated users stay on the page.
+
+**Files changed:** `src/integrations/supabase/client.ts`, `src/auth/AuthGate.tsx`
+
+---
+
+## Original Plan (preserved for reference)
 
 ---
 

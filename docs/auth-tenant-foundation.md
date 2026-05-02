@@ -159,11 +159,15 @@ All SECURITY DEFINER functions:
 
 ---
 
-## Current Known Limitation: Session Persistence Bug
+## Session Persistence (Fixed in Build 1.0E/1.0F)
 
-As of Build 1.0E (branch `build-1.0e-auth-session-fix`), the Supabase Auth session is lost on page refresh and navigation. The Supabase client is configured with `persistSession: true` and `storage: localStorage` (conditional on `typeof window !== 'undefined'`), but the Proxy singleton pattern combined with TanStack Start's SSR architecture may cause the client to initialize with `storage: undefined` in a server context.
+Supabase Auth session persistence now works. The fix involved:
+1. Removing the Proxy singleton from `src/integrations/supabase/client.ts`.
+2. Removing the explicit `storage: typeof window !== 'undefined' ? localStorage : undefined` option that passed `storage: undefined` during SSR.
+3. Letting `@supabase/supabase-js` use its built-in default storage detection (localStorage in browser, in-memory on server).
+4. Removing `/qa-auth` from AuthGate's `PUBLIC_PATHS` so authenticated users are not redirected away.
 
-**This is the current blocker.** Build 1.0E aims to fix this.
+Auth config: `persistSession: true`, `autoRefreshToken: true`, `detectSessionInUrl: true`.
 
 ---
 

@@ -4,39 +4,21 @@ Known issues and limitations for Margin IQ.
 
 ---
 
-## Critical
+## Resolved
 
 ### OI-01 — Auth session lost on refresh / navigation
 
 **Severity:** Critical
-**Affected area:** Auth, all authenticated pages
-**Status:** Open — Build 1.0E in progress
-**Branch:** `build-1.0e-auth-session-fix`
-
-**Description:** After login, the Supabase Auth session is lost when the page is refreshed or when navigating between pages. `/qa-auth` shows "Auth QA requires sign in."
-
-**Root cause (suspected):** Supabase client Proxy singleton in `src/integrations/supabase/client.ts` with conditional `typeof window` check for `storage`. In the TanStack Start SSR environment, this may resolve to `undefined` during server-side rendering, poisoning the singleton.
-
-**Planned build:** Build 1.0E
-**Acceptance criteria:**
-- Login succeeds and session persists across page refresh
-- Session persists across client-side navigation
-- `/qa-auth` shows all auth checks PASS after refresh
-- Sign out clears session
-- No `activeRestaurantId` / role / membership in localStorage
+**Status:** Resolved — Build 1.0E/1.0F
+**Resolution:** Removed Proxy singleton and explicit `storage` option from Supabase client. Removed `/qa-auth` from AuthGate's `PUBLIC_PATHS`.
 
 ---
 
 ### OI-02 — /qa-auth shows sign-in required after login
 
-**Severity:** Critical (symptom of OI-01)
-**Affected area:** `/qa-auth`
-**Status:** Open — blocked by OI-01
-**Planned build:** Build 1.0E
-
-**Description:** `/qa-auth` diagnostic page cannot run auth checks because the session is not persisted. Shows "Not signed in. Sign in first to run Auth QA."
-
-**Acceptance criteria:** All `/qa-auth` automated checks show PASS after login and page refresh.
+**Severity:** Critical
+**Status:** Resolved — Build 1.0E-A/1.0F
+**Resolution:** `/qa-auth` removed from `PUBLIC_PATHS` so authenticated users are no longer redirected to `/dashboard`.
 
 ---
 
@@ -46,10 +28,10 @@ Known issues and limitations for Margin IQ.
 
 **Severity:** High
 **Affected area:** `/settings`, `/qa-settings-admin`
-**Status:** Implemented, pending re-acceptance
-**Planned build:** Build 1.1A (after 1.0E and 1.0F)
+**Status:** Pending re-acceptance — Auth is now fixed
+**Planned build:** Build 1.1A
 
-**Description:** Build 1.1 Settings/Admin reference data is implemented in code and database, but cannot be fully accepted because the Auth session bug prevents reliable testing. Must be re-verified after Auth is fixed.
+**Description:** Build 1.1 Settings/Admin reference data is implemented in code and database. Auth session persistence now works, so `/qa-settings-admin` can be reliably tested.
 
 **Acceptance criteria:** All `/qa-settings-admin` checks A through U show PASS.
 
