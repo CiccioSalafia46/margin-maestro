@@ -138,7 +138,7 @@ export function AppSidebar() {
       <SidebarFooter className="border-t">
         {!collapsed && (
           <p className="px-2 py-1 text-[10px] text-muted-foreground">
-            Build 0.4 — Margin Intelligence
+            Build 1.0B — Auth/RLS Accepted
           </p>
         )}
       </SidebarFooter>

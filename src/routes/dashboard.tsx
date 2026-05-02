@@ -388,7 +388,7 @@ function DashboardPage() {
 
         <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Bell className="h-3 w-3" />
-          Build 0.4 — Margin Intelligence over a mock dataset. No persistence, no backend.
+          Build 1.0B — Auth/RLS Accepted. Operational data still mock; auth + tenant live in backend.
         </p>
       </div>
     </AppShell>
