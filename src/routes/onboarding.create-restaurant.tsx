@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/auth/AuthProvider";
-import { createRestaurantWithOwner, setStoredActiveRestaurantId } from "@/data/api/tenantApi";
+import { createRestaurantWithOwner } from "@/data/api/tenantApi";
 
 export const Route = createFileRoute("/onboarding/create-restaurant")({
   head: () => ({
@@ -20,13 +20,19 @@ export const Route = createFileRoute("/onboarding/create-restaurant")({
 });
 
 function CreateRestaurantPage() {
-  const { refreshTenants, signOut, email } = useAuth();
+  const { refreshTenants, signOut, email, status } = useAuth();
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (status !== "authenticated") {
+      toast.error("Please sign in to create a restaurant.");
+      navigate({ to: "/login", replace: true });
+      return;
+    }
+
     const trimmed = name.trim();
     if (!trimmed) {
       toast.error("Restaurant name is required.");
@@ -34,13 +40,18 @@ function CreateRestaurantPage() {
     }
     setSubmitting(true);
     try {
-      const id = await createRestaurantWithOwner(trimmed);
-      setStoredActiveRestaurantId(id);
+      await createRestaurantWithOwner(trimmed);
       await refreshTenants();
       toast.success("Restaurant created.");
       navigate({ to: "/dashboard", replace: true });
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Could not create restaurant";
+      const raw = err instanceof Error ? err.message : "Could not create restaurant";
+      const msg =
+        raw === "not authenticated"
+          ? "Your session expired. Please sign in again."
+          : raw === "restaurant name required"
+            ? "Restaurant name is required."
+            : "Could not create restaurant. Please try again.";
       toast.error(msg);
     } finally {
       setSubmitting(false);
@@ -76,7 +87,10 @@ function CreateRestaurantPage() {
           <button
             type="button"
             className="text-xs text-muted-foreground hover:text-foreground"
-            onClick={() => void signOut()}
+            onClick={async () => {
+              await signOut();
+              navigate({ to: "/login", replace: true });
+            }}
           >
             Sign out
           </button>
