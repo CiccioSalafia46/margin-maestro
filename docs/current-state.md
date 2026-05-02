@@ -1,31 +1,28 @@
 # Current State
 
 **Date:** 2026-05-02
-**Build:** 1.0F — Auth Accepted
-**Branch:** `build-1.0e-auth-session-fix`
+**Build:** 1.1A — Settings/Admin Accepted
+**Branch:** `build-1.1a-settings-admin-acceptance`
 
 ---
 
 ## Actual State
 
-**Auth session persistence is fixed and accepted.** Supabase Auth sessions now survive page refresh and navigation. The Supabase client uses the library's built-in localStorage default for session storage.
+**Auth session persistence works** (fixed in Build 1.0E/1.0F). **Settings/Admin reference data is accepted** (Build 1.1A).
 
-Build 1.1 (Settings/Admin Reference Data) is implemented in code and database. It needs manual re-acceptance (Build 1.1A) now that Auth works.
+All 8 Supabase tables are live. All QA routes pass. Operational pages remain mock-based.
 
 ## Accepted Baseline
 
-**Build 1.0F — Auth Accepted.**
+**Build 1.1A — Settings/Admin Accepted.**
 
-- Login, signup, onboarding work end-to-end.
-- Session persists across refresh and navigation.
-- Sign out clears the session.
-- `/qa-auth` is accessible as a protected diagnostic route.
-- `/qa-auth` shows authenticated diagnostics after login.
-
-## What Was Fixed in Build 1.0E/1.0F
-
-- **Supabase client** (`src/integrations/supabase/client.ts`): Removed the Proxy singleton and the explicit `storage: typeof window !== 'undefined' ? localStorage : undefined` option. The previous code passed `storage: undefined` during SSR, overriding Supabase's built-in localStorage default. Now the client uses Supabase's default storage detection.
-- **AuthGate** (`src/auth/AuthGate.tsx`): Removed `/qa-auth` from `PUBLIC_PATHS`. It was being treated as an auth-flow page, causing authenticated users to be redirected to `/dashboard`. Now only `/login`, `/signup`, and `/auth/callback` redirect authenticated users away.
+- Auth session persists across refresh and navigation.
+- Settings page reads/writes real Supabase tenant-scoped data.
+- Units and unit conversions are read-only global reference data.
+- Menu categories and suppliers support add/rename/activate/deactivate.
+- Role-based access enforced: owner can edit settings/thresholds, owner/manager can manage categories/suppliers, viewer is read-only.
+- RLS tenant scoping verified.
+- `/qa-settings-admin` checks A through U pass (or warn for non-critical/role-specific items).
 
 ## Sessions
 
@@ -36,22 +33,22 @@ Build 1.1 (Settings/Admin Reference Data) is implemented in code and database. I
 
 ## Next Task
 
-**Build 1.1A — Settings/Admin Re-acceptance.**
+**Build 1.2 — Ingredients Database.**
 
-Re-verify Settings/Admin reference data layer now that Auth session persistence works. Run `/qa-settings-admin` full suite.
+Introduce `ingredients` and `ingredient_cost_state` tables, supplier linkage, and swap `/ingredients` page from mock to Supabase.
 
 ## Backend Scope (Supabase, live)
 
 | Table | Build | Status |
 |-------|-------|--------|
-| `profiles` | 1.0 | Implemented |
-| `restaurants` | 1.0 | Implemented |
-| `restaurant_members` | 1.0 | Implemented |
-| `restaurant_settings` | 1.0 | Implemented |
-| `units` | 1.1 | Implemented |
-| `unit_conversions` | 1.1 | Implemented |
-| `menu_categories` | 1.1 | Implemented |
-| `suppliers` | 1.1 | Implemented |
+| `profiles` | 1.0 | Accepted |
+| `restaurants` | 1.0 | Accepted |
+| `restaurant_members` | 1.0 | Accepted |
+| `restaurant_settings` | 1.0 | Accepted |
+| `units` | 1.1 | Accepted |
+| `unit_conversions` | 1.1 | Accepted |
+| `menu_categories` | 1.1 | Accepted |
+| `suppliers` | 1.1 | Accepted |
 
 ## Backend Scope (NOT yet implemented)
 
@@ -62,8 +59,6 @@ Re-verify Settings/Admin reference data layer now that Auth session persistence 
 - impact_cascade_runs, impact_cascade_items (Build 1.7)
 - alerts, audit_events (Build 1.8)
 - billing / subscriptions (Build 2.0)
-- CSV import/export (Build 1.9)
-- Edge Functions (not planned — using TanStack Start createServerFn)
 
 ## Routes Available
 
@@ -81,14 +76,7 @@ Re-verify Settings/Admin reference data layer now that Auth session persistence 
 
 ## What Remains Mock
 
-All operational pages read from `src/data/mock.ts`:
-- Ingredients, recipes, recipe lines
-- Menu items, menu prices
-- Price batches, price log
-- Cost states, snapshots
-- Impact cascade
-- Alerts
-- Dashboard KPIs
+All operational pages read from `src/data/mock.ts`.
 
 ## What Must Not Be Touched Next
 
@@ -97,9 +85,13 @@ All operational pages read from `src/data/mock.ts`:
 - `src/lib/*.ts` — No calculation helper changes.
 - `src/routes/qa-calculations.tsx` — No QA check modifications.
 - `src/routes/qa-data-integrity.tsx` — No QA check modifications.
-- `supabase/migrations/` — No new tables or schema changes.
-- No ingredients, recipes, menu_items, price log, snapshots, cascade, alerts, or billing tables.
+- No operational tables until their designated build.
 
 ## Known Limitations
 
-See `docs/open-issues.md` for the full list.
+- Google OAuth not enabled
+- Operational data still mock
+- Restaurant switcher limited (in-memory only)
+- Team management placeholder
+- Suppliers not linked to ingredients yet (Build 1.2)
+- Custom unit management not exposed

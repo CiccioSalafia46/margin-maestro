@@ -27,13 +27,8 @@ Known issues and limitations for Margin IQ.
 ### OI-03 — Settings/Admin pending re-acceptance
 
 **Severity:** High
-**Affected area:** `/settings`, `/qa-settings-admin`
-**Status:** Pending re-acceptance — Auth is now fixed
-**Planned build:** Build 1.1A
-
-**Description:** Build 1.1 Settings/Admin reference data is implemented in code and database. Auth session persistence now works, so `/qa-settings-admin` can be reliably tested.
-
-**Acceptance criteria:** All `/qa-settings-admin` checks A through U show PASS.
+**Status:** Resolved — Build 1.1A
+**Resolution:** Settings/Admin re-accepted. `/qa-settings-admin` checks A through U pass (or warn for non-critical/role-specific items). Auth stable since Build 1.0F.
 
 ---
 

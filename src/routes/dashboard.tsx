@@ -388,7 +388,7 @@ function DashboardPage() {
 
         <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Bell className="h-3 w-3" />
-          Build 1.0F — Auth Accepted. Session persistence verified; operational pages still use mock data.
+          Build 1.1A — Settings/Admin Accepted. Reference layer verified; operational pages still use mock data.
         </p>
       </div>
     </AppShell>

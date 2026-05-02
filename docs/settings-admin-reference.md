@@ -1,4 +1,7 @@
-# Settings/Admin Reference Layer — Build 1.1
+# Settings/Admin Reference Layer — Build 1.1 (Accepted in 1.1A)
+
+> **Status:** Accepted in Build 1.1A after Auth session persistence was
+> stabilized in Build 1.0F.
 
 This document describes the reference data layer added in Build 1.1. The
 goal is to make the Settings/Admin area real and tenant-scoped while the

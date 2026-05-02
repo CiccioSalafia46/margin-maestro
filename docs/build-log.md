@@ -169,3 +169,29 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - No `activeRestaurantId`, role, membership, or settings in localStorage
 - Documentation updated
 - Previous blocker resolved
+
+---
+
+## Build 1.1A — Settings/Admin Acceptance
+
+**Status:** Accepted
+
+- Re-accepted Settings/Admin reference data layer now that Auth session persistence is stable (Build 1.0F).
+- `/qa-settings-admin` checks A through U verified.
+- Settings page 6 tabs verified: General, Units & Conversions, Menu Categories, Suppliers, Alert Thresholds, Team.
+- Role-based access: owner can edit settings/thresholds, owner/manager can manage categories/suppliers, viewer is read-only.
+- Units (Ct, Gr, Kg, Lb, Oz, Ml, Lt, Gl) and unit conversions are read-only global reference data.
+- Default menu categories and suppliers seeded on restaurant creation.
+- Duplicate name handling verified for categories and suppliers.
+- RLS tenant scoping verified for menu_categories and suppliers.
+- No service-role key exposed to client.
+- No operational tables created.
+- Team tab remains placeholder/read-only.
+- Build label updated to "Build 1.1A — Settings/Admin Accepted".
+
+**Known limitations:**
+- Custom unit management not exposed (units are read-only).
+- Suppliers not linked to ingredients yet (Build 1.2).
+- Team management is placeholder — no invites or role changes.
+- Restaurant switcher limited to in-memory re-pointing.
+- Google OAuth not enabled.

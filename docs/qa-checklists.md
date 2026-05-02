@@ -137,6 +137,32 @@ Validates:
 
 **Expected:** All PASS for owner role. Some role-specific checks show WARN if current role cannot exercise them.
 
+### Build 1.1A Settings/Admin Acceptance Checklist
+
+- [ ] Owner can open `/settings`
+- [ ] Owner can update General settings (name, currency, locale, timezone, tax mode, target GPM)
+- [ ] Owner can update Alert Thresholds (spike %, GPM drop %, GP floor)
+- [ ] Owner can add a Menu Category
+- [ ] Owner can rename a Menu Category
+- [ ] Owner can deactivate/activate a Menu Category
+- [ ] Owner can add a Supplier
+- [ ] Owner can rename a Supplier
+- [ ] Owner can deactivate/activate a Supplier
+- [ ] Units & Conversions tab is read-only
+- [ ] Team tab is placeholder/read-only
+- [ ] Duplicate menu category name shows friendly error
+- [ ] Duplicate supplier name shows friendly error
+- [ ] Empty category/supplier name is rejected
+- [ ] Manager can manage Categories/Suppliers
+- [ ] Manager cannot update General settings or Alert Thresholds
+- [ ] Viewer is read-only across all tabs
+- [ ] `/qa-settings-admin` checks A through U pass (or warn for role-specific items)
+- [ ] Manual no-op write smoke test passes for owner
+- [ ] No cross-tenant data visible (RLS verified by checks R and S)
+- [ ] No service-role key exposed (verified by check T)
+- [ ] No operational tables created (verified by check U)
+- [ ] Operational pages still render mock data
+
 ---
 
 ## Future: Ingredients QA (Build 1.2)

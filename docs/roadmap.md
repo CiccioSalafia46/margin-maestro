@@ -6,51 +6,19 @@ Forward implementation plan for Margin IQ — Restaurant Margin Intelligence Saa
 
 ## Build 1.0E — Persistent Supabase Session Hard Fix
 
-**Goal:** Fix official Supabase Auth session persistence so sessions survive page refresh and navigation.
-
-**Scope:**
-- Fix Supabase client initialization to guarantee `storage: localStorage` on the browser
-- Replace or fix the Proxy singleton pattern in `src/integrations/supabase/client.ts`
-- Verify AuthProvider session restoration flow
-- Verify AuthGate does not redirect prematurely during SSR hydration
-- Update `AUTH_SESSION_CONFIG` display constant to match reality
-
-**Acceptance criteria:**
-- `/login` renders and accepts credentials
-- Login creates a session visible in `/qa-auth`
-- Refreshing `/qa-auth` keeps the session (PASS on "Session restored from getSession")
-- Navigating `/dashboard` → `/settings` → `/qa-auth` keeps the session
-- Sign out clears the session and redirects to `/login`
-- After sign out, `/qa-auth` shows "Sign in required"
-- No `activeRestaurantId`, role, membership, or settings in `localStorage`
-- No service-role key exposed to client
-
-**Out of scope:** New tables, schema changes, operational data migration, app redesign.
+**Status:** Accepted.
 
 ---
 
 ## Build 1.0F — Auth Acceptance Final
 
-**Goal:** Full acceptance pass of the Auth + Tenant foundation.
-
-**Scope:**
-- Run complete `/qa-auth` acceptance suite — all checks PASS
-- Verify signup → email confirmation → login → onboarding → dashboard flow
-- Verify restaurant creation via `create_restaurant_with_owner`
-- Verify profile auto-creation via trigger
-- Verify restaurant switcher behavior (in-memory only)
-- Update `docs/current-state.md`
-
-**Acceptance criteria:**
-- All `/qa-auth` checks PASS (session, profile, membership, RLS smoke, security)
-- Manual checklist items verified
-- No regressions in `/qa-calculations` or `/qa-data-integrity`
-
-**Out of scope:** New tables, settings changes, operational data.
+**Status:** Accepted.
 
 ---
 
 ## Build 1.1A — Settings/Admin Acceptance
+
+**Status:** Accepted.
 
 **Goal:** Re-verify Settings/Admin reference data layer after Auth is stable.
 
