@@ -21,6 +21,8 @@ import type {
 interface AuthContextValue {
   status: "loading" | "unauthenticated" | "authenticated";
   session: Session | null;
+  sessionRestored: boolean;
+  lastAuthEvent: string;
   userId: string | null;
   email: string | null;
   profile: Profile | null;
@@ -39,6 +41,8 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const [sessionRestored, setSessionRestored] = useState(false);
+  const [lastAuthEvent, setLastAuthEvent] = useState("initializing");
   const [profile, setProfile] = useState<Profile | null>(null);
   const [memberships, setMemberships] = useState<RestaurantMembership[]>([]);
   const [activeRestaurantSettings, setActiveRestaurantSettings] =
@@ -99,25 +103,65 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [loadRestaurantSettings]);
 
   useEffect(() => {
+    let mounted = true;
+
     // Auth state listener FIRST, then getSession.
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, newSession) => {
+      if (!mounted) return;
+
+      setLastAuthEvent(event);
       setSession(newSession);
       const uid = newSession?.user?.id ?? null;
       userIdRef.current = uid;
+      if (event === "SIGNED_OUT") {
+        setSessionRestored(false);
+      }
+
       // Defer Supabase calls out of the listener callback to avoid deadlocks.
       setTimeout(() => {
-        void loadTenantData(uid);
+        void loadTenantData(uid).finally(() => {
+          if (mounted) {
+            setSessionRestored(!!uid);
+          }
+        });
       }, 0);
     });
 
-    void supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      const uid = data.session?.user?.id ?? null;
-      userIdRef.current = uid;
-      void loadTenantData(uid).finally(() => setHydrated(true));
-    });
+    void supabase.auth
+      .getSession()
+      .then(({ data, error }) => {
+        if (!mounted) return;
+        if (error) {
+          console.error("[auth] failed to restore session", error);
+          setSession(null);
+          userIdRef.current = null;
+          setLastAuthEvent("restore_error");
+          return loadTenantData(null);
+        }
+
+        setSession(data.session);
+        const uid = data.session?.user?.id ?? null;
+        userIdRef.current = uid;
+        setSessionRestored(!!data.session);
+        setLastAuthEvent(data.session ? "getSession:restored" : "getSession:none");
+        return loadTenantData(uid);
+      })
+      .catch((error) => {
+        if (!mounted) return;
+        console.error("[auth] session bootstrap crashed", error);
+        setSession(null);
+        userIdRef.current = null;
+        setLastAuthEvent("restore_crash");
+        return loadTenantData(null);
+      })
+      .finally(() => {
+        if (mounted) {
+          setHydrated(true);
+        }
+      });
 
     return () => {
+      mounted = false;
       sub.subscription.unsubscribe();
     };
   }, [loadTenantData]);
@@ -137,6 +181,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     setSession(nextSession);
     userIdRef.current = uid;
+    setSessionRestored(!!nextSession);
+    setLastAuthEvent(nextSession ? "refreshAuth:session" : "refreshAuth:none");
 
     await loadTenantData(uid);
 
@@ -156,6 +202,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await supabase.auth.signOut();
     } finally {
       setSession(null);
+      setSessionRestored(false);
+      setLastAuthEvent("SIGNED_OUT");
       setProfile(null);
       setMemberships([]);
       setActiveRestaurantSettings(null);
@@ -175,6 +223,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return {
       status,
       session,
+      sessionRestored,
+      lastAuthEvent,
       userId: session?.user?.id ?? null,
       email: session?.user?.email ?? null,
       profile,
@@ -190,6 +240,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [
     hydrated,
     session,
+    sessionRestored,
+    lastAuthEvent,
     profile,
     memberships,
     activeRestaurantId,
