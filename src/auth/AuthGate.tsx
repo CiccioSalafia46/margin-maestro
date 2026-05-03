@@ -4,13 +4,15 @@ import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { useAuth } from "./AuthProvider";
 
 /** Routes that do NOT require authentication. */
-const PUBLIC_PATHS = new Set(["/login", "/signup", "/auth/callback"]);
+const PUBLIC_PATHS = new Set(["/login", "/signup", "/auth/callback", "/accept-invite"]);
 
 /**
  * Routes that authenticated users should be bounced away from — these are
  * login/signup flows that make no sense once you're signed in.
+ * Note: /accept-invite is public but NOT an auth-flow path — authenticated
+ * users should be able to accept invites.
  */
-const AUTH_FLOW_PATHS = PUBLIC_PATHS;
+const AUTH_FLOW_PATHS = new Set(["/login", "/signup", "/auth/callback"]);
 
 const ONBOARDING_PATH = "/onboarding/create-restaurant";
 

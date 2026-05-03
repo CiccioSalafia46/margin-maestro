@@ -497,3 +497,16 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - **Environment safety:** `.env.example` created with placeholders only.
 - **QA:** `/qa-mvp-readiness` with checks A–V (tables, security, module data, documentation).
 - Build label updated to "Build 2.0 — Beta Readiness".
+
+---
+
+## Build 2.1 — Team Management
+
+**Status:** Implemented
+
+- **Migration:** `restaurant_invitations` + `accept_restaurant_invitation` RPC.
+- **API:** `teamApi.ts` — members, invitations, role changes, accept invite.
+- **Settings Team tab:** Full UI replacing placeholder.
+- **Accept invite route:** `/accept-invite?token=<token>`.
+- **QA:** `/qa-team-management` with checks A–Q.
+- Sole owner protection via existing trigger.

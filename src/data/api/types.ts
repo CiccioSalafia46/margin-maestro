@@ -1,4 +1,4 @@
-// Build 1.8 — Full operational API types. Dashboard remains mock.
+// Build 2.1 — Full operational + team management API types.
 
 export type RestaurantRole = "owner" | "manager" | "viewer";
 
@@ -456,6 +456,34 @@ export interface AlertSummary {
   acknowledged: number;
   resolved: number;
   dismissed: number;
+}
+
+// ---------------- Team Management (Build 2.1) ----------------
+
+export type InvitationStatus = "pending" | "accepted" | "cancelled" | "expired";
+
+export interface RestaurantInvitationRow {
+  id: string;
+  restaurant_id: string;
+  email: string;
+  role: RestaurantRole;
+  status: InvitationStatus;
+  invited_by: string | null;
+  accepted_by: string | null;
+  accepted_at: string | null;
+  cancelled_at: string | null;
+  expires_at: string | null;
+  token: string;
+  note: string | null;
+  created_at: string;
+}
+
+export interface TeamMember {
+  user_id: string;
+  email: string | null;
+  full_name: string | null;
+  role: RestaurantRole;
+  joined_at: string;
 }
 
 export interface ApiError {

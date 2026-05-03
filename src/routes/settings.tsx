@@ -141,7 +141,7 @@ function SettingsPage() {
           </TabsContent>
 
           <TabsContent value="team" className="mt-4">
-            <TeamPlaceholder />
+            <TeamTab restaurantId={activeRestaurantId} canManage={canEditSettings} />
           </TabsContent>
         </Tabs>
 
@@ -844,47 +844,150 @@ function NumField({
   );
 }
 
-// ----------------- Team placeholder -----------------
-function TeamPlaceholder() {
-  const { memberships, activeMembership } = useAuth();
-  const list = useMemo(
-    () =>
-      activeMembership
-        ? memberships.filter((m) => m.restaurant.id === activeMembership.restaurant.id)
-        : [],
-    [memberships, activeMembership],
-  );
+// ----------------- Team -----------------
+function TeamTab({ restaurantId, canManage }: { restaurantId: string; canManage: boolean }) {
+  const { userId } = useAuth();
+  const [members, setMembers] = useState<import("@/data/api/types").TeamMember[]>([]);
+  const [invitations, setInvitations] = useState<import("@/data/api/types").RestaurantInvitationRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [invEmail, setInvEmail] = useState("");
+  const [invRole, setInvRole] = useState<string>("viewer");
+  const [submitting, setSubmitting] = useState(false);
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const { getTeamMembers, getRestaurantInvitations } = await import("@/data/api/teamApi");
+      const [m, i] = await Promise.all([getTeamMembers(restaurantId), getRestaurantInvitations(restaurantId)]);
+      setMembers(m);
+      setInvitations(i);
+    } catch (e) { toast.error(errMsg(e)); } finally { setLoading(false); }
+  };
+
+  useEffect(() => { void load(); }, [restaurantId]);
+
+  const onInvite = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!userId) return;
+    setSubmitting(true);
+    try {
+      const { createRestaurantInvitation } = await import("@/data/api/teamApi");
+      const inv = await createRestaurantInvitation(restaurantId, invEmail, invRole as "owner" | "manager" | "viewer", userId);
+      const link = `${window.location.origin}/accept-invite?token=${inv.token}`;
+      await navigator.clipboard.writeText(link).catch(() => {});
+      toast.success("Invite link copied to clipboard! Send it to the invited user manually.", { duration: 8000 });
+      setInvEmail("");
+      await load();
+    } catch (e) { toast.error(errMsg(e)); } finally { setSubmitting(false); }
+  };
+
+  const onCancel = async (invId: string) => {
+    try {
+      const { cancelRestaurantInvitation } = await import("@/data/api/teamApi");
+      await cancelRestaurantInvitation(restaurantId, invId);
+      toast.success("Invitation cancelled.");
+      await load();
+    } catch (e) { toast.error(errMsg(e)); }
+  };
+
+  const onChangeRole = async (memberUserId: string, role: string) => {
+    try {
+      const { updateMemberRole } = await import("@/data/api/teamApi");
+      await updateMemberRole(restaurantId, memberUserId, role as "owner" | "manager" | "viewer");
+      toast.success("Role updated.");
+      await load();
+    } catch (e) { toast.error(errMsg(e)); }
+  };
+
+  const onRemove = async (memberUserId: string) => {
+    if (!window.confirm("Remove this team member?")) return;
+    try {
+      const { removeTeamMember } = await import("@/data/api/teamApi");
+      await removeTeamMember(restaurantId, memberUserId);
+      toast.success("Member removed.");
+      await load();
+    } catch (e) { toast.error(errMsg(e)); }
+  };
+
+  if (loading) return <Card><CardContent className="flex items-center gap-2 p-6 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Loading…</CardContent></Card>;
+
+  const pendingInvites = invitations.filter((i) => i.status === "pending");
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Team</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <p className="text-xs text-muted-foreground">
-          Member invitations and role management arrive in a later build. Read-only for now.
-        </p>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Restaurant</TableHead>
-              <TableHead>Role</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {list.map((m) => (
-              <TableRow key={m.restaurant.id}>
-                <TableCell className="font-medium">{m.restaurant.name}</TableCell>
-                <TableCell>
-                  <Badge variant="outline" className="uppercase">
-                    {m.role}
-                  </Badge>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+    <div className="space-y-4">
+      <Card>
+        <CardHeader><CardTitle className="text-base">Team members</CardTitle></CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-xs text-muted-foreground">Owners: full access. Managers: edit data. Viewers: read-only.</p>
+          <Table>
+            <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Email</TableHead><TableHead>Role</TableHead>{canManage && <TableHead className="text-right">Actions</TableHead>}</TableRow></TableHeader>
+            <TableBody>
+              {members.map((m) => (
+                <TableRow key={m.user_id}>
+                  <TableCell className="font-medium">{m.full_name ?? "—"}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{m.email ?? "—"}</TableCell>
+                  <TableCell>
+                    {canManage && m.user_id !== userId ? (
+                      <Select value={m.role} onValueChange={(v) => onChangeRole(m.user_id, v)}>
+                        <SelectTrigger className="h-8 w-28"><SelectValue /></SelectTrigger>
+                        <SelectContent><SelectItem value="owner">Owner</SelectItem><SelectItem value="manager">Manager</SelectItem><SelectItem value="viewer">Viewer</SelectItem></SelectContent>
+                      </Select>
+                    ) : (
+                      <Badge variant="outline" className="uppercase">{m.role}</Badge>
+                    )}
+                  </TableCell>
+                  {canManage && (
+                    <TableCell className="text-right">
+                      {m.user_id !== userId && <Button size="sm" variant="ghost" onClick={() => onRemove(m.user_id)}>Remove</Button>}
+                    </TableCell>
+                  )}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {canManage && (
+        <Card>
+          <CardHeader><CardTitle className="text-base">Invite member</CardTitle></CardHeader>
+          <CardContent>
+            <form onSubmit={onInvite} className="flex items-end gap-2">
+              <div className="flex-1 space-y-1.5"><Label>Email</Label><Input type="email" required value={invEmail} onChange={(e) => setInvEmail(e.target.value)} placeholder="team@example.com" /></div>
+              <div className="w-32 space-y-1.5"><Label>Role</Label>
+                <Select value={invRole} onValueChange={setInvRole}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="owner">Owner</SelectItem><SelectItem value="manager">Manager</SelectItem><SelectItem value="viewer">Viewer</SelectItem></SelectContent></Select>
+              </div>
+              <Button type="submit" disabled={submitting}>{submitting ? "Creating…" : "Create invite"}</Button>
+            </form>
+            <p className="mt-2 text-[11px] text-muted-foreground">Email delivery is not enabled yet. After creating an invite, copy the link and send it to the user manually. The user must sign up or log in with the invited email.</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {pendingInvites.length > 0 && (
+        <Card>
+          <CardHeader><CardTitle className="text-base">Pending invitations</CardTitle></CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader><TableRow><TableHead>Email</TableHead><TableHead>Role</TableHead><TableHead>Sent</TableHead>{canManage && <TableHead className="text-right">Actions</TableHead>}</TableRow></TableHeader>
+              <TableBody>
+                {pendingInvites.map((inv) => (
+                  <TableRow key={inv.id}>
+                    <TableCell className="text-sm">{inv.email}</TableCell>
+                    <TableCell><Badge variant="outline" className="uppercase">{inv.role}</Badge></TableCell>
+                    <TableCell className="text-xs text-muted-foreground">{new Date(inv.created_at).toLocaleDateString()}</TableCell>
+                    {canManage && <TableCell className="text-right space-x-1">
+                      <Button size="sm" variant="outline" onClick={() => { const link = `${window.location.origin}/accept-invite?token=${inv.token}`; navigator.clipboard.writeText(link).then(() => toast.success("Invite link copied.")); }}>Copy link</Button>
+                      <Button size="sm" variant="ghost" onClick={() => onCancel(inv.id)}>Cancel</Button>
+                    </TableCell>}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
+    </div>
   );
 }
 
@@ -910,6 +1013,7 @@ function DeveloperQa() {
         <QaLink to="/qa-alerts" label="Alerts QA" />
         <QaLink to="/qa-dashboard" label="Dashboard QA" />
         <QaLink to="/qa-mvp-readiness" label="MVP Readiness QA" />
+        <QaLink to="/qa-team-management" label="Team Management QA" />
       </CardContent>
     </Card>
   );

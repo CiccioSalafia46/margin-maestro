@@ -508,6 +508,12 @@ export type Database = {
           },
         ]
       }
+      restaurant_invitations: {
+        Row: { id: string; restaurant_id: string; email: string; role: string; status: string; invited_by: string | null; accepted_by: string | null; accepted_at: string | null; cancelled_at: string | null; expires_at: string | null; token: string; note: string | null; created_at: string; updated_at: string }
+        Insert: { id?: string; restaurant_id: string; email: string; role: string; status?: string; invited_by?: string | null; accepted_by?: string | null; accepted_at?: string | null; cancelled_at?: string | null; expires_at?: string | null; token?: string; note?: string | null; created_at?: string; updated_at?: string }
+        Update: { id?: string; restaurant_id?: string; email?: string; role?: string; status?: string; invited_by?: string | null; accepted_by?: string | null; accepted_at?: string | null; cancelled_at?: string | null; expires_at?: string | null; token?: string; note?: string | null; created_at?: string; updated_at?: string }
+        Relationships: [{ foreignKeyName: "restaurant_invitations_restaurant_id_fkey"; columns: ["restaurant_id"]; isOneToOne: false; referencedRelation: "restaurants"; referencedColumns: ["id"] }]
+      }
       menu_categories: {
         Row: {
           created_at: string
@@ -806,6 +812,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_restaurant_invitation: {
+        Args: { p_token: string }
+        Returns: unknown
+      }
       create_restaurant_with_owner: {
         Args: { p_name: string }
         Returns: string

@@ -301,7 +301,7 @@ function QaAuthPage() {
         label: "Operational data partially migrated",
         status: "warn",
         nonCritical: true,
-        detail: "All operational pages Supabase-backed (Build 2.0). Billing, team management, and Google OAuth remain future scope.",
+        detail: "All operational pages + Team Management Supabase-backed (Build 2.1). Billing and Google OAuth remain future scope.",
       },
     ],
     [],
@@ -443,7 +443,7 @@ function QaAuthPage() {
 
         <p className="text-[11px] text-muted-foreground">
           No access tokens, refresh tokens, service-role keys, or raw session JSON are displayed.
-          Build 2.0 — Beta Readiness.
+          Build 2.1 — Team Management.
         </p>
       </div>
     </AppShell>

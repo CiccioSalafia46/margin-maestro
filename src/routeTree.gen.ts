@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RecipesRouteImport } from './routes/recipes'
+import { Route as QaTeamManagementRouteImport } from './routes/qa-team-management'
 import { Route as QaSettingsAdminRouteImport } from './routes/qa-settings-admin'
 import { Route as QaRecipesRouteImport } from './routes/qa-recipes'
 import { Route as QaPriceTrendRouteImport } from './routes/qa-price-trend'
@@ -35,6 +36,7 @@ import { Route as ImpactCascadeRouteImport } from './routes/impact-cascade'
 import { Route as DishAnalysisRouteImport } from './routes/dish-analysis'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AlertsRouteImport } from './routes/alerts'
+import { Route as AcceptInviteRouteImport } from './routes/accept-invite'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RecipesIndexRouteImport } from './routes/recipes.index'
 import { Route as DishAnalysisIndexRouteImport } from './routes/dish-analysis.index'
@@ -58,6 +60,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const RecipesRoute = RecipesRouteImport.update({
   id: '/recipes',
   path: '/recipes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QaTeamManagementRoute = QaTeamManagementRouteImport.update({
+  id: '/qa-team-management',
+  path: '/qa-team-management',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QaSettingsAdminRoute = QaSettingsAdminRouteImport.update({
@@ -175,6 +182,11 @@ const AlertsRoute = AlertsRouteImport.update({
   path: '/alerts',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AcceptInviteRoute = AcceptInviteRouteImport.update({
+  id: '/accept-invite',
+  path: '/accept-invite',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -224,6 +236,7 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/accept-invite': typeof AcceptInviteRoute
   '/alerts': typeof AlertsRoute
   '/dashboard': typeof DashboardRoute
   '/dish-analysis': typeof DishAnalysisRouteWithChildren
@@ -247,6 +260,7 @@ export interface FileRoutesByFullPath {
   '/qa-price-trend': typeof QaPriceTrendRoute
   '/qa-recipes': typeof QaRecipesRoute
   '/qa-settings-admin': typeof QaSettingsAdminRoute
+  '/qa-team-management': typeof QaTeamManagementRoute
   '/recipes': typeof RecipesRouteWithChildren
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
@@ -261,6 +275,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/accept-invite': typeof AcceptInviteRoute
   '/alerts': typeof AlertsRoute
   '/dashboard': typeof DashboardRoute
   '/impact-cascade': typeof ImpactCascadeRouteWithChildren
@@ -283,6 +298,7 @@ export interface FileRoutesByTo {
   '/qa-price-trend': typeof QaPriceTrendRoute
   '/qa-recipes': typeof QaRecipesRoute
   '/qa-settings-admin': typeof QaSettingsAdminRoute
+  '/qa-team-management': typeof QaTeamManagementRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -297,6 +313,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/accept-invite': typeof AcceptInviteRoute
   '/alerts': typeof AlertsRoute
   '/dashboard': typeof DashboardRoute
   '/dish-analysis': typeof DishAnalysisRouteWithChildren
@@ -320,6 +337,7 @@ export interface FileRoutesById {
   '/qa-price-trend': typeof QaPriceTrendRoute
   '/qa-recipes': typeof QaRecipesRoute
   '/qa-settings-admin': typeof QaSettingsAdminRoute
+  '/qa-team-management': typeof QaTeamManagementRoute
   '/recipes': typeof RecipesRouteWithChildren
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
@@ -336,6 +354,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/accept-invite'
     | '/alerts'
     | '/dashboard'
     | '/dish-analysis'
@@ -359,6 +378,7 @@ export interface FileRouteTypes {
     | '/qa-price-trend'
     | '/qa-recipes'
     | '/qa-settings-admin'
+    | '/qa-team-management'
     | '/recipes'
     | '/settings'
     | '/signup'
@@ -373,6 +393,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/accept-invite'
     | '/alerts'
     | '/dashboard'
     | '/impact-cascade'
@@ -395,6 +416,7 @@ export interface FileRouteTypes {
     | '/qa-price-trend'
     | '/qa-recipes'
     | '/qa-settings-admin'
+    | '/qa-team-management'
     | '/settings'
     | '/signup'
     | '/auth/callback'
@@ -408,6 +430,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/accept-invite'
     | '/alerts'
     | '/dashboard'
     | '/dish-analysis'
@@ -431,6 +454,7 @@ export interface FileRouteTypes {
     | '/qa-price-trend'
     | '/qa-recipes'
     | '/qa-settings-admin'
+    | '/qa-team-management'
     | '/recipes'
     | '/settings'
     | '/signup'
@@ -446,6 +470,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AcceptInviteRoute: typeof AcceptInviteRoute
   AlertsRoute: typeof AlertsRoute
   DashboardRoute: typeof DashboardRoute
   DishAnalysisRoute: typeof DishAnalysisRouteWithChildren
@@ -469,6 +494,7 @@ export interface RootRouteChildren {
   QaPriceTrendRoute: typeof QaPriceTrendRoute
   QaRecipesRoute: typeof QaRecipesRoute
   QaSettingsAdminRoute: typeof QaSettingsAdminRoute
+  QaTeamManagementRoute: typeof QaTeamManagementRoute
   RecipesRoute: typeof RecipesRouteWithChildren
   SettingsRoute: typeof SettingsRoute
   SignupRoute: typeof SignupRoute
@@ -497,6 +523,13 @@ declare module '@tanstack/react-router' {
       path: '/recipes'
       fullPath: '/recipes'
       preLoaderRoute: typeof RecipesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qa-team-management': {
+      id: '/qa-team-management'
+      path: '/qa-team-management'
+      fullPath: '/qa-team-management'
+      preLoaderRoute: typeof QaTeamManagementRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/qa-settings-admin': {
@@ -660,6 +693,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AlertsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/accept-invite': {
+      id: '/accept-invite'
+      path: '/accept-invite'
+      fullPath: '/accept-invite'
+      preLoaderRoute: typeof AcceptInviteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -779,6 +819,7 @@ const RecipesRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AcceptInviteRoute: AcceptInviteRoute,
   AlertsRoute: AlertsRoute,
   DashboardRoute: DashboardRoute,
   DishAnalysisRoute: DishAnalysisRouteWithChildren,
@@ -802,6 +843,7 @@ const rootRouteChildren: RootRouteChildren = {
   QaPriceTrendRoute: QaPriceTrendRoute,
   QaRecipesRoute: QaRecipesRoute,
   QaSettingsAdminRoute: QaSettingsAdminRoute,
+  QaTeamManagementRoute: QaTeamManagementRoute,
   RecipesRoute: RecipesRouteWithChildren,
   SettingsRoute: SettingsRoute,
   SignupRoute: SignupRoute,
