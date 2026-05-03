@@ -107,7 +107,7 @@ function QaMenuAnalyticsPage() {
 
       // S. no future tables
       try {
-        const future = ["menu_items", "ingredient_price_log", "ingredient_snapshots", "impact_cascade_runs", "alerts"] as const;
+        const future = ["menu_items", "impact_cascade_runs", "impact_cascade_items", "alerts"] as const;
         const probes = await Promise.all(future.map(async (t) => {
           const { error } = await (supabase as unknown as { from: (t: string) => { select: (s: string) => { limit: (n: number) => Promise<{ error: unknown }> } } }).from(t).select("id").limit(1);
           return { t, error };

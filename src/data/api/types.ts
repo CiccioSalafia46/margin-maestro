@@ -1,5 +1,5 @@
-// Build 1.4 — Auth + tenant + settings/admin + ingredients + recipes + menu analytics API types.
-// Price log/cascade/alerts remain mock for now.
+// Build 1.5 — Auth + tenant + settings/admin + ingredients + recipes + menu analytics + price log/snapshot API types.
+// Impact cascade/alerts remain mock for now.
 
 export type RestaurantRole = "owner" | "manager" | "viewer";
 
@@ -262,6 +262,78 @@ export interface MenuAnalyticsSummary {
   incomplete_costing_count: number;
   top_performer: MenuAnalyticsRow | null;
   bottom_performer: MenuAnalyticsRow | null;
+}
+
+// ---------------- Price Log + Snapshot (Build 1.5) ----------------
+
+export type PriceUpdateBatchStatus = "draft" | "previewed" | "applied" | "cancelled" | "failed";
+export type PriceUpdateBatchSource = "manual" | "baseline_initialization" | "baseline_reset" | "system";
+export type PriceLogEventType = "baseline" | "change" | "correction" | "manual_note";
+
+export interface PriceUpdateBatchRow {
+  id: string;
+  restaurant_id: string;
+  created_by: string | null;
+  status: PriceUpdateBatchStatus;
+  source: PriceUpdateBatchSource;
+  note: string | null;
+  baseline_version: number;
+  applied_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface IngredientPriceLogRow {
+  id: string;
+  restaurant_id: string;
+  batch_id: string | null;
+  ingredient_id: string | null;
+  baseline_version: number;
+  ingredient_name_at_time: string;
+  supplier_name_at_time: string | null;
+  ingredient_type_at_time: string;
+  old_total_cost: number | null;
+  old_quantity: number | null;
+  old_uom_code: string | null;
+  old_unit_cost: number | null;
+  old_recipe_unit_cost: number | null;
+  new_total_cost: number | null;
+  new_quantity: number | null;
+  new_uom_code: string | null;
+  new_unit_cost: number | null;
+  new_recipe_unit_cost: number | null;
+  delta_recipe_unit_cost_amount: number | null;
+  delta_recipe_unit_cost_percent: number | null;
+  event_type: PriceLogEventType;
+  note: string | null;
+  created_by: string | null;
+  created_at: string;
+}
+
+export interface IngredientSnapshotRow {
+  id: string;
+  restaurant_id: string;
+  ingredient_id: string;
+  baseline_version: number;
+  ingredient_name_at_time: string;
+  supplier_name_at_time: string | null;
+  ingredient_type_at_time: string;
+  total_cost: number | null;
+  quantity: number | null;
+  uom_code: string | null;
+  unit_cost: number | null;
+  recipe_unit_cost: number | null;
+  calculation_status: string | null;
+  captured_at: string;
+}
+
+export interface SnapshotStatus {
+  initialized: boolean;
+  baseline_version: number;
+  snapshot_count: number;
+  active_ingredient_count: number;
+  coverage_complete: boolean;
+  latest_batch_at: string | null;
 }
 
 export interface ApiError {

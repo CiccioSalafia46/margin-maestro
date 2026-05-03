@@ -14,6 +14,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RecipesRouteImport } from './routes/recipes'
 import { Route as QaSettingsAdminRouteImport } from './routes/qa-settings-admin'
 import { Route as QaRecipesRouteImport } from './routes/qa-recipes'
+import { Route as QaPriceLogSnapshotRouteImport } from './routes/qa-price-log-snapshot'
 import { Route as QaMenuAnalyticsRouteImport } from './routes/qa-menu-analytics'
 import { Route as QaIngredientsRouteImport } from './routes/qa-ingredients'
 import { Route as QaDataIntegrityRouteImport } from './routes/qa-data-integrity'
@@ -60,6 +61,11 @@ const QaSettingsAdminRoute = QaSettingsAdminRouteImport.update({
 const QaRecipesRoute = QaRecipesRouteImport.update({
   id: '/qa-recipes',
   path: '/qa-recipes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QaPriceLogSnapshotRoute = QaPriceLogSnapshotRouteImport.update({
+  id: '/qa-price-log-snapshot',
+  path: '/qa-price-log-snapshot',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QaMenuAnalyticsRoute = QaMenuAnalyticsRouteImport.update({
@@ -190,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/qa-ingredients': typeof QaIngredientsRoute
   '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
+  '/qa-price-log-snapshot': typeof QaPriceLogSnapshotRoute
   '/qa-recipes': typeof QaRecipesRoute
   '/qa-settings-admin': typeof QaSettingsAdminRoute
   '/recipes': typeof RecipesRouteWithChildren
@@ -218,6 +225,7 @@ export interface FileRoutesByTo {
   '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/qa-ingredients': typeof QaIngredientsRoute
   '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
+  '/qa-price-log-snapshot': typeof QaPriceLogSnapshotRoute
   '/qa-recipes': typeof QaRecipesRoute
   '/qa-settings-admin': typeof QaSettingsAdminRoute
   '/recipes': typeof RecipesRouteWithChildren
@@ -248,6 +256,7 @@ export interface FileRoutesById {
   '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/qa-ingredients': typeof QaIngredientsRoute
   '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
+  '/qa-price-log-snapshot': typeof QaPriceLogSnapshotRoute
   '/qa-recipes': typeof QaRecipesRoute
   '/qa-settings-admin': typeof QaSettingsAdminRoute
   '/recipes': typeof RecipesRouteWithChildren
@@ -279,6 +288,7 @@ export interface FileRouteTypes {
     | '/qa-data-integrity'
     | '/qa-ingredients'
     | '/qa-menu-analytics'
+    | '/qa-price-log-snapshot'
     | '/qa-recipes'
     | '/qa-settings-admin'
     | '/recipes'
@@ -307,6 +317,7 @@ export interface FileRouteTypes {
     | '/qa-data-integrity'
     | '/qa-ingredients'
     | '/qa-menu-analytics'
+    | '/qa-price-log-snapshot'
     | '/qa-recipes'
     | '/qa-settings-admin'
     | '/recipes'
@@ -336,6 +347,7 @@ export interface FileRouteTypes {
     | '/qa-data-integrity'
     | '/qa-ingredients'
     | '/qa-menu-analytics'
+    | '/qa-price-log-snapshot'
     | '/qa-recipes'
     | '/qa-settings-admin'
     | '/recipes'
@@ -366,6 +378,7 @@ export interface RootRouteChildren {
   QaDataIntegrityRoute: typeof QaDataIntegrityRoute
   QaIngredientsRoute: typeof QaIngredientsRoute
   QaMenuAnalyticsRoute: typeof QaMenuAnalyticsRoute
+  QaPriceLogSnapshotRoute: typeof QaPriceLogSnapshotRoute
   QaRecipesRoute: typeof QaRecipesRoute
   QaSettingsAdminRoute: typeof QaSettingsAdminRoute
   RecipesRoute: typeof RecipesRouteWithChildren
@@ -410,6 +423,13 @@ declare module '@tanstack/react-router' {
       path: '/qa-recipes'
       fullPath: '/qa-recipes'
       preLoaderRoute: typeof QaRecipesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qa-price-log-snapshot': {
+      id: '/qa-price-log-snapshot'
+      path: '/qa-price-log-snapshot'
+      fullPath: '/qa-price-log-snapshot'
+      preLoaderRoute: typeof QaPriceLogSnapshotRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/qa-menu-analytics': {
@@ -634,6 +654,7 @@ const rootRouteChildren: RootRouteChildren = {
   QaDataIntegrityRoute: QaDataIntegrityRoute,
   QaIngredientsRoute: QaIngredientsRoute,
   QaMenuAnalyticsRoute: QaMenuAnalyticsRoute,
+  QaPriceLogSnapshotRoute: QaPriceLogSnapshotRoute,
   QaRecipesRoute: QaRecipesRoute,
   QaSettingsAdminRoute: QaSettingsAdminRoute,
   RecipesRoute: RecipesRouteWithChildren,

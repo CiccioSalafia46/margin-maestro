@@ -399,11 +399,12 @@ function QaSettingsAdminPage() {
         detail: "no VITE_SUPABASE_SERVICE_ROLE_KEY in client env",
       });
 
-      // U. only expected Build 1.3 operational tables present
-      // ingredients, ingredient_cost_state, recipes, recipe_lines are expected.
-      // Future tables (menu_items, price_log, etc.) should NOT exist yet.
+      // U. only expected Build 1.5 operational tables present
+      // ingredients, ingredient_cost_state, recipes, recipe_lines, price_update_batches,
+      // ingredient_price_log, ingredient_snapshots are expected.
+      // Future tables (menu_items, impact_cascade, alerts, etc.) should NOT exist yet.
       try {
-        const futureOnly = ["menu_items", "ingredient_price_log", "ingredient_snapshots", "impact_cascade_runs", "alerts"] as const;
+        const futureOnly = ["menu_items", "impact_cascade_runs", "impact_cascade_items", "alerts"] as const;
         const probes = await Promise.all(
           futureOnly.map(async (t) => {
             const { error } = await (supabase as unknown as {
@@ -419,16 +420,16 @@ function QaSettingsAdminPage() {
         );
         const unexpected = probes.filter((p) => !p.error).map((p) => p.t);
         next.push({
-          label: "U. only expected Build 1.3 operational tables present",
+          label: "U. only expected Build 1.5 operational tables present",
           status: unexpected.length === 0 ? "pass" : "fail",
           detail:
             unexpected.length === 0
-              ? "ingredients/recipes/recipe_lines expected; no future tables found"
+              ? "ingredients/recipes/price_log/snapshots expected; no future tables found"
               : `unexpected tables present: ${unexpected.join(", ")}`,
         });
       } catch {
         next.push({
-          label: "U. only expected Build 1.3 operational tables present",
+          label: "U. only expected Build 1.5 operational tables present",
           status: "pass",
           detail: "probe rejected (future tables absent)",
         });

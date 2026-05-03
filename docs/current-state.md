@@ -1,7 +1,7 @@
 # Current State
 
 **Date:** 2026-05-03
-**Build:** 1.4A — Menu Analytics Accepted
+**Build:** 1.5 — Price Log + Snapshot
 **Branch:** `build-1.3-recipes`
 **Backend:** Self-owned Supabase project `margin-maestro-dev`
 
@@ -9,17 +9,7 @@
 
 ## Actual State
 
-**Ingredients, Recipes, and Menu Analytics use Supabase.** Menu Analytics is derived (no new tables) from active dish recipes, recipe_lines, ingredients, ingredient_cost_state, and restaurant_settings. All other operational pages remain mock-based.
-
-## Accepted Baseline
-
-**Build 1.4A — Menu Analytics Accepted.**
-
-- Auth session persistence (Build 1.0F).
-- Settings/Admin reference data (Build 1.1A).
-- Ingredients database (Build 1.2A).
-- Recipes with line editor, intermediate propagation, cycle detection (Build 1.3A/B).
-- Menu Analytics derived from live Supabase data (Build 1.4A).
+**Ingredients, Recipes, Menu Analytics, Price Log, and Snapshots use Supabase.** Price Log is append-only. Baseline initialization captures current ingredient state. Dashboard, Dish Analysis, Impact Cascade, Price Trend, and Alerts remain mock-based.
 
 ## Backend Scope (Supabase, live)
 
@@ -37,23 +27,23 @@
 | `ingredient_cost_state` | 1.2 | Accepted |
 | `recipes` | 1.3 | Accepted |
 | `recipe_lines` | 1.3 | Accepted |
-
-**Note:** Menu Analytics is derived — no table.
+| `price_update_batches` | 1.5 | **New** |
+| `ingredient_price_log` | 1.5 | **New** |
+| `ingredient_snapshots` | 1.5 | **New** |
 
 ## What Remains Mock
 
-Dashboard, dish analysis, impact cascade, price trend, price log, alerts.
+Dashboard, dish analysis, impact cascade, price trend, alerts.
 
 ## Next Task
 
-**Build 1.5 — Price Log + Snapshot.**
+**Build 1.5A — Price Update Batch Flow** or **Build 1.6 — Recalculation Cascade.**
 
 ## Known Limitations
 
-- No snapshot deltas yet (Build 1.5)
-- Suggested price is informational only — no Apply action
+- Full price update batch editing deferred
+- Non-destructive baseline reset deferred
+- Price Trend still uses mock data
 - Dashboard uses mock data
-- Dish Analysis uses mock data
-- Price Log/Snapshot awaits Build 1.5
-- Google OAuth not enabled
-- Team management placeholder
+- Impact Cascade persistence awaits Build 1.7
+- Alerts persistence awaits Build 1.8

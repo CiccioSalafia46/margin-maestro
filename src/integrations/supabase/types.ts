@@ -305,6 +305,191 @@ export type Database = {
           },
         ]
       }
+      ingredient_price_log: {
+        Row: {
+          id: string
+          restaurant_id: string
+          batch_id: string | null
+          ingredient_id: string | null
+          baseline_version: number
+          ingredient_name_at_time: string
+          supplier_name_at_time: string | null
+          ingredient_type_at_time: string
+          old_total_cost: number | null
+          old_quantity: number | null
+          old_uom_code: string | null
+          old_unit_cost: number | null
+          old_recipe_unit_cost: number | null
+          new_total_cost: number | null
+          new_quantity: number | null
+          new_uom_code: string | null
+          new_unit_cost: number | null
+          new_recipe_unit_cost: number | null
+          delta_recipe_unit_cost_amount: number | null
+          delta_recipe_unit_cost_percent: number | null
+          event_type: string
+          note: string | null
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          restaurant_id: string
+          batch_id?: string | null
+          ingredient_id?: string | null
+          baseline_version?: number
+          ingredient_name_at_time: string
+          supplier_name_at_time?: string | null
+          ingredient_type_at_time: string
+          old_total_cost?: number | null
+          old_quantity?: number | null
+          old_uom_code?: string | null
+          old_unit_cost?: number | null
+          old_recipe_unit_cost?: number | null
+          new_total_cost?: number | null
+          new_quantity?: number | null
+          new_uom_code?: string | null
+          new_unit_cost?: number | null
+          new_recipe_unit_cost?: number | null
+          delta_recipe_unit_cost_amount?: number | null
+          delta_recipe_unit_cost_percent?: number | null
+          event_type: string
+          note?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          [_ in never]: never
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ingredient_price_log_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ingredient_snapshots: {
+        Row: {
+          id: string
+          restaurant_id: string
+          ingredient_id: string
+          baseline_version: number
+          ingredient_name_at_time: string
+          supplier_name_at_time: string | null
+          ingredient_type_at_time: string
+          total_cost: number | null
+          quantity: number | null
+          uom_code: string | null
+          unit_cost: number | null
+          recipe_unit_cost: number | null
+          calculation_status: string | null
+          captured_at: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          restaurant_id: string
+          ingredient_id: string
+          baseline_version?: number
+          ingredient_name_at_time: string
+          supplier_name_at_time?: string | null
+          ingredient_type_at_time: string
+          total_cost?: number | null
+          quantity?: number | null
+          uom_code?: string | null
+          unit_cost?: number | null
+          recipe_unit_cost?: number | null
+          calculation_status?: string | null
+          captured_at?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          restaurant_id?: string
+          ingredient_id?: string
+          baseline_version?: number
+          ingredient_name_at_time?: string
+          supplier_name_at_time?: string | null
+          ingredient_type_at_time?: string
+          total_cost?: number | null
+          quantity?: number | null
+          uom_code?: string | null
+          unit_cost?: number | null
+          recipe_unit_cost?: number | null
+          calculation_status?: string | null
+          captured_at?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ingredient_snapshots_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ingredient_snapshots_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "ingredients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      price_update_batches: {
+        Row: {
+          id: string
+          restaurant_id: string
+          created_by: string | null
+          status: string
+          source: string
+          note: string | null
+          baseline_version: number
+          applied_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          restaurant_id: string
+          created_by?: string | null
+          status?: string
+          source?: string
+          note?: string | null
+          baseline_version?: number
+          applied_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          restaurant_id?: string
+          created_by?: string | null
+          status?: string
+          source?: string
+          note?: string | null
+          baseline_version?: number
+          applied_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_update_batches_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       menu_categories: {
         Row: {
           created_at: string

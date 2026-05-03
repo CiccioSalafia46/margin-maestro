@@ -320,3 +320,24 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - KPIs, per-dish profitability table, suggested prices verified.
 - `/qa-menu-analytics` checks A–U verified (PASS or acceptable WARN).
 - Build label updated to "Build 1.4A — Menu Analytics Accepted".
+
+---
+
+## Build 1.5 — Price Log + Snapshot Foundation
+
+**Status:** Implemented
+
+- **Migration:** `price_update_batches`, `ingredient_price_log`, `ingredient_snapshots` with RLS.
+- **API:** `src/data/api/priceLogApi.ts` — getPriceLogEntries, getPriceUpdateBatches, getIngredientSnapshots, getSnapshotStatus, initializeBaseline.
+- **Types:** `PriceUpdateBatchRow`, `IngredientPriceLogRow`, `IngredientSnapshotRow`, `SnapshotStatus` in `types.ts`.
+- **Route:** `/price-log` rewritten from mock to Supabase. Baseline status card, initialize baseline button, append-only log table.
+- **Append-only:** No UPDATE/DELETE policy on ingredient_price_log.
+- **Baseline init:** Captures current ingredients, creates baseline log entries + snapshots.
+- **QA:** `/qa-price-log-snapshot` with checks A–V.
+- **Developer QA link:** Added to Settings → Developer QA.
+
+**Limitations:**
+- Full price update batch editing deferred.
+- Non-destructive baseline reset deferred.
+- Price Trend still uses mock data.
+- Dashboard and other operational pages still use mock data.

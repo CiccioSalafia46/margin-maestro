@@ -213,9 +213,9 @@ function QaIngredientsPage() {
         detail: "Manual test only. Use Add Ingredient form on /ingredients.",
       });
 
-      // R. no price_log/snapshot/impact/alerts tables
+      // R. no future impact/alerts tables
       try {
-        const opTables = ["ingredient_price_log", "ingredient_snapshots", "impact_cascade_runs", "alerts"] as const;
+        const opTables = ["impact_cascade_runs", "impact_cascade_items", "alerts"] as const;
         const probes = await Promise.all(
           opTables.map(async (t) => {
             const { error } = await (supabase as unknown as {
@@ -226,7 +226,7 @@ function QaIngredientsPage() {
         );
         const present = probes.filter((p) => !p.error).map((p) => p.t);
         next.push({
-          label: "R. no price_log/snapshot/impact/alerts tables",
+          label: "R. no future impact/alerts tables",
           status: present.length === 0 ? "pass" : "fail",
           detail: present.length === 0 ? "none present" : `unexpected: ${present.join(", ")}`,
         });
