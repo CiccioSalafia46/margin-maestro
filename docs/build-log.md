@@ -550,3 +550,16 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - **Edge Functions:** Documented stubs requiring deployment with Stripe keys.
 - **QA:** `/qa-billing` with checks A–Q.
 - No Stripe secrets in browser. Owner-only via RLS.
+
+---
+
+## Build 2.2A — Billing Stripe Test
+
+**Status:** Implemented
+
+- **Edge Functions:** `create-checkout-session`, `create-customer-portal-session`, `stripe-webhook` — deployable Deno functions.
+- **Shared helpers:** `_shared/cors.ts`, `_shared/supabase.ts` for auth verification and admin client.
+- **Webhook:** Stripe signature verification, idempotent event recording, subscription state sync.
+- **Checkout:** Creates/reuses Stripe customer, creates subscription Checkout Session.
+- **Portal:** Creates Billing Portal session for existing customers.
+- Requires `supabase secrets set` for STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, STRIPE_PRICE_ID, SITE_URL.
