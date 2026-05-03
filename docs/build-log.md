@@ -575,3 +575,14 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - **Dish Analysis → Margin Manager:** "Apply this price" under primary target.
 - Owner/manager only. Updates `recipes.menu_price` only.
 - **QA:** `/qa-apply-price` with checks A–S.
+
+---
+
+## Build 2.4A — Apply Price Acceptance
+
+**Status:** Accepted
+
+- Apply Price verified on margin-maestro-dev.
+- Updates `recipes.menu_price` only — no price log, no batches, no billing, no POS.
+- Owner/manager only. Viewer read-only.
+- Build label: "Build 2.4A — Apply Price Accepted".

@@ -107,21 +107,21 @@ Forward implementation plan for Margin IQ — Restaurant Margin Intelligence Saa
 
 ---
 
-## Build 2.2 — Billing
+## Build 2.2 / 2.2A — Billing
 
-**Status:** Not started.
+**Status:** Accepted.
 
 ---
 
 ## Build 2.3 — Automated E2E QA
 
-**Status:** Not started.
+**Status:** Accepted.
 
 ---
 
-## Build 2.4 — Apply Price Workflow
+## Build 2.4 / 2.4A — Apply Price Workflow
 
-**Status:** Not started.
+**Status:** Accepted.
 
 ---
 
