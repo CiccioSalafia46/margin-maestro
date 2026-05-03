@@ -904,6 +904,7 @@ function DeveloperQa() {
         <QaLink to="/qa-recipes" label="Recipes QA" />
         <QaLink to="/qa-menu-analytics" label="Menu Analytics QA" />
         <QaLink to="/qa-price-log-snapshot" label="Price Log + Snapshot QA" />
+        <QaLink to="/qa-price-trend" label="Price Trend QA" />
       </CardContent>
     </Card>
   );

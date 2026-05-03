@@ -1,7 +1,7 @@
 # Current State
 
 **Date:** 2026-05-03
-**Build:** 1.5A — Price Update Batch
+**Build:** 1.5B — Price Trend
 **Branch:** `build-1.3-recipes`
 **Backend:** Self-owned Supabase project `margin-maestro-dev`
 
@@ -9,7 +9,7 @@
 
 ## Actual State
 
-**Ingredients, Recipes, Menu Analytics, Price Log, Snapshots, and Price Update Batches use Supabase.** The controlled Price Update Batch flow allows owner/manager to update supplier prices, preview cost impact, and apply append-only log entries. Dashboard, Dish Analysis, Impact Cascade, Price Trend, and Alerts remain mock-based.
+**Ingredients, Recipes, Menu Analytics, Price Log, Snapshots, Price Update Batches, and Price Trend use Supabase.** Dashboard, Dish Analysis, Impact Cascade, and Alerts remain mock-based.
 
 ## Backend Scope (Supabase, live)
 
@@ -31,20 +31,21 @@
 | `ingredient_price_log` | 1.5 | Live |
 | `ingredient_snapshots` | 1.5 | Live |
 
+**Derived (no table):** Menu Analytics (1.4), Price Trend (1.5B).
+
 ## What Remains Mock
 
-Dashboard, dish analysis, impact cascade, price trend, alerts.
+Dashboard, dish analysis, impact cascade, alerts.
 
 ## Next Task
 
-**Build 1.5B — Price Trend Supabase-backed** or **Build 1.7 — Impact Cascade.**
+**Build 1.7 — Impact Cascade** or **Build 1.6 — Dish Analysis Supabase-derived.**
 
 ## Known Limitations
 
-- Batch apply is client-orchestrated (not an atomic DB transaction)
-- Non-destructive baseline reset deferred
-- Price Trend still uses mock data
 - Dashboard uses mock data
+- Dish Analysis uses mock data
 - Impact Cascade persistence awaits Build 1.7
 - Alerts persistence awaits Build 1.8
-- Normal ingredient edits do NOT write price log entries (by design)
+- Batch apply is client-orchestrated (not atomic DB transaction)
+- Non-destructive baseline reset deferred

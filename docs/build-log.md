@@ -355,3 +355,24 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - **/ingredients:** "Run Price Update" button now links to /price-log.
 - Batch apply is client-orchestrated (not atomic DB transaction).
 - Normal ingredient edits do NOT write price log entries (by design).
+
+---
+
+## Build 1.5B — Price Trend Supabase-backed
+
+**Status:** Implemented
+
+- **No new migration.** Reads from existing ingredient_price_log.
+- **API:** `src/data/api/priceTrendApi.ts` — getPriceTrendIngredients, getIngredientPriceTrend, derivePriceTrendStats, derivePriceTrendSeries.
+- **Route:** `/price-trend` rewritten from mock to Supabase-backed.
+- **Chart:** Recipe unit cost over time from baseline + change events.
+- **KPIs:** First recorded, current, absolute change, percent change, number of changes, largest increase.
+- **History table:** Timestamp, event type, old/new RUC, delta %, baseline version, note.
+- **QA:** `/qa-price-trend` with checks A–S.
+- **Developer QA link:** Added to Settings → Developer QA.
+
+**Limitations:**
+- Dashboard still uses mock data.
+- Dish Analysis still uses mock data.
+- Impact Cascade persistence deferred.
+- Alerts persistence deferred.
