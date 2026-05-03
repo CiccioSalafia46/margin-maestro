@@ -16,6 +16,7 @@ import { Route as QaSettingsAdminRouteImport } from './routes/qa-settings-admin'
 import { Route as QaRecipesRouteImport } from './routes/qa-recipes'
 import { Route as QaPriceTrendRouteImport } from './routes/qa-price-trend'
 import { Route as QaPriceLogSnapshotRouteImport } from './routes/qa-price-log-snapshot'
+import { Route as QaMvpReadinessRouteImport } from './routes/qa-mvp-readiness'
 import { Route as QaMenuAnalyticsRouteImport } from './routes/qa-menu-analytics'
 import { Route as QaIngredientsRouteImport } from './routes/qa-ingredients'
 import { Route as QaImpactCascadeRouteImport } from './routes/qa-impact-cascade'
@@ -77,6 +78,11 @@ const QaPriceTrendRoute = QaPriceTrendRouteImport.update({
 const QaPriceLogSnapshotRoute = QaPriceLogSnapshotRouteImport.update({
   id: '/qa-price-log-snapshot',
   path: '/qa-price-log-snapshot',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QaMvpReadinessRoute = QaMvpReadinessRouteImport.update({
+  id: '/qa-mvp-readiness',
+  path: '/qa-mvp-readiness',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QaMenuAnalyticsRoute = QaMenuAnalyticsRouteImport.update({
@@ -236,6 +242,7 @@ export interface FileRoutesByFullPath {
   '/qa-impact-cascade': typeof QaImpactCascadeRoute
   '/qa-ingredients': typeof QaIngredientsRoute
   '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
+  '/qa-mvp-readiness': typeof QaMvpReadinessRoute
   '/qa-price-log-snapshot': typeof QaPriceLogSnapshotRoute
   '/qa-price-trend': typeof QaPriceTrendRoute
   '/qa-recipes': typeof QaRecipesRoute
@@ -271,6 +278,7 @@ export interface FileRoutesByTo {
   '/qa-impact-cascade': typeof QaImpactCascadeRoute
   '/qa-ingredients': typeof QaIngredientsRoute
   '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
+  '/qa-mvp-readiness': typeof QaMvpReadinessRoute
   '/qa-price-log-snapshot': typeof QaPriceLogSnapshotRoute
   '/qa-price-trend': typeof QaPriceTrendRoute
   '/qa-recipes': typeof QaRecipesRoute
@@ -307,6 +315,7 @@ export interface FileRoutesById {
   '/qa-impact-cascade': typeof QaImpactCascadeRoute
   '/qa-ingredients': typeof QaIngredientsRoute
   '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
+  '/qa-mvp-readiness': typeof QaMvpReadinessRoute
   '/qa-price-log-snapshot': typeof QaPriceLogSnapshotRoute
   '/qa-price-trend': typeof QaPriceTrendRoute
   '/qa-recipes': typeof QaRecipesRoute
@@ -345,6 +354,7 @@ export interface FileRouteTypes {
     | '/qa-impact-cascade'
     | '/qa-ingredients'
     | '/qa-menu-analytics'
+    | '/qa-mvp-readiness'
     | '/qa-price-log-snapshot'
     | '/qa-price-trend'
     | '/qa-recipes'
@@ -380,6 +390,7 @@ export interface FileRouteTypes {
     | '/qa-impact-cascade'
     | '/qa-ingredients'
     | '/qa-menu-analytics'
+    | '/qa-mvp-readiness'
     | '/qa-price-log-snapshot'
     | '/qa-price-trend'
     | '/qa-recipes'
@@ -415,6 +426,7 @@ export interface FileRouteTypes {
     | '/qa-impact-cascade'
     | '/qa-ingredients'
     | '/qa-menu-analytics'
+    | '/qa-mvp-readiness'
     | '/qa-price-log-snapshot'
     | '/qa-price-trend'
     | '/qa-recipes'
@@ -452,6 +464,7 @@ export interface RootRouteChildren {
   QaImpactCascadeRoute: typeof QaImpactCascadeRoute
   QaIngredientsRoute: typeof QaIngredientsRoute
   QaMenuAnalyticsRoute: typeof QaMenuAnalyticsRoute
+  QaMvpReadinessRoute: typeof QaMvpReadinessRoute
   QaPriceLogSnapshotRoute: typeof QaPriceLogSnapshotRoute
   QaPriceTrendRoute: typeof QaPriceTrendRoute
   QaRecipesRoute: typeof QaRecipesRoute
@@ -512,6 +525,13 @@ declare module '@tanstack/react-router' {
       path: '/qa-price-log-snapshot'
       fullPath: '/qa-price-log-snapshot'
       preLoaderRoute: typeof QaPriceLogSnapshotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qa-mvp-readiness': {
+      id: '/qa-mvp-readiness'
+      path: '/qa-mvp-readiness'
+      fullPath: '/qa-mvp-readiness'
+      preLoaderRoute: typeof QaMvpReadinessRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/qa-menu-analytics': {
@@ -777,6 +797,7 @@ const rootRouteChildren: RootRouteChildren = {
   QaImpactCascadeRoute: QaImpactCascadeRoute,
   QaIngredientsRoute: QaIngredientsRoute,
   QaMenuAnalyticsRoute: QaMenuAnalyticsRoute,
+  QaMvpReadinessRoute: QaMvpReadinessRoute,
   QaPriceLogSnapshotRoute: QaPriceLogSnapshotRoute,
   QaPriceTrendRoute: QaPriceTrendRoute,
   QaRecipesRoute: QaRecipesRoute,

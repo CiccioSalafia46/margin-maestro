@@ -236,7 +236,7 @@ function DashboardPage() {
             </Card>
 
             <p className="text-[11px] text-muted-foreground">
-              Build 1.9 — Dashboard. Per-serving metrics. No sales volume or monthly revenue projections.
+              Build 2.0 — Beta Readiness. Per-serving metrics. All operational pages Supabase-backed.
             </p>
           </>
         )}

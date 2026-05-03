@@ -482,3 +482,18 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - Outdated "still mock" copy removed from QA routes.
 - Build label updated to "Build 1.9A — MVP Accepted".
 - Core MVP modules complete: Auth, Settings, Ingredients, Recipes, Menu Analytics, Price Log, Snapshot, Price Update Batch, Price Trend, Dish Analysis, Impact Cascade, Alerts, Dashboard.
+
+---
+
+## Build 2.0 — Production Hardening & Beta Readiness
+
+**Status:** Implemented
+
+- **No new migration.** No new tables. Documentation and QA only.
+- **Security review:** `docs/security-review.md` — RLS coverage, client safety, auth/session, known limitations.
+- **Deployment guide:** `docs/deployment-guide.md` — env vars, Supabase setup, pre-deploy validation, beta checklist.
+- **Beta checklist:** `docs/beta-checklist.md` — manual acceptance flows for all 11 modules.
+- **Production readiness:** `docs/production-readiness.md` — MVP status, pre-production requirements, known limitations.
+- **Environment safety:** `.env.example` created with placeholders only.
+- **QA:** `/qa-mvp-readiness` with checks A–V (tables, security, module data, documentation).
+- Build label updated to "Build 2.0 — Beta Readiness".

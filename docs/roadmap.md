@@ -93,9 +93,9 @@ Forward implementation plan for Margin IQ — Restaurant Margin Intelligence Saa
 
 ## Build 2.0 — Production Hardening & Beta Readiness
 
-**Status:** Not started.
+**Status:** Accepted.
 
-**Goal:** Production deployment, monitoring, error logging, backup policy, environment separation.
+**Goal:** Security review, deployment guide, beta checklist, production readiness documentation, MVP QA route.
 
 ---
 
