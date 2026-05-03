@@ -27,6 +27,7 @@ import { Route as QaDataIntegrityRouteImport } from './routes/qa-data-integrity'
 import { Route as QaDashboardRouteImport } from './routes/qa-dashboard'
 import { Route as QaCalculationsRouteImport } from './routes/qa-calculations'
 import { Route as QaBillingRouteImport } from './routes/qa-billing'
+import { Route as QaBetaLaunchRouteImport } from './routes/qa-beta-launch'
 import { Route as QaAuthRouteImport } from './routes/qa-auth'
 import { Route as QaApplyPriceRouteImport } from './routes/qa-apply-price'
 import { Route as QaAlertsRouteImport } from './routes/qa-alerts'
@@ -138,6 +139,11 @@ const QaCalculationsRoute = QaCalculationsRouteImport.update({
 const QaBillingRoute = QaBillingRouteImport.update({
   id: '/qa-billing',
   path: '/qa-billing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QaBetaLaunchRoute = QaBetaLaunchRouteImport.update({
+  id: '/qa-beta-launch',
+  path: '/qa-beta-launch',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QaAuthRoute = QaAuthRouteImport.update({
@@ -267,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/qa-alerts': typeof QaAlertsRoute
   '/qa-apply-price': typeof QaApplyPriceRoute
   '/qa-auth': typeof QaAuthRoute
+  '/qa-beta-launch': typeof QaBetaLaunchRoute
   '/qa-billing': typeof QaBillingRoute
   '/qa-calculations': typeof QaCalculationsRoute
   '/qa-dashboard': typeof QaDashboardRoute
@@ -308,6 +315,7 @@ export interface FileRoutesByTo {
   '/qa-alerts': typeof QaAlertsRoute
   '/qa-apply-price': typeof QaApplyPriceRoute
   '/qa-auth': typeof QaAuthRoute
+  '/qa-beta-launch': typeof QaBetaLaunchRoute
   '/qa-billing': typeof QaBillingRoute
   '/qa-calculations': typeof QaCalculationsRoute
   '/qa-dashboard': typeof QaDashboardRoute
@@ -350,6 +358,7 @@ export interface FileRoutesById {
   '/qa-alerts': typeof QaAlertsRoute
   '/qa-apply-price': typeof QaApplyPriceRoute
   '/qa-auth': typeof QaAuthRoute
+  '/qa-beta-launch': typeof QaBetaLaunchRoute
   '/qa-billing': typeof QaBillingRoute
   '/qa-calculations': typeof QaCalculationsRoute
   '/qa-dashboard': typeof QaDashboardRoute
@@ -394,6 +403,7 @@ export interface FileRouteTypes {
     | '/qa-alerts'
     | '/qa-apply-price'
     | '/qa-auth'
+    | '/qa-beta-launch'
     | '/qa-billing'
     | '/qa-calculations'
     | '/qa-dashboard'
@@ -435,6 +445,7 @@ export interface FileRouteTypes {
     | '/qa-alerts'
     | '/qa-apply-price'
     | '/qa-auth'
+    | '/qa-beta-launch'
     | '/qa-billing'
     | '/qa-calculations'
     | '/qa-dashboard'
@@ -476,6 +487,7 @@ export interface FileRouteTypes {
     | '/qa-alerts'
     | '/qa-apply-price'
     | '/qa-auth'
+    | '/qa-beta-launch'
     | '/qa-billing'
     | '/qa-calculations'
     | '/qa-dashboard'
@@ -519,6 +531,7 @@ export interface RootRouteChildren {
   QaAlertsRoute: typeof QaAlertsRoute
   QaApplyPriceRoute: typeof QaApplyPriceRoute
   QaAuthRoute: typeof QaAuthRoute
+  QaBetaLaunchRoute: typeof QaBetaLaunchRoute
   QaBillingRoute: typeof QaBillingRoute
   QaCalculationsRoute: typeof QaCalculationsRoute
   QaDashboardRoute: typeof QaDashboardRoute
@@ -667,6 +680,13 @@ declare module '@tanstack/react-router' {
       path: '/qa-billing'
       fullPath: '/qa-billing'
       preLoaderRoute: typeof QaBillingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qa-beta-launch': {
+      id: '/qa-beta-launch'
+      path: '/qa-beta-launch'
+      fullPath: '/qa-beta-launch'
+      preLoaderRoute: typeof QaBetaLaunchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/qa-auth': {
@@ -892,6 +912,7 @@ const rootRouteChildren: RootRouteChildren = {
   QaAlertsRoute: QaAlertsRoute,
   QaApplyPriceRoute: QaApplyPriceRoute,
   QaAuthRoute: QaAuthRoute,
+  QaBetaLaunchRoute: QaBetaLaunchRoute,
   QaBillingRoute: QaBillingRoute,
   QaCalculationsRoute: QaCalculationsRoute,
   QaDashboardRoute: QaDashboardRoute,

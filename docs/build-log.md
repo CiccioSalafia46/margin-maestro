@@ -609,3 +609,15 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - Export for 5 datasets confirmed with formula injection protection.
 - Import does not write price log, create batches, or create billing records.
 - Build label: "Build 2.5A — CSV Accepted".
+
+---
+
+## Build 2.6 — Beta Launch Prep
+
+**Status:** Implemented
+
+- **Docs created:** beta-release-notes.md, beta-user-guide.md, support-playbook.md, beta-launch-prep.md.
+- **QA:** `/qa-beta-launch` with checks A–AB (tables, routes, features, docs, security).
+- **Developer QA links:** All 19 QA routes linked under Settings → Developer QA.
+- Build label: "Build 2.6 — Beta Launch Prep".
+- Beta-ready MVP with full documentation.
