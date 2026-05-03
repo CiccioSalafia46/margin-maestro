@@ -114,6 +114,7 @@ function SettingsPage() {
             <TabsTrigger value="thresholds">Alert Thresholds</TabsTrigger>
             <TabsTrigger value="team">Team</TabsTrigger>
             <TabsTrigger value="billing">Billing</TabsTrigger>
+            <TabsTrigger value="import-export">Import / Export</TabsTrigger>
           </TabsList>
 
           <TabsContent value="general" className="mt-4">
@@ -147,6 +148,10 @@ function SettingsPage() {
 
           <TabsContent value="billing" className="mt-4">
             <BillingTab restaurantId={activeRestaurantId} canManage={canEditSettings} />
+          </TabsContent>
+
+          <TabsContent value="import-export" className="mt-4">
+            <ImportExportTab restaurantId={activeRestaurantId} canManage={canManageReference} />
           </TabsContent>
         </Tabs>
 
@@ -1072,6 +1077,133 @@ function BillingTab({ restaurantId, canManage }: { restaurantId: string; canMana
   );
 }
 
+// ----------------- Import / Export -----------------
+function ImportExportTab({ restaurantId, canManage }: { restaurantId: string; canManage: boolean }) {
+  const [csvText, setCsvText] = useState("");
+  const [preview, setPreview] = useState<import("@/data/api/importExportApi").ImportPreview | null>(null);
+  const [mode, setMode] = useState<"skip" | "update">("skip");
+  const [importing, setImporting] = useState(false);
+  const [exporting, setExporting] = useState("");
+
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setCsvText(reader.result as string);
+    reader.readAsText(file);
+  };
+
+  const onPreview = async () => {
+    try {
+      const { previewIngredientImport } = await import("@/data/api/importExportApi");
+      const p = await previewIngredientImport(restaurantId, csvText, mode);
+      setPreview(p);
+    } catch (e) { toast.error(errMsg(e)); }
+  };
+
+  const onApply = async () => {
+    if (!preview) return;
+    setImporting(true);
+    try {
+      const { applyIngredientImport } = await import("@/data/api/importExportApi");
+      const result = await applyIngredientImport(restaurantId, preview);
+      toast.success(`Import complete: ${result.created} created, ${result.updated} updated, ${result.errors} errors.`);
+      setCsvText(""); setPreview(null);
+    } catch (e) { toast.error(errMsg(e)); } finally { setImporting(false); }
+  };
+
+  const onExport = async (fn: string) => {
+    setExporting(fn);
+    try {
+      const mod = await import("@/data/api/importExportApi");
+      const fnMap: Record<string, (id: string) => Promise<void>> = {
+        ingredients: mod.exportIngredientsCsv,
+        recipes: mod.exportRecipesCsv,
+        menuAnalytics: mod.exportMenuAnalyticsCsv,
+        priceLog: mod.exportPriceLogCsv,
+        alerts: mod.exportAlertsCsv,
+      };
+      await fnMap[fn]?.(restaurantId);
+      toast.success("Export downloaded.");
+    } catch (e) { toast.error(errMsg(e)); } finally { setExporting(""); }
+  };
+
+  const onDownloadTemplate = async () => {
+    const { getIngredientImportTemplate } = await import("@/data/api/importExportApi");
+    const blob = new Blob([getIngredientImportTemplate()], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = "ingredient-import-template.csv"; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="space-y-4">
+      {canManage && (
+        <Card>
+          <CardHeader><CardTitle className="text-base">Import Ingredients</CardTitle></CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" onClick={onDownloadTemplate}>Download template</Button>
+              <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm hover:bg-accent">
+                Upload CSV <input type="file" accept=".csv" className="hidden" onChange={onFileChange} />
+              </label>
+            </div>
+            {csvText && (
+              <>
+                <div className="flex items-center gap-2">
+                  <Label className="text-xs">Duplicate handling:</Label>
+                  <Select value={mode} onValueChange={(v) => setMode(v as "skip" | "update")}><SelectTrigger className="h-8 w-32"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="skip">Skip</SelectItem><SelectItem value="update">Update</SelectItem></SelectContent></Select>
+                  <Button size="sm" onClick={onPreview}>Preview</Button>
+                  <Button size="sm" variant="ghost" onClick={() => { setCsvText(""); setPreview(null); }}>Clear</Button>
+                </div>
+                {preview && (
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-4 gap-2 text-center text-sm">
+                      <div><p className="text-2xl font-semibold">{preview.creates}</p><p className="text-[10px] text-muted-foreground uppercase">Create</p></div>
+                      <div><p className="text-2xl font-semibold">{preview.updates}</p><p className="text-[10px] text-muted-foreground uppercase">Update</p></div>
+                      <div><p className="text-2xl font-semibold">{preview.skips}</p><p className="text-[10px] text-muted-foreground uppercase">Skip</p></div>
+                      <div><p className="text-2xl font-semibold text-destructive">{preview.error}</p><p className="text-[10px] text-muted-foreground uppercase">Error</p></div>
+                    </div>
+                    {preview.rows.filter((r) => r.messages.length > 0).slice(0, 10).map((r) => (
+                      <p key={r.row_number} className="text-xs"><span className="font-mono">Row {r.row_number}:</span> <span className={r.status === "error" ? "text-destructive" : "text-muted-foreground"}>{r.messages.join(" ")}</span></p>
+                    ))}
+                    <Button size="sm" onClick={onApply} disabled={importing || preview.error > 0}>
+                      {importing ? "Importing…" : `Apply ${preview.creates + preview.updates} row(s)`}
+                    </Button>
+                    {preview.error > 0 && <p className="text-xs text-destructive">Fix error rows before applying.</p>}
+                  </div>
+                )}
+              </>
+            )}
+            <p className="text-[11px] text-muted-foreground">Import does not write price log or create price update batches.</p>
+          </CardContent>
+        </Card>
+      )}
+
+      <Card>
+        <CardHeader><CardTitle className="text-base">Export Data</CardTitle></CardHeader>
+        <CardContent className="space-y-2">
+          {[
+            { key: "ingredients", label: "Ingredients" },
+            { key: "recipes", label: "Recipes" },
+            { key: "menuAnalytics", label: "Menu Analytics" },
+            { key: "priceLog", label: "Price Log" },
+            { key: "alerts", label: "Alerts" },
+          ].map((e) => (
+            <div key={e.key} className="flex items-center justify-between">
+              <span className="text-sm">{e.label}</span>
+              <Button size="sm" variant="outline" onClick={() => onExport(e.key)} disabled={!!exporting}>
+                {exporting === e.key ? "Exporting…" : "Export CSV"}
+              </Button>
+            </div>
+          ))}
+          <p className="text-[11px] text-muted-foreground">Exports respect RLS and include active restaurant data only. Formula-risky cells are sanitized.</p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 // ----------------- Developer QA links -----------------
 function DeveloperQa() {
   return (
@@ -1097,6 +1229,7 @@ function DeveloperQa() {
         <QaLink to="/qa-team-management" label="Team Management QA" />
         <QaLink to="/qa-billing" label="Billing QA" />
         <QaLink to="/qa-apply-price" label="Apply Price QA" />
+        <QaLink to="/qa-import-export" label="Import/Export QA" />
       </CardContent>
     </Card>
   );

@@ -20,6 +20,7 @@ import { Route as QaPriceLogSnapshotRouteImport } from './routes/qa-price-log-sn
 import { Route as QaMvpReadinessRouteImport } from './routes/qa-mvp-readiness'
 import { Route as QaMenuAnalyticsRouteImport } from './routes/qa-menu-analytics'
 import { Route as QaIngredientsRouteImport } from './routes/qa-ingredients'
+import { Route as QaImportExportRouteImport } from './routes/qa-import-export'
 import { Route as QaImpactCascadeRouteImport } from './routes/qa-impact-cascade'
 import { Route as QaDishAnalysisRouteImport } from './routes/qa-dish-analysis'
 import { Route as QaDataIntegrityRouteImport } from './routes/qa-data-integrity'
@@ -102,6 +103,11 @@ const QaMenuAnalyticsRoute = QaMenuAnalyticsRouteImport.update({
 const QaIngredientsRoute = QaIngredientsRouteImport.update({
   id: '/qa-ingredients',
   path: '/qa-ingredients',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QaImportExportRoute = QaImportExportRouteImport.update({
+  id: '/qa-import-export',
+  path: '/qa-import-export',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QaImpactCascadeRoute = QaImpactCascadeRouteImport.update({
@@ -267,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/qa-dish-analysis': typeof QaDishAnalysisRoute
   '/qa-impact-cascade': typeof QaImpactCascadeRoute
+  '/qa-import-export': typeof QaImportExportRoute
   '/qa-ingredients': typeof QaIngredientsRoute
   '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
   '/qa-mvp-readiness': typeof QaMvpReadinessRoute
@@ -307,6 +314,7 @@ export interface FileRoutesByTo {
   '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/qa-dish-analysis': typeof QaDishAnalysisRoute
   '/qa-impact-cascade': typeof QaImpactCascadeRoute
+  '/qa-import-export': typeof QaImportExportRoute
   '/qa-ingredients': typeof QaIngredientsRoute
   '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
   '/qa-mvp-readiness': typeof QaMvpReadinessRoute
@@ -348,6 +356,7 @@ export interface FileRoutesById {
   '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/qa-dish-analysis': typeof QaDishAnalysisRoute
   '/qa-impact-cascade': typeof QaImpactCascadeRoute
+  '/qa-import-export': typeof QaImportExportRoute
   '/qa-ingredients': typeof QaIngredientsRoute
   '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
   '/qa-mvp-readiness': typeof QaMvpReadinessRoute
@@ -391,6 +400,7 @@ export interface FileRouteTypes {
     | '/qa-data-integrity'
     | '/qa-dish-analysis'
     | '/qa-impact-cascade'
+    | '/qa-import-export'
     | '/qa-ingredients'
     | '/qa-menu-analytics'
     | '/qa-mvp-readiness'
@@ -431,6 +441,7 @@ export interface FileRouteTypes {
     | '/qa-data-integrity'
     | '/qa-dish-analysis'
     | '/qa-impact-cascade'
+    | '/qa-import-export'
     | '/qa-ingredients'
     | '/qa-menu-analytics'
     | '/qa-mvp-readiness'
@@ -471,6 +482,7 @@ export interface FileRouteTypes {
     | '/qa-data-integrity'
     | '/qa-dish-analysis'
     | '/qa-impact-cascade'
+    | '/qa-import-export'
     | '/qa-ingredients'
     | '/qa-menu-analytics'
     | '/qa-mvp-readiness'
@@ -513,6 +525,7 @@ export interface RootRouteChildren {
   QaDataIntegrityRoute: typeof QaDataIntegrityRoute
   QaDishAnalysisRoute: typeof QaDishAnalysisRoute
   QaImpactCascadeRoute: typeof QaImpactCascadeRoute
+  QaImportExportRoute: typeof QaImportExportRoute
   QaIngredientsRoute: typeof QaIngredientsRoute
   QaMenuAnalyticsRoute: typeof QaMenuAnalyticsRoute
   QaMvpReadinessRoute: typeof QaMvpReadinessRoute
@@ -605,6 +618,13 @@ declare module '@tanstack/react-router' {
       path: '/qa-ingredients'
       fullPath: '/qa-ingredients'
       preLoaderRoute: typeof QaIngredientsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qa-import-export': {
+      id: '/qa-import-export'
+      path: '/qa-import-export'
+      fullPath: '/qa-import-export'
+      preLoaderRoute: typeof QaImportExportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/qa-impact-cascade': {
@@ -878,6 +898,7 @@ const rootRouteChildren: RootRouteChildren = {
   QaDataIntegrityRoute: QaDataIntegrityRoute,
   QaDishAnalysisRoute: QaDishAnalysisRoute,
   QaImpactCascadeRoute: QaImpactCascadeRoute,
+  QaImportExportRoute: QaImportExportRoute,
   QaIngredientsRoute: QaIngredientsRoute,
   QaMenuAnalyticsRoute: QaMenuAnalyticsRoute,
   QaMvpReadinessRoute: QaMvpReadinessRoute,

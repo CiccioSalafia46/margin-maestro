@@ -586,3 +586,14 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - Updates `recipes.menu_price` only — no price log, no batches, no billing, no POS.
 - Owner/manager only. Viewer read-only.
 - Build label: "Build 2.4A — Apply Price Accepted".
+
+---
+
+## Build 2.5 — CSV Import/Export
+
+**Status:** Implemented
+
+- **CSV utilities:** `src/lib/csv.ts` — parser, serializer, formula injection protection.
+- **API:** `importExportApi.ts` — ingredient import + 5 export functions.
+- **Settings Import/Export tab.** Import preview + export buttons.
+- **QA:** `/qa-import-export` with checks A–V.

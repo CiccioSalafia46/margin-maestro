@@ -138,7 +138,7 @@ export function AppSidebar() {
       <SidebarFooter className="border-t">
         {!collapsed && (
           <p className="px-2 py-1 text-[10px] text-muted-foreground">
-            Build 2.4A — Apply Price Accepted
+            Build 2.5 — CSV Import/Export
           </p>
         )}
       </SidebarFooter>
