@@ -83,6 +83,52 @@ Forward implementation plan for Margin IQ — Restaurant Margin Intelligence Saa
 
 ---
 
+## Build 1.9 / 1.9A — Dashboard & MVP
+
+**Status:** Accepted.
+
+**Goal:** Supabase-backed dashboard. All operational pages now live. MVP feature-complete.
+
+---
+
+## Build 2.0 — Production Hardening & Beta Readiness
+
+**Status:** Not started.
+
+**Goal:** Production deployment, monitoring, error logging, backup policy, environment separation.
+
+---
+
+## Build 2.1 — Team Management
+
+**Status:** Not started.
+
+---
+
+## Build 2.2 — Billing
+
+**Status:** Not started.
+
+---
+
+## Build 2.3 — Automated E2E QA
+
+**Status:** Not started.
+
+---
+
+## Build 2.4 — Apply Price Workflow
+
+**Status:** Not started.
+
+---
+
+## Build 2.5 — CSV Import/Export
+
+**Status:** Not started.
+
+---
+
 ## Build 1.3 — Recipes
 
 **Goal:** Introduce `recipes`, `recipe_lines`, `recipe_dependency_edges` in Supabase.

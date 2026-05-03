@@ -593,7 +593,7 @@ function QaSettingsAdminPage() {
                 "Duplicate supplier names are handled gracefully (friendly error, no crash).",
                 "Manager can manage Categories/Suppliers but cannot update General/Thresholds.",
                 "Viewer is read-only across all Settings tabs.",
-                "Operational pages (/dashboard, /ingredients, /recipes, /menu-analytics, /dish-analysis, /impact-cascade, /price-trend, /price-log, /alerts) still render mock data.",
+                "All operational pages now use Supabase data.",
               ].map((item) => (
                 <li key={item} className="flex items-start gap-2">
                   <Circle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />

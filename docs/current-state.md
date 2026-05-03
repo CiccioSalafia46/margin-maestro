@@ -1,7 +1,7 @@
 # Current State
 
 **Date:** 2026-05-03
-**Build:** 1.9 — Dashboard
+**Build:** 1.9A — MVP Accepted
 **Branch:** `build-1.9-dashboard`
 **Backend:** Self-owned Supabase project `margin-maestro-dev`
 
@@ -9,45 +9,36 @@
 
 ## Actual State
 
-**All operational pages are Supabase-backed or Supabase-derived.** The full core chain is live: Ingredients → Recipes → Menu Analytics → Price Log → Price Trend → Dish Analysis → Impact Cascade → Alerts → Dashboard.
+**All operational pages are Supabase-backed or Supabase-derived.** No mock data is used by any operational page. The full core chain is live.
 
-No mock data is used by any operational page.
+## Core MVP Modules (All Accepted)
 
-## Backend Scope (Supabase, live)
+| Module | Build | Data Source |
+|--------|-------|-------------|
+| Auth / Tenant | 1.0 | Supabase Auth + profiles/restaurants/members/settings |
+| Settings / Admin | 1.1 | units, unit_conversions, menu_categories, suppliers |
+| Ingredients | 1.2 | ingredients, ingredient_cost_state |
+| Recipes | 1.3 | recipes, recipe_lines |
+| Menu Analytics | 1.4 | Derived from recipes/ingredients/settings |
+| Price Log + Snapshot | 1.5 | price_update_batches, ingredient_price_log, ingredient_snapshots |
+| Price Trend | 1.5B | Derived from ingredient_price_log |
+| Dish Analysis | 1.6 | Derived from recipes/ingredients/settings |
+| Impact Cascade | 1.7 | impact_cascade_runs, impact_cascade_items |
+| Alerts | 1.8 | alerts |
+| Dashboard | 1.9 | Derived from all above |
 
-| Table | Build | Status |
-|-------|-------|--------|
-| `profiles` | 1.0 | Accepted |
-| `restaurants` | 1.0 | Accepted |
-| `restaurant_members` | 1.0 | Accepted |
-| `restaurant_settings` | 1.0 | Accepted |
-| `units` | 1.1 | Accepted |
-| `unit_conversions` | 1.1 | Accepted |
-| `menu_categories` | 1.1 | Accepted |
-| `suppliers` | 1.1 | Accepted |
-| `ingredients` | 1.2 | Accepted |
-| `ingredient_cost_state` | 1.2 | Accepted |
-| `recipes` | 1.3 | Accepted |
-| `recipe_lines` | 1.3 | Accepted |
-| `price_update_batches` | 1.5 | Accepted |
-| `ingredient_price_log` | 1.5 | Accepted |
-| `ingredient_snapshots` | 1.5 | Accepted |
-| `impact_cascade_runs` | 1.7 | Accepted |
-| `impact_cascade_items` | 1.7 | Accepted |
-| `alerts` | 1.8 | Accepted |
+## Pre-Production Limitations
 
-**Derived (no table):** Menu Analytics, Price Trend, Dish Analysis, Dashboard.
-
-## What Remains
-
-- Billing (Build 2.0)
-- Team management
-- Google OAuth
-- Apply Price action
-- Production hardening
-- CSV import/export
-- Automated tests
+- Billing not implemented (Build 2.0+)
+- Team management placeholder
+- Google OAuth not enabled
+- Apply Price workflow not implemented
+- CSV import/export not implemented
+- Production deployment/hardening not complete
+- Automated E2E tests not complete
+- Monitoring/error logging not complete
+- Backup/restore policy not documented
 
 ## Next Task
 
-**Build 1.9A — Dashboard Acceptance & MVP Readiness.**
+**Build 2.0 — Production Hardening & Beta Readiness.**

@@ -443,7 +443,7 @@ function QaAuthPage() {
 
         <p className="text-[11px] text-muted-foreground">
           No access tokens, refresh tokens, service-role keys, or raw session JSON are displayed.
-          Build 1.9 — Dashboard.
+          Build 1.9A — MVP Accepted.
         </p>
       </div>
     </AppShell>

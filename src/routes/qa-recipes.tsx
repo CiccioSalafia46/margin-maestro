@@ -211,7 +211,7 @@ function QaRecipesPage() {
                 "/qa-auth still passes.",
                 "/qa-settings-admin still passes.",
                 "/qa-ingredients still passes.",
-                "Dashboard and other operational pages still render mock data.",
+                "All operational pages now use Supabase data.",
               ].map((item) => (
                 <li key={item} className="flex items-start gap-2">
                   <Circle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />

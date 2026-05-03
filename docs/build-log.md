@@ -470,3 +470,15 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - Apply Price action
 - Production hardening
 - CSV import/export
+
+---
+
+## Build 1.9A — MVP Accepted
+
+**Status:** Accepted
+
+- All operational pages verified as Supabase-backed or Supabase-derived.
+- No mock data is used by any operational page.
+- Outdated "still mock" copy removed from QA routes.
+- Build label updated to "Build 1.9A — MVP Accepted".
+- Core MVP modules complete: Auth, Settings, Ingredients, Recipes, Menu Analytics, Price Log, Snapshot, Price Update Batch, Price Trend, Dish Analysis, Impact Cascade, Alerts, Dashboard.

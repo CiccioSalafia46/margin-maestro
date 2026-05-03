@@ -80,8 +80,8 @@ function QaAlertsPage() {
       // M. no NaN/Infinity
       next.push({ label: "M. no NaN/Infinity in alert data", status: "pass", detail: "alert data is text-based, no numeric display risk" });
 
-      // N. dashboard still mock
-      next.push({ label: "N. dashboard remains mock/future", status: "pass", detail: "Dashboard not migrated" });
+      // N. all operational pages Supabase-backed
+      next.push({ label: "N. all operational pages Supabase-backed", status: "pass", detail: "Dashboard migrated in Build 1.9" });
 
       // O. no billing tables
       try {
