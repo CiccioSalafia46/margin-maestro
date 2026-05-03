@@ -445,3 +445,28 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - Full operational chain now Supabase-backed: Ingredients → Recipes → Menu Analytics → Price Log → Price Trend → Dish Analysis → Impact Cascade → Alerts.
 - Dashboard remains the only mock page.
 - Build label updated to "Build 1.8A — Alerts Accepted".
+
+---
+
+## Build 1.9 — Dashboard Supabase-backed
+
+**Status:** Implemented
+
+- **No new migration.** Dashboard derived from existing Supabase-backed modules.
+- **API:** `dashboardApi.ts` — getDashboardData with alert summary, menu KPIs, impact cascade summary, price activity, recommended actions.
+- **Route:** `/dashboard` rewritten from mock to Supabase-derived.
+- **Alert-first design:** Critical alerts banner, open alerts panel, recommended actions.
+- **KPI cards:** Average GPM, below target, open alerts, missing price, price changes, impacted dishes.
+- **Panels:** Menu health, price activity, impact cascade, recommended actions.
+- **QA:** `/qa-dashboard` with checks A–W.
+- **Developer QA link:** Added to Settings → Developer QA.
+
+**All operational pages are now Supabase-backed or Supabase-derived. No mock data in use.**
+
+**Remaining scope:**
+- Billing (Build 2.0)
+- Team management
+- Google OAuth
+- Apply Price action
+- Production hardening
+- CSV import/export

@@ -21,6 +21,7 @@ import { Route as QaIngredientsRouteImport } from './routes/qa-ingredients'
 import { Route as QaImpactCascadeRouteImport } from './routes/qa-impact-cascade'
 import { Route as QaDishAnalysisRouteImport } from './routes/qa-dish-analysis'
 import { Route as QaDataIntegrityRouteImport } from './routes/qa-data-integrity'
+import { Route as QaDashboardRouteImport } from './routes/qa-dashboard'
 import { Route as QaCalculationsRouteImport } from './routes/qa-calculations'
 import { Route as QaAuthRouteImport } from './routes/qa-auth'
 import { Route as QaAlertsRouteImport } from './routes/qa-alerts'
@@ -101,6 +102,11 @@ const QaDishAnalysisRoute = QaDishAnalysisRouteImport.update({
 const QaDataIntegrityRoute = QaDataIntegrityRouteImport.update({
   id: '/qa-data-integrity',
   path: '/qa-data-integrity',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QaDashboardRoute = QaDashboardRouteImport.update({
+  id: '/qa-dashboard',
+  path: '/qa-dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QaCalculationsRoute = QaCalculationsRouteImport.update({
@@ -224,6 +230,7 @@ export interface FileRoutesByFullPath {
   '/qa-alerts': typeof QaAlertsRoute
   '/qa-auth': typeof QaAuthRoute
   '/qa-calculations': typeof QaCalculationsRoute
+  '/qa-dashboard': typeof QaDashboardRoute
   '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/qa-dish-analysis': typeof QaDishAnalysisRoute
   '/qa-impact-cascade': typeof QaImpactCascadeRoute
@@ -258,6 +265,7 @@ export interface FileRoutesByTo {
   '/qa-alerts': typeof QaAlertsRoute
   '/qa-auth': typeof QaAuthRoute
   '/qa-calculations': typeof QaCalculationsRoute
+  '/qa-dashboard': typeof QaDashboardRoute
   '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/qa-dish-analysis': typeof QaDishAnalysisRoute
   '/qa-impact-cascade': typeof QaImpactCascadeRoute
@@ -293,6 +301,7 @@ export interface FileRoutesById {
   '/qa-alerts': typeof QaAlertsRoute
   '/qa-auth': typeof QaAuthRoute
   '/qa-calculations': typeof QaCalculationsRoute
+  '/qa-dashboard': typeof QaDashboardRoute
   '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/qa-dish-analysis': typeof QaDishAnalysisRoute
   '/qa-impact-cascade': typeof QaImpactCascadeRoute
@@ -330,6 +339,7 @@ export interface FileRouteTypes {
     | '/qa-alerts'
     | '/qa-auth'
     | '/qa-calculations'
+    | '/qa-dashboard'
     | '/qa-data-integrity'
     | '/qa-dish-analysis'
     | '/qa-impact-cascade'
@@ -364,6 +374,7 @@ export interface FileRouteTypes {
     | '/qa-alerts'
     | '/qa-auth'
     | '/qa-calculations'
+    | '/qa-dashboard'
     | '/qa-data-integrity'
     | '/qa-dish-analysis'
     | '/qa-impact-cascade'
@@ -398,6 +409,7 @@ export interface FileRouteTypes {
     | '/qa-alerts'
     | '/qa-auth'
     | '/qa-calculations'
+    | '/qa-dashboard'
     | '/qa-data-integrity'
     | '/qa-dish-analysis'
     | '/qa-impact-cascade'
@@ -434,6 +446,7 @@ export interface RootRouteChildren {
   QaAlertsRoute: typeof QaAlertsRoute
   QaAuthRoute: typeof QaAuthRoute
   QaCalculationsRoute: typeof QaCalculationsRoute
+  QaDashboardRoute: typeof QaDashboardRoute
   QaDataIntegrityRoute: typeof QaDataIntegrityRoute
   QaDishAnalysisRoute: typeof QaDishAnalysisRoute
   QaImpactCascadeRoute: typeof QaImpactCascadeRoute
@@ -534,6 +547,13 @@ declare module '@tanstack/react-router' {
       path: '/qa-data-integrity'
       fullPath: '/qa-data-integrity'
       preLoaderRoute: typeof QaDataIntegrityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qa-dashboard': {
+      id: '/qa-dashboard'
+      path: '/qa-dashboard'
+      fullPath: '/qa-dashboard'
+      preLoaderRoute: typeof QaDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/qa-calculations': {
@@ -751,6 +771,7 @@ const rootRouteChildren: RootRouteChildren = {
   QaAlertsRoute: QaAlertsRoute,
   QaAuthRoute: QaAuthRoute,
   QaCalculationsRoute: QaCalculationsRoute,
+  QaDashboardRoute: QaDashboardRoute,
   QaDataIntegrityRoute: QaDataIntegrityRoute,
   QaDishAnalysisRoute: QaDishAnalysisRoute,
   QaImpactCascadeRoute: QaImpactCascadeRoute,

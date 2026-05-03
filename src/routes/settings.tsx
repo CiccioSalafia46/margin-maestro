@@ -908,6 +908,7 @@ function DeveloperQa() {
         <QaLink to="/qa-dish-analysis" label="Dish Analysis QA" />
         <QaLink to="/qa-impact-cascade" label="Impact Cascade QA" />
         <QaLink to="/qa-alerts" label="Alerts QA" />
+        <QaLink to="/qa-dashboard" label="Dashboard QA" />
       </CardContent>
     </Card>
   );

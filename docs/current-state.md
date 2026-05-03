@@ -1,30 +1,17 @@
 # Current State
 
 **Date:** 2026-05-03
-**Build:** 1.8A — Alerts Accepted
-**Branch:** `build-1.8-alerts`
+**Build:** 1.9 — Dashboard
+**Branch:** `build-1.9-dashboard`
 **Backend:** Self-owned Supabase project `margin-maestro-dev`
 
 ---
 
 ## Actual State
 
-**Full operational chain Supabase-backed.** Ingredients → Recipes → Menu Analytics → Price Log → Price Trend → Dish Analysis → Impact Cascade → Alerts. Dashboard remains the only mock page.
+**All operational pages are Supabase-backed or Supabase-derived.** The full core chain is live: Ingredients → Recipes → Menu Analytics → Price Log → Price Trend → Dish Analysis → Impact Cascade → Alerts → Dashboard.
 
-## Accepted Baseline
-
-**Build 1.8A — Alerts Accepted.**
-
-- Auth session persistence (1.0F).
-- Settings/Admin (1.1A).
-- Ingredients (1.2A).
-- Recipes with line editor, intermediate propagation, cycle detection (1.3A/B).
-- Menu Analytics derived (1.4A).
-- Price Log + Snapshot + Price Update Batch (1.5/1.5A).
-- Price Trend (1.5B).
-- Dish Analysis with scenario modeling (1.6).
-- Impact Cascade (1.7).
-- Alerts with generation, status actions, duplicate prevention (1.8A).
+No mock data is used by any operational page.
 
 ## Backend Scope (Supabase, live)
 
@@ -49,12 +36,18 @@
 | `impact_cascade_items` | 1.7 | Accepted |
 | `alerts` | 1.8 | Accepted |
 
-**Derived (no table):** Menu Analytics (1.4), Price Trend (1.5B), Dish Analysis (1.6).
+**Derived (no table):** Menu Analytics, Price Trend, Dish Analysis, Dashboard.
 
-## What Remains Mock
+## What Remains
 
-Dashboard only.
+- Billing (Build 2.0)
+- Team management
+- Google OAuth
+- Apply Price action
+- Production hardening
+- CSV import/export
+- Automated tests
 
 ## Next Task
 
-**Build 1.9 — Dashboard Supabase-backed.**
+**Build 1.9A — Dashboard Acceptance & MVP Readiness.**
