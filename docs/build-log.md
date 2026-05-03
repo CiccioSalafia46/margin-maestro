@@ -277,3 +277,34 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - `/qa-settings-admin` check U updated to accept Build 1.3 tables.
 - `/qa-auth` operational data warning updated to reflect Build 1.3.
 - Build label updated to "Build 1.3A — Recipes Accepted".
+
+---
+
+## Build 1.3B — Recipes Edit Complete
+
+**Status:** Accepted
+
+- Full recipe field editing on /recipes/$id (name, category, serving, menu price, linked ingredient, notes).
+- Save updates both recipe row and recipe lines in one flow.
+- Intermediate cost propagation on save.
+
+---
+
+## Build 1.4 — Menu Analytics
+
+**Status:** Implemented
+
+- **No new migration.** Menu Analytics is derived from existing tables.
+- **API:** `src/data/api/menuAnalyticsApi.ts` — deriveMenuAnalyticsRows, deriveMenuAnalyticsSummary, getMenuAnalyticsData.
+- **Types:** `MenuAnalyticsRow`, `MenuAnalyticsSummary`, `MenuAnalyticsStatus` in `types.ts`.
+- **Route:** `/menu-analytics` rewritten from mock to Supabase-derived data.
+- **KPI cards:** Average GPM, Average GP, Top/Bottom performer, Below target count.
+- **Table:** Dish, Category, Menu Price, COGS/serving, GP, GPM, Target, Suggested Price, Status.
+- **Filters:** Below target only, Category, Missing price / Incomplete costing.
+- **QA:** `/qa-menu-analytics` with checks A–U.
+- **Developer QA link:** Added to Settings → Developer QA.
+
+**Limitations:**
+- No snapshot deltas (Δ COGS, Δ GPM) — arrives in Build 1.5.
+- Suggested price is informational only — no Apply action yet.
+- Dashboard and other operational pages still use mock data.

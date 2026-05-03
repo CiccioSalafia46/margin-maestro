@@ -14,6 +14,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RecipesRouteImport } from './routes/recipes'
 import { Route as QaSettingsAdminRouteImport } from './routes/qa-settings-admin'
 import { Route as QaRecipesRouteImport } from './routes/qa-recipes'
+import { Route as QaMenuAnalyticsRouteImport } from './routes/qa-menu-analytics'
 import { Route as QaIngredientsRouteImport } from './routes/qa-ingredients'
 import { Route as QaDataIntegrityRouteImport } from './routes/qa-data-integrity'
 import { Route as QaCalculationsRouteImport } from './routes/qa-calculations'
@@ -59,6 +60,11 @@ const QaSettingsAdminRoute = QaSettingsAdminRouteImport.update({
 const QaRecipesRoute = QaRecipesRouteImport.update({
   id: '/qa-recipes',
   path: '/qa-recipes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QaMenuAnalyticsRoute = QaMenuAnalyticsRouteImport.update({
+  id: '/qa-menu-analytics',
+  path: '/qa-menu-analytics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QaIngredientsRoute = QaIngredientsRouteImport.update({
@@ -183,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/qa-calculations': typeof QaCalculationsRoute
   '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/qa-ingredients': typeof QaIngredientsRoute
+  '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
   '/qa-recipes': typeof QaRecipesRoute
   '/qa-settings-admin': typeof QaSettingsAdminRoute
   '/recipes': typeof RecipesRouteWithChildren
@@ -210,6 +217,7 @@ export interface FileRoutesByTo {
   '/qa-calculations': typeof QaCalculationsRoute
   '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/qa-ingredients': typeof QaIngredientsRoute
+  '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
   '/qa-recipes': typeof QaRecipesRoute
   '/qa-settings-admin': typeof QaSettingsAdminRoute
   '/recipes': typeof RecipesRouteWithChildren
@@ -239,6 +247,7 @@ export interface FileRoutesById {
   '/qa-calculations': typeof QaCalculationsRoute
   '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/qa-ingredients': typeof QaIngredientsRoute
+  '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
   '/qa-recipes': typeof QaRecipesRoute
   '/qa-settings-admin': typeof QaSettingsAdminRoute
   '/recipes': typeof RecipesRouteWithChildren
@@ -269,6 +278,7 @@ export interface FileRouteTypes {
     | '/qa-calculations'
     | '/qa-data-integrity'
     | '/qa-ingredients'
+    | '/qa-menu-analytics'
     | '/qa-recipes'
     | '/qa-settings-admin'
     | '/recipes'
@@ -296,6 +306,7 @@ export interface FileRouteTypes {
     | '/qa-calculations'
     | '/qa-data-integrity'
     | '/qa-ingredients'
+    | '/qa-menu-analytics'
     | '/qa-recipes'
     | '/qa-settings-admin'
     | '/recipes'
@@ -324,6 +335,7 @@ export interface FileRouteTypes {
     | '/qa-calculations'
     | '/qa-data-integrity'
     | '/qa-ingredients'
+    | '/qa-menu-analytics'
     | '/qa-recipes'
     | '/qa-settings-admin'
     | '/recipes'
@@ -353,6 +365,7 @@ export interface RootRouteChildren {
   QaCalculationsRoute: typeof QaCalculationsRoute
   QaDataIntegrityRoute: typeof QaDataIntegrityRoute
   QaIngredientsRoute: typeof QaIngredientsRoute
+  QaMenuAnalyticsRoute: typeof QaMenuAnalyticsRoute
   QaRecipesRoute: typeof QaRecipesRoute
   QaSettingsAdminRoute: typeof QaSettingsAdminRoute
   RecipesRoute: typeof RecipesRouteWithChildren
@@ -397,6 +410,13 @@ declare module '@tanstack/react-router' {
       path: '/qa-recipes'
       fullPath: '/qa-recipes'
       preLoaderRoute: typeof QaRecipesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qa-menu-analytics': {
+      id: '/qa-menu-analytics'
+      path: '/qa-menu-analytics'
+      fullPath: '/qa-menu-analytics'
+      preLoaderRoute: typeof QaMenuAnalyticsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/qa-ingredients': {
@@ -613,6 +633,7 @@ const rootRouteChildren: RootRouteChildren = {
   QaCalculationsRoute: QaCalculationsRoute,
   QaDataIntegrityRoute: QaDataIntegrityRoute,
   QaIngredientsRoute: QaIngredientsRoute,
+  QaMenuAnalyticsRoute: QaMenuAnalyticsRoute,
   QaRecipesRoute: QaRecipesRoute,
   QaSettingsAdminRoute: QaSettingsAdminRoute,
   RecipesRoute: RecipesRouteWithChildren,

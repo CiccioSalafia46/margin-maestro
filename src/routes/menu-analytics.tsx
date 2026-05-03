@@ -1,5 +1,7 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 import { AppShell } from "@/components/layout/AppShell";
 import { PageHeader } from "@/components/common/PageHeader";
@@ -9,7 +11,6 @@ import {
   MoneyCell,
   OnTargetBadge,
   PercentCell,
-  PpDeltaCell,
 } from "@/components/common/badges";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -29,8 +30,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { TARGET_GPM } from "@/data/mock";
-import { getMenuAnalyticsRows, getMenuBenchmarks } from "@/data/selectors";
+import { useAuth } from "@/auth/AuthProvider";
+import { getMenuAnalyticsData } from "@/data/api/menuAnalyticsApi";
+import type { MenuAnalyticsRow, MenuAnalyticsSummary } from "@/data/api/types";
+import { formatMoney } from "@/lib/format";
 
 export const Route = createFileRoute("/menu-analytics")({
   head: () => ({
@@ -38,201 +41,224 @@ export const Route = createFileRoute("/menu-analytics")({
       { title: "Menu Analytics — Margin IQ" },
       {
         name: "description",
-        content: "Per-dish profitability: COGS, GP, GPM, target status, derived snapshot delta.",
+        content: "Per-dish profitability: COGS, GP, GPM, target status, suggested price.",
       },
     ],
   }),
   component: MenuAnalyticsPage,
 });
 
+function errMsg(e: unknown): string {
+  if (e && typeof e === "object" && "message" in e) return String((e as { message?: unknown }).message);
+  return e instanceof Error ? e.message : "Something went wrong.";
+}
+
 function MenuAnalyticsPage() {
+  const { activeRestaurantId, activeMembership, activeRestaurantSettings } = useAuth();
+  const [rows, setRows] = useState<MenuAnalyticsRow[]>([]);
+  const [summary, setSummary] = useState<MenuAnalyticsSummary | null>(null);
+  const [loading, setLoading] = useState(true);
   const [belowOnly, setBelowOnly] = useState(false);
   const [category, setCategory] = useState("all");
-  const [onMenu, setOnMenu] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
 
-  const rows = useMemo(() => getMenuAnalyticsRows(), []);
-  const bench = useMemo(() => getMenuBenchmarks(), []);
+  const targetGpm = activeRestaurantSettings?.target_gpm ?? 0.78;
+
+  const load = useCallback(async () => {
+    if (!activeRestaurantId) return;
+    setLoading(true);
+    try {
+      const data = await getMenuAnalyticsData(activeRestaurantId);
+      setRows(data.rows);
+      setSummary(data.summary);
+    } catch (e) {
+      toast.error(errMsg(e));
+    } finally {
+      setLoading(false);
+    }
+  }, [activeRestaurantId]);
+
+  useEffect(() => { void load(); }, [load]);
 
   const categories = useMemo(
-    () => Array.from(new Set(rows.map((d) => d.recipe.category))).sort(),
+    () => Array.from(new Set(rows.map((r) => r.category_name).filter(Boolean) as string[])).sort(),
     [rows],
   );
 
-  const filtered = rows.filter((d) => {
-    if (belowOnly && d.on_target) return false;
-    if (category !== "all" && d.recipe.category !== category) return false;
-    if (onMenu === "yes" && !d.recipe.on_menu) return false;
-    if (onMenu === "no" && d.recipe.on_menu) return false;
-    return true;
-  });
+  const filtered = useMemo(() => {
+    return rows.filter((r) => {
+      if (belowOnly && r.on_target !== false) return false;
+      if (category !== "all" && r.category_name !== category) return false;
+      if (statusFilter === "incomplete" && r.status !== "incomplete") return false;
+      if (statusFilter === "missing_price" && (r.menu_price != null && r.menu_price > 0)) return false;
+      return true;
+    }).sort((a, b) => (a.gpm ?? 1) - (b.gpm ?? 1));
+  }, [rows, belowOnly, category, statusFilter]);
+
+  if (!activeRestaurantId || !activeMembership) {
+    return (
+      <AppShell>
+        <PageHeader title="Menu Analytics" description="Dish profitability analysis." />
+        <div className="p-6 text-sm text-muted-foreground">No active restaurant.</div>
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell>
       <PageHeader
         title="Menu Analytics"
-        description={`Target GPM ${(TARGET_GPM * 100).toFixed(0)}%. Δ vs last confirmed snapshot. Off-menu dishes excluded from benchmarks.`}
+        description={`Target GPM ${(targetGpm * 100).toFixed(0)}%. Derived from active dish recipes. Snapshot delta arrives in Build 1.5.`}
       />
 
       <div className="space-y-6 p-6">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          <KpiCard
-            label="Average GPM"
-            value={<PercentCell value={bench.avg_gpm} decimals={1} />}
-            tone={bench.avg_gpm !== null && bench.avg_gpm >= TARGET_GPM ? "positive" : "warning"}
-            hint={`Target ${(TARGET_GPM * 100).toFixed(0)}% • ${bench.on_menu_count} on menu`}
-          />
-          <KpiCard label="Average GP" value={<MoneyCell value={bench.avg_gp} />} hint="Per cover" />
-          <KpiCard
-            label="Top performer"
-            value={bench.top ? <span className="text-base">{bench.top.recipe.name}</span> : "—"}
-            hint={bench.top ? <PercentCell value={bench.top.gpm} /> : ""}
-            tone="positive"
-          />
-          <KpiCard
-            label="Bottom performer"
-            value={bench.bottom ? <span className="text-base">{bench.bottom.recipe.name}</span> : "—"}
-            hint={bench.bottom ? <PercentCell value={bench.bottom.gpm} /> : ""}
-            tone="negative"
-          />
-          <KpiCard
-            label="Dishes below target"
-            value={bench.below_target_count}
-            tone={bench.below_target_count > 0 ? "negative" : "positive"}
-          />
-        </div>
+        {loading ? (
+          <div className="flex items-center justify-center gap-2 py-12 text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" /> Loading menu analytics…
+          </div>
+        ) : (
+          <>
+            {/* KPI Cards */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+              <KpiCard
+                label="Average GPM"
+                value={summary?.avg_gpm != null ? <PercentCell value={summary.avg_gpm} decimals={1} /> : "—"}
+                tone={summary?.avg_gpm != null && summary.avg_gpm >= targetGpm ? "positive" : "warning"}
+                hint={`Target ${(targetGpm * 100).toFixed(0)}% • ${summary?.priced_dishes ?? 0} priced`}
+              />
+              <KpiCard
+                label="Average GP"
+                value={summary?.avg_gp != null ? <MoneyCell value={summary.avg_gp} /> : "—"}
+                hint="Per serving"
+              />
+              <KpiCard
+                label="Top performer"
+                value={summary?.top_performer ? <span className="text-base">{summary.top_performer.dish_name}</span> : "—"}
+                hint={summary?.top_performer?.gpm != null ? <PercentCell value={summary.top_performer.gpm} /> : ""}
+                tone="positive"
+              />
+              <KpiCard
+                label="Bottom performer"
+                value={summary?.bottom_performer ? <span className="text-base">{summary.bottom_performer.dish_name}</span> : "—"}
+                hint={summary?.bottom_performer?.gpm != null ? <PercentCell value={summary.bottom_performer.gpm} /> : ""}
+                tone="negative"
+              />
+              <KpiCard
+                label="Below target"
+                value={summary?.below_target_count ?? 0}
+                tone={(summary?.below_target_count ?? 0) > 0 ? "negative" : "positive"}
+                hint={`${summary?.missing_price_count ?? 0} missing price`}
+              />
+            </div>
+          </>
+        )}
       </div>
 
-      <FilterBar>
-        <div className="flex items-center gap-2">
-          <Switch id="below" checked={belowOnly} onCheckedChange={setBelowOnly} />
-          <Label htmlFor="below" className="cursor-pointer">
-            Below target only
-          </Label>
-        </div>
-        <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger className="h-9 w-44">
-            <SelectValue placeholder="Category" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All categories</SelectItem>
-            {categories.map((c) => (
-              <SelectItem key={c} value={c}>
-                {c}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={onMenu} onValueChange={setOnMenu}>
-          <SelectTrigger className="h-9 w-40">
-            <SelectValue placeholder="On menu" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Any</SelectItem>
-            <SelectItem value="yes">On menu</SelectItem>
-            <SelectItem value="no">Off menu</SelectItem>
-          </SelectContent>
-        </Select>
-        <p className="ml-auto text-xs text-muted-foreground">
-          {filtered.length} of {rows.length} dishes
-        </p>
-      </FilterBar>
+      {!loading && (
+        <>
+          <FilterBar>
+            <div className="flex items-center gap-2">
+              <Switch id="below" checked={belowOnly} onCheckedChange={setBelowOnly} />
+              <Label htmlFor="below" className="cursor-pointer">Below target only</Label>
+            </div>
+            <Select value={category} onValueChange={setCategory}>
+              <SelectTrigger className="h-9 w-44"><SelectValue placeholder="Category" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All categories</SelectItem>
+                {categories.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="h-9 w-44"><SelectValue placeholder="Status" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="incomplete">Incomplete costing</SelectItem>
+                <SelectItem value="missing_price">Missing price</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="ml-auto text-xs text-muted-foreground">
+              {filtered.length} of {rows.length} dishes
+            </p>
+          </FilterBar>
 
-      <div className="p-6 pt-4">
-        <div className="overflow-hidden rounded-md border bg-card">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Dish</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>On menu</TableHead>
-                <TableHead className="text-right">Menu price</TableHead>
-                <TableHead className="text-right">COGS</TableHead>
-                <TableHead className="text-right">GP</TableHead>
-                <TableHead className="text-right">GPM</TableHead>
-                <TableHead>Target</TableHead>
-                <TableHead className="text-right">Δ COGS</TableHead>
-                <TableHead className="text-right">Δ GPM</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {[...filtered]
-                .sort((a, b) => (a.gpm ?? 1) - (b.gpm ?? 1))
-                .map((row) => (
-                  <TableRow key={row.recipe.id}>
-                    <TableCell className="font-medium">
-                      <Link
-                        to="/dish-analysis/$id"
-                        params={{ id: row.recipe.id }}
-                        className="hover:underline"
-                      >
-                        {row.recipe.name}
-                      </Link>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {row.recipe.category}
-                    </TableCell>
-                    <TableCell>
-                      {row.recipe.on_menu ? (
-                        <Badge
-                          variant="outline"
-                          className="border-success/30 bg-success/10 text-success"
-                        >
-                          On
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline" className="text-muted-foreground">
-                          Off
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {row.recipe.menu_price === null || row.recipe.menu_price === 0 ? (
-                        <span className="text-xs italic text-muted-foreground">
-                          Set menu price
-                        </span>
-                      ) : (
-                        <MoneyCell value={row.recipe.menu_price} />
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <MoneyCell value={row.cost_per_serving} />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <MoneyCell value={row.gp} />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <PercentCell value={row.gpm} />
-                    </TableCell>
-                    <TableCell>
-                      <OnTargetBadge onTarget={row.on_target} />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {row.delta_cogs_vs_snapshot === null ? (
-                        <span className="text-muted-foreground">—</span>
-                      ) : (
-                        <span
-                          className={
-                            row.delta_cogs_vs_snapshot > 0
-                              ? "tabular-nums text-destructive"
-                              : row.delta_cogs_vs_snapshot < 0
-                                ? "tabular-nums text-success"
-                                : "tabular-nums text-muted-foreground"
-                          }
-                        >
-                          {row.delta_cogs_vs_snapshot > 0 ? "+" : ""}
-                          {row.delta_cogs_vs_snapshot.toFixed(2)}
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <PpDeltaCell value={row.delta_gpm_vs_snapshot} />
-                    </TableCell>
+          <div className="p-6 pt-4">
+            <div className="overflow-hidden rounded-md border bg-card">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Dish</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead className="text-right">Menu price</TableHead>
+                    <TableHead className="text-right">COGS/serving</TableHead>
+                    <TableHead className="text-right">GP</TableHead>
+                    <TableHead className="text-right">GPM</TableHead>
+                    <TableHead>Target</TableHead>
+                    <TableHead className="text-right">Suggested</TableHead>
+                    <TableHead>Status</TableHead>
                   </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
+                </TableHeader>
+                <TableBody>
+                  {filtered.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={9} className="py-12 text-center text-sm text-muted-foreground">
+                        {rows.length === 0 ? "No active dish recipes. Create a dish recipe to see analytics." : "No dishes match the current filters."}
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filtered.map((row) => (
+                      <TableRow key={row.recipe_id}>
+                        <TableCell className="font-medium">
+                          <Link to="/recipes/$id" params={{ id: row.recipe_id }} className="hover:underline">
+                            {row.dish_name}
+                          </Link>
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">{row.category_name ?? "—"}</TableCell>
+                        <TableCell className="text-right">
+                          {row.menu_price != null && row.menu_price > 0
+                            ? <MoneyCell value={row.menu_price} />
+                            : <span className="text-xs italic text-muted-foreground">Set menu price</span>}
+                        </TableCell>
+                        <TableCell className="text-right"><MoneyCell value={row.cost_per_serving} /></TableCell>
+                        <TableCell className="text-right">
+                          {row.gp != null ? <MoneyCell value={row.gp} /> : <span className="text-muted-foreground">—</span>}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {row.gpm != null ? <PercentCell value={row.gpm} decimals={1} /> : <span className="text-muted-foreground">—</span>}
+                        </TableCell>
+                        <TableCell>
+                          {row.on_target != null ? <OnTargetBadge onTarget={row.on_target} /> : <span className="text-muted-foreground">—</span>}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {row.suggested_menu_price != null ? (
+                            <span className="tabular-nums text-sm">
+                              {formatMoney(row.suggested_menu_price)}
+                              {row.menu_price != null && row.menu_price > 0 && (
+                                <span className={`ml-1 text-[10px] ${row.suggested_menu_price > row.menu_price ? "text-destructive" : "text-success"}`}>
+                                  ({row.suggested_menu_price > row.menu_price ? "+" : ""}{formatMoney(row.suggested_menu_price - row.menu_price)})
+                                </span>
+                              )}
+                            </span>
+                          ) : "—"}
+                        </TableCell>
+                        <TableCell>
+                          <StatusBadge status={row.status} />
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+        </>
+      )}
     </AppShell>
   );
+}
+
+function StatusBadge({ status }: { status: string }) {
+  if (status === "valid") return <Badge className="bg-success text-success-foreground text-[10px]">OK</Badge>;
+  if (status === "warning") return <Badge className="bg-warning text-warning-foreground text-[10px]">Warn</Badge>;
+  if (status === "error") return <Badge className="bg-destructive text-destructive-foreground text-[10px]">Err</Badge>;
+  return <Badge variant="outline" className="text-[10px]">Incomplete</Badge>;
 }

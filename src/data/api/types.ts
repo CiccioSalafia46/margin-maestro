@@ -1,5 +1,5 @@
-// Build 1.3 — Auth + tenant + settings/admin + ingredients + recipes API types.
-// Menu analytics/price log/cascade/alerts remain mock for now.
+// Build 1.4 — Auth + tenant + settings/admin + ingredients + recipes + menu analytics API types.
+// Price log/cascade/alerts remain mock for now.
 
 export type RestaurantRole = "owner" | "manager" | "viewer";
 
@@ -229,6 +229,40 @@ export type RecipeLineInput = {
   sort_order?: number;
   notes?: string | null;
 };
+
+// ---------------- Menu Analytics (Build 1.4, derived — no table) ----
+
+export type MenuAnalyticsStatus = "valid" | "warning" | "error" | "incomplete";
+
+export interface MenuAnalyticsRow {
+  recipe_id: string;
+  dish_name: string;
+  category_name: string | null;
+  serving_quantity: number;
+  serving_uom_code: string;
+  cogs: number;
+  cost_per_serving: number;
+  menu_price: number | null;
+  gp: number | null;
+  gpm: number | null;
+  target_gpm: number;
+  on_target: boolean | null;
+  suggested_menu_price: number | null;
+  status: MenuAnalyticsStatus;
+  issues: string[];
+}
+
+export interface MenuAnalyticsSummary {
+  total_dishes: number;
+  priced_dishes: number;
+  avg_gpm: number | null;
+  avg_gp: number | null;
+  below_target_count: number;
+  missing_price_count: number;
+  incomplete_costing_count: number;
+  top_performer: MenuAnalyticsRow | null;
+  bottom_performer: MenuAnalyticsRow | null;
+}
 
 export interface ApiError {
   code: "auth" | "permission" | "duplicate" | "validation" | "not_found" | "unknown";
