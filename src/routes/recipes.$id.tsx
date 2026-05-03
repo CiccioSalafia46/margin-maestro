@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import {
   Select,
@@ -29,6 +30,7 @@ import {
 } from "@/components/ui/table";
 import { useAuth } from "@/auth/AuthProvider";
 import { getIngredients } from "@/data/api/ingredientsApi";
+import { getMenuCategories } from "@/data/api/settingsApi";
 import {
   calculateRecipeMetrics,
   detectCycle,
@@ -36,9 +38,11 @@ import {
   getRecipes,
   replaceRecipeLines,
   updateLinkedIntermediateIngredientCostState,
+  updateRecipe,
 } from "@/data/api/recipesApi";
 import type {
   IngredientWithCostState,
+  MenuCategoryRow,
   RecipeLineInput,
   RecipeMetrics,
   RecipeWithLines,
@@ -75,8 +79,20 @@ function RecipeDetailPage() {
   const [recipe, setRecipe] = useState<RecipeWithLines | null>(null);
   const [allRecipes, setAllRecipes] = useState<RecipeWithLines[]>([]);
   const [ingredients, setIngredients] = useState<IngredientWithCostState[]>([]);
+  const [categories, setCategories] = useState<MenuCategoryRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Draft recipe fields
+  const [draftName, setDraftName] = useState("");
+  const [draftCategoryId, setDraftCategoryId] = useState("none");
+  const [draftServQty, setDraftServQty] = useState("1");
+  const [draftServUom, setDraftServUom] = useState("Ct");
+  const [draftMenuPrice, setDraftMenuPrice] = useState("");
+  const [draftLinkedIngId, setDraftLinkedIngId] = useState("none");
+  const [draftNotes, setDraftNotes] = useState("");
+
+  // Draft lines
   const [draftLines, setDraftLines] = useState<DraftLine[]>([]);
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
@@ -84,27 +100,40 @@ function RecipeDetailPage() {
   const canManage = activeMembership?.role === "owner" || activeMembership?.role === "manager";
   const targetGpm = activeRestaurantSettings?.target_gpm ?? 0.78;
 
+  const populateDrafts = (rec: RecipeWithLines) => {
+    setDraftName(rec.name);
+    setDraftCategoryId(rec.menu_category_id ?? "none");
+    setDraftServQty(String(Number(rec.serving_quantity)));
+    setDraftServUom(rec.serving_uom_code);
+    setDraftMenuPrice(rec.menu_price != null ? String(Number(rec.menu_price)) : "");
+    setDraftLinkedIngId(rec.linked_intermediate_ingredient_id ?? "none");
+    setDraftNotes(rec.notes ?? "");
+    setDraftLines(rec.lines.map((l) => ({
+      key: l.id,
+      ingredient_id: l.ingredient_id,
+      quantity: String(Number(l.quantity)),
+      uom_code: l.uom_code,
+    })));
+    setDirty(false);
+  };
+
   const load = useCallback(async () => {
     if (!activeRestaurantId) return;
     setLoading(true);
     setError(null);
     try {
-      const [rec, ings, recs] = await Promise.all([
+      const [rec, ings, recs, cats] = await Promise.all([
         getRecipeById(activeRestaurantId, id),
         getIngredients(activeRestaurantId),
         getRecipes(activeRestaurantId),
+        getMenuCategories(activeRestaurantId),
       ]);
       if (!rec) { setError("Recipe not found."); return; }
       setRecipe(rec);
       setIngredients(ings);
       setAllRecipes(recs);
-      setDraftLines(rec.lines.map((l) => ({
-        key: l.id,
-        ingredient_id: l.ingredient_id,
-        quantity: String(Number(l.quantity)),
-        uom_code: l.uom_code,
-      })));
-      setDirty(false);
+      setCategories(cats);
+      populateDrafts(rec);
     } catch (e) {
       setError(errMsg(e));
     } finally {
@@ -113,6 +142,17 @@ function RecipeDetailPage() {
   }, [activeRestaurantId, id]);
 
   useEffect(() => { void load(); }, [load]);
+
+  // Build virtual recipe for metrics preview using draft fields
+  const virtualRecipe = useMemo(() => {
+    if (!recipe) return null;
+    return {
+      ...recipe,
+      serving_quantity: Number(draftServQty) || 1,
+      serving_uom_code: draftServUom,
+      menu_price: recipe.kind === "dish" && draftMenuPrice ? Number(draftMenuPrice) : null,
+    };
+  }, [recipe, draftServQty, draftServUom, draftMenuPrice]);
 
   const virtualLines = useMemo(() => draftLines.map((d, idx) => ({
     id: d.key,
@@ -128,28 +168,25 @@ function RecipeDetailPage() {
   })), [draftLines, activeRestaurantId, id]);
 
   const metrics: RecipeMetrics | null = useMemo(() => {
-    if (!recipe) return null;
-    return calculateRecipeMetrics(recipe, virtualLines, ingredients, targetGpm);
-  }, [recipe, virtualLines, ingredients, targetGpm]);
+    if (!virtualRecipe) return null;
+    return calculateRecipeMetrics(virtualRecipe, virtualLines, ingredients, targetGpm);
+  }, [virtualRecipe, virtualLines, ingredients, targetGpm]);
 
+  const markDirty = () => setDirty(true);
   const addLine = () => {
     setDraftLines((prev) => [...prev, { key: crypto.randomUUID(), ingredient_id: "", quantity: "1", uom_code: "Gr" }]);
-    setDirty(true);
+    markDirty();
   };
-
-  const removeLine = (key: string) => {
-    setDraftLines((prev) => prev.filter((l) => l.key !== key));
-    setDirty(true);
-  };
-
+  const removeLine = (key: string) => { setDraftLines((prev) => prev.filter((l) => l.key !== key)); markDirty(); };
   const updateLine = (key: string, field: keyof DraftLine, value: string) => {
     setDraftLines((prev) => prev.map((l) => l.key === key ? { ...l, [field]: value } : l));
-    setDirty(true);
+    markDirty();
   };
 
   const onSave = async () => {
     if (!activeRestaurantId || !recipe) return;
 
+    // Cycle detection for intermediate
     if (recipe.kind === "intermediate") {
       const lineIngIds = draftLines.filter((l) => l.ingredient_id).map((l) => l.ingredient_id);
       const cycleErr = detectCycle(recipe.id, lineIngIds, allRecipes, ingredients);
@@ -158,17 +195,30 @@ function RecipeDetailPage() {
 
     setSaving(true);
     try {
+      // 1. Update recipe fields
+      const updatedRecipe = await updateRecipe(activeRestaurantId, recipe.id, {
+        name: draftName.trim(),
+        menu_category_id: draftCategoryId === "none" ? null : draftCategoryId,
+        serving_quantity: Number(draftServQty) || 1,
+        serving_uom_code: draftServUom,
+        menu_price: recipe.kind === "dish" && draftMenuPrice ? Number(draftMenuPrice) : null,
+        linked_intermediate_ingredient_id:
+          recipe.kind === "intermediate" && draftLinkedIngId !== "none" ? draftLinkedIngId : null,
+        notes: draftNotes.trim() || null,
+      });
+
+      // 2. Replace lines
       const lines: RecipeLineInput[] = draftLines
         .filter((d) => d.ingredient_id && Number(d.quantity) > 0)
         .map((d, idx) => ({ ingredient_id: d.ingredient_id, quantity: Number(d.quantity), uom_code: d.uom_code, sort_order: idx * 10 }));
-
       await replaceRecipeLines(activeRestaurantId, recipe.id, lines);
 
-      if (recipe.kind === "intermediate" && recipe.linked_intermediate_ingredient_id && metrics) {
-        await updateLinkedIntermediateIngredientCostState(activeRestaurantId, recipe, metrics);
+      // 3. Intermediate propagation
+      if (updatedRecipe.kind === "intermediate" && updatedRecipe.linked_intermediate_ingredient_id && metrics) {
+        await updateLinkedIntermediateIngredientCostState(activeRestaurantId, updatedRecipe, metrics);
       }
 
-      toast.success("Recipe lines saved.");
+      toast.success("Recipe saved.");
       await load();
     } catch (e) {
       toast.error(errMsg(e));
@@ -198,17 +248,19 @@ function RecipeDetailPage() {
   }
 
   const isDish = recipe.kind === "dish";
+  const intermediateIngredients = ingredients.filter((i) => i.type === "intermediate" && i.is_active);
+  const disabled = !canManage || saving;
 
   return (
     <AppShell>
       <PageHeader
         title={recipe.name}
-        description={`${recipe.category_name ?? "No category"} · ${Number(recipe.serving_quantity)} ${recipe.serving_uom_code}/serving`}
+        description={`${recipe.category_name ?? "No category"} · ${recipe.kind}`}
         actions={
           <div className="flex gap-2">
             {canManage && dirty && (
               <Button size="sm" onClick={onSave} disabled={saving}>
-                {saving ? <><Loader2 className="mr-1.5 h-4 w-4 animate-spin" />Saving…</> : <><Save className="mr-1.5 h-4 w-4" />Save lines</>}
+                {saving ? <><Loader2 className="mr-1.5 h-4 w-4 animate-spin" />Saving…</> : <><Save className="mr-1.5 h-4 w-4" />Save</>}
               </Button>
             )}
             <Button variant="outline" size="sm" asChild>
@@ -222,11 +274,68 @@ function RecipeDetailPage() {
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant={isDish ? "default" : "outline"}>{isDish ? "Dish" : "Intermediate"}</Badge>
           {!recipe.is_active && <Badge variant="outline">Inactive</Badge>}
-          {isDish && recipe.menu_price != null && <Badge variant="outline">Menu: {formatMoney(Number(recipe.menu_price))}</Badge>}
-          {!isDish && recipe.linked_intermediate_ingredient_id && <Badge variant="outline">Linked ingredient</Badge>}
         </div>
 
+        {/* Recipe fields */}
+        <Card>
+          <CardHeader className="pb-3"><CardTitle className="text-base">Recipe details</CardTitle></CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="space-y-1.5">
+                <Label>Name</Label>
+                <Input value={draftName} onChange={(e) => { setDraftName(e.target.value); markDirty(); }} disabled={disabled} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Category</Label>
+                <Select value={draftCategoryId} onValueChange={(v) => { setDraftCategoryId(v); markDirty(); }} disabled={disabled}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    {categories.filter((c) => c.is_active).map((c) => (
+                      <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Serving qty</Label>
+                <Input type="number" min={0.001} step="any" value={draftServQty} onChange={(e) => { setDraftServQty(e.target.value); markDirty(); }} disabled={disabled} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Serving UoM</Label>
+                <Select value={draftServUom} onValueChange={(v) => { setDraftServUom(v); markDirty(); }} disabled={disabled}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>{UOM_CODES.map((u) => <SelectItem key={u} value={u}>{u}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              {isDish && (
+                <div className="space-y-1.5">
+                  <Label>Menu price (USD)</Label>
+                  <Input type="number" min={0} step="any" value={draftMenuPrice} onChange={(e) => { setDraftMenuPrice(e.target.value); markDirty(); }} disabled={disabled} />
+                </div>
+              )}
+              {!isDish && (
+                <div className="space-y-1.5">
+                  <Label>Linked ingredient</Label>
+                  <Select value={draftLinkedIngId} onValueChange={(v) => { setDraftLinkedIngId(v); markDirty(); }} disabled={disabled}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">None</SelectItem>
+                      {intermediateIngredients.map((i) => <SelectItem key={i.id} value={i.id}>{i.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              <div className="space-y-1.5 sm:col-span-2 lg:col-span-3">
+                <Label>Notes</Label>
+                <Input value={draftNotes} onChange={(e) => { setDraftNotes(e.target.value); markDirty(); }} disabled={disabled} placeholder="Optional notes" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          {/* Lines editor */}
           <Card className="lg:col-span-2">
             <CardHeader className="flex flex-row items-center justify-between pb-3">
               <CardTitle className="text-base">Ingredient lines</CardTitle>
@@ -302,6 +411,7 @@ function RecipeDetailPage() {
             </CardContent>
           </Card>
 
+          {/* Live totals */}
           <Card>
             <CardHeader className="pb-3"><CardTitle className="text-base">Live totals</CardTitle></CardHeader>
             <CardContent className="space-y-3">
@@ -310,18 +420,18 @@ function RecipeDetailPage() {
               {isDish && (
                 <>
                   <Separator />
-                  <TotalRow label="Menu price" value={recipe.menu_price != null ? formatMoney(Number(recipe.menu_price)) : "—"} />
+                  <TotalRow label="Menu price" value={draftMenuPrice ? formatMoney(Number(draftMenuPrice)) : "—"} />
                   <TotalRow label="GP" value={metrics?.gp != null ? formatMoney(metrics.gp) : "—"} />
                   <TotalRow label="GPM" value={metrics?.gpm != null ? `${(metrics.gpm * 100).toFixed(1)}%` : "—"} />
                   <TotalRow label="On target" value={metrics?.on_target != null ? (metrics.on_target ? "Yes" : "No") : "—"} />
                   {metrics?.suggested_menu_price != null && <TotalRow label="Suggested price" value={formatMoney(metrics.suggested_menu_price)} highlight />}
                 </>
               )}
-              {!isDish && recipe.linked_intermediate_ingredient_id && (
+              {!isDish && draftLinkedIngId !== "none" && (
                 <>
                   <Separator />
                   <TotalRow label="Resulting unit cost" value={metrics ? formatUnitCost(metrics.cost_per_serving, 6) : "—"} />
-                  <p className="text-[11px] text-muted-foreground">Saving updates the linked Intermediate ingredient's cost state.</p>
+                  <p className="text-[11px] text-muted-foreground">Saving updates the linked ingredient's cost state.</p>
                 </>
               )}
               {metrics && metrics.errors.length > 0 && (
@@ -336,13 +446,6 @@ function RecipeDetailPage() {
             </CardContent>
           </Card>
         </div>
-
-        {recipe.notes && (
-          <Card>
-            <CardHeader className="pb-3"><CardTitle className="text-base">Notes</CardTitle></CardHeader>
-            <CardContent><p className="text-sm">{recipe.notes}</p></CardContent>
-          </Card>
-        )}
       </div>
     </AppShell>
   );

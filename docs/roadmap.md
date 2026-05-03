@@ -43,7 +43,13 @@ Forward implementation plan for Margin IQ — Restaurant Margin Intelligence Saa
 
 **Status:** Accepted.
 
-**Goal:** Introduce `ingredients` and `ingredient_cost_state` tables in Supabase. Verified on self-owned Supabase project `margin-maestro-dev`.
+---
+
+## Build 1.3 / 1.3A — Recipes
+
+**Status:** Accepted.
+
+**Goal:** Introduce `recipes` and `recipe_lines` tables in Supabase. Dish and Intermediate recipes with line editor, live COGS, intermediate cost propagation, and cycle detection.
 
 ---
 

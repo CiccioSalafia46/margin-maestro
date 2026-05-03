@@ -101,13 +101,17 @@ function QaRecipesPage() {
       // N. line unit references valid
       next.push({ label: "N. line unit references valid", status: "warn", detail: "Manual/role-dependent — UoM validated by DB FK constraint." });
 
-      // O. intermediate recipes have linked ingredient
-      const intRecipes = recipes.filter((r) => r.kind === "intermediate" && r.is_active);
+      // O. active intermediate recipes have linked ingredient (inactive ignored)
+      const intRecipes = recipes.filter((r) => r.kind === "intermediate" && r.is_active === true);
       const unlinked = intRecipes.filter((r) => !r.linked_intermediate_ingredient_id);
       next.push({
-        label: "O. intermediate recipes linked to ingredient",
+        label: "O. active intermediate recipes linked to ingredient",
         status: unlinked.length === 0 ? (intRecipes.length > 0 ? "pass" : "warn") : "warn",
-        detail: intRecipes.length === 0 ? "no intermediate recipes yet" : unlinked.length === 0 ? "all linked" : `${unlinked.length} unlinked`,
+        detail: intRecipes.length === 0
+          ? "no active intermediate recipes"
+          : unlinked.length === 0
+            ? `${intRecipes.length} active intermediate(s), all linked`
+            : `${unlinked.length} of ${intRecipes.length} active intermediate(s) unlinked`,
       });
 
       // P. cycle detection

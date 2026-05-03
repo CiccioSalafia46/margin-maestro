@@ -301,7 +301,7 @@ function QaAuthPage() {
         label: "Operational data partially migrated",
         status: "warn",
         nonCritical: true,
-        detail: "Ingredients in Supabase (Build 1.2). Recipes, menu analytics, price log, snapshots, impact cascade, and alerts remain mock/future.",
+        detail: "Ingredients and Recipes in Supabase (Build 1.3). Menu analytics, dish analysis, price log, snapshots, impact cascade, and alerts remain mock/future.",
       },
     ],
     [],
@@ -443,7 +443,7 @@ function QaAuthPage() {
 
         <p className="text-[11px] text-muted-foreground">
           No access tokens, refresh tokens, service-role keys, or raw session JSON are displayed.
-          Build 1.3 — Recipes.
+          Build 1.3B — Recipes Edit Complete.
         </p>
       </div>
     </AppShell>

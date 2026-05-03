@@ -262,3 +262,18 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - Price Log/Snapshot awaits Build 1.5.
 - Dashboard and other operational pages still use mock data.
 - Full recipe edit form (name, category, serving) is future scope.
+
+---
+
+## Build 1.3A — Recipes Acceptance
+
+**Status:** Accepted
+
+- Verified on self-owned Supabase project `margin-maestro-dev`.
+- Dish recipes: COGS, cost/serving, GP, GPM, suggested price compute correctly.
+- Intermediate recipes: cost propagation updates linked ingredient_cost_state.
+- Cycle detection blocks circular intermediate dependencies.
+- `/qa-recipes` checks A–V verified (PASS or acceptable WARN for role-dependent checks).
+- `/qa-settings-admin` check U updated to accept Build 1.3 tables.
+- `/qa-auth` operational data warning updated to reflect Build 1.3.
+- Build label updated to "Build 1.3A — Recipes Accepted".

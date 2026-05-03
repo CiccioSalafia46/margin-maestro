@@ -1,7 +1,7 @@
 # Current State
 
 **Date:** 2026-05-03
-**Build:** 1.3 — Recipes
+**Build:** 1.3A — Recipes Accepted
 **Branch:** `build-1.3-recipes`
 **Backend:** Self-owned Supabase project `margin-maestro-dev`
 
@@ -9,7 +9,19 @@
 
 ## Actual State
 
-**Ingredients and Recipes now use Supabase.** `/ingredients`, `/ingredients/$id`, `/recipes`, and `/recipes/$id` read/write real tenant-scoped data. Recipe line editor with live COGS computation. Intermediate recipe cost propagation to linked ingredients. Cycle detection. All other operational pages remain mock-based.
+**Ingredients and Recipes use Supabase.** All other operational pages remain mock-based.
+
+## Accepted Baseline
+
+**Build 1.3A — Recipes Accepted.**
+
+- Auth session persistence works (Build 1.0F).
+- Settings/Admin reference data accepted (Build 1.1A).
+- Ingredients database accepted (Build 1.2A).
+- Recipes accepted (Build 1.3A).
+- Dish recipes: COGS, cost/serving, GP, GPM, suggested price.
+- Intermediate recipes: cost propagation to linked ingredient.
+- Cycle detection blocks circular dependencies.
 
 ## Backend Scope (Supabase, live)
 
@@ -25,8 +37,8 @@
 | `suppliers` | 1.1 | Accepted |
 | `ingredients` | 1.2 | Accepted |
 | `ingredient_cost_state` | 1.2 | Accepted |
-| `recipes` | 1.3 | **New** |
-| `recipe_lines` | 1.3 | **New** |
+| `recipes` | 1.3 | Accepted |
+| `recipe_lines` | 1.3 | Accepted |
 
 ## What Remains Mock
 
@@ -43,3 +55,6 @@ Dashboard, menu analytics, dish analysis, impact cascade, price trend, price log
 - Price Log/Snapshot awaits Build 1.5
 - Dashboard uses mock data
 - Google OAuth not enabled
+- Team management placeholder
+- Restaurant switcher in-memory only
+- Full recipe edit form is future scope

@@ -176,7 +176,7 @@ function QaIngredientsPage() {
       next.push({
         label: "N. intermediate ingredient pending status",
         status: "warn",
-        detail: "Manual/role-dependent — intermediate ingredients show cost_source = intermediate_pending until Build 1.3.",
+        detail: "Manual/role-dependent — intermediate ingredients show pending unless linked to a recipe (Build 1.3+).",
       });
 
       // P. viewer write blocked
