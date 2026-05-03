@@ -510,3 +510,15 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - **Accept invite route:** `/accept-invite?token=<token>`.
 - **QA:** `/qa-team-management` with checks A–Q.
 - Sole owner protection via existing trigger.
+
+---
+
+## Build 2.1A — Team Management Acceptance
+
+**Status:** Accepted
+
+- Team Management verified on margin-maestro-dev.
+- RLS fixed to use JWT email claims (not auth.users from client).
+- Member loading fixed (two-step query, no embedded join).
+- Invite link copy-to-clipboard with clear "no email delivery" copy.
+- Build label: "Build 2.1A — Team Management Accepted".

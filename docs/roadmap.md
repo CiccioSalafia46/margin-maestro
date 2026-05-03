@@ -99,9 +99,11 @@ Forward implementation plan for Margin IQ — Restaurant Margin Intelligence Saa
 
 ---
 
-## Build 2.1 — Team Management
+## Build 2.1 / 2.1A — Team Management
 
-**Status:** Not started.
+**Status:** Accepted.
+
+**Goal:** Invitation-based team management with role assignment, app-level invite links, and sole owner protection.
 
 ---
 
