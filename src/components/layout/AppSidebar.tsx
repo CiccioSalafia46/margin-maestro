@@ -138,7 +138,7 @@ export function AppSidebar() {
       <SidebarFooter className="border-t">
         {!collapsed && (
           <p className="px-2 py-1 text-[10px] text-muted-foreground">
-            Build 1.5B — Price Trend
+            Build 1.6 — Dish Analysis
           </p>
         )}
       </SidebarFooter>

@@ -18,6 +18,7 @@ import { Route as QaPriceTrendRouteImport } from './routes/qa-price-trend'
 import { Route as QaPriceLogSnapshotRouteImport } from './routes/qa-price-log-snapshot'
 import { Route as QaMenuAnalyticsRouteImport } from './routes/qa-menu-analytics'
 import { Route as QaIngredientsRouteImport } from './routes/qa-ingredients'
+import { Route as QaDishAnalysisRouteImport } from './routes/qa-dish-analysis'
 import { Route as QaDataIntegrityRouteImport } from './routes/qa-data-integrity'
 import { Route as QaCalculationsRouteImport } from './routes/qa-calculations'
 import { Route as QaAuthRouteImport } from './routes/qa-auth'
@@ -82,6 +83,11 @@ const QaMenuAnalyticsRoute = QaMenuAnalyticsRouteImport.update({
 const QaIngredientsRoute = QaIngredientsRouteImport.update({
   id: '/qa-ingredients',
   path: '/qa-ingredients',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QaDishAnalysisRoute = QaDishAnalysisRouteImport.update({
+  id: '/qa-dish-analysis',
+  path: '/qa-dish-analysis',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QaDataIntegrityRoute = QaDataIntegrityRouteImport.update({
@@ -200,6 +206,7 @@ export interface FileRoutesByFullPath {
   '/qa-auth': typeof QaAuthRoute
   '/qa-calculations': typeof QaCalculationsRoute
   '/qa-data-integrity': typeof QaDataIntegrityRoute
+  '/qa-dish-analysis': typeof QaDishAnalysisRoute
   '/qa-ingredients': typeof QaIngredientsRoute
   '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
   '/qa-price-log-snapshot': typeof QaPriceLogSnapshotRoute
@@ -230,6 +237,7 @@ export interface FileRoutesByTo {
   '/qa-auth': typeof QaAuthRoute
   '/qa-calculations': typeof QaCalculationsRoute
   '/qa-data-integrity': typeof QaDataIntegrityRoute
+  '/qa-dish-analysis': typeof QaDishAnalysisRoute
   '/qa-ingredients': typeof QaIngredientsRoute
   '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
   '/qa-price-log-snapshot': typeof QaPriceLogSnapshotRoute
@@ -262,6 +270,7 @@ export interface FileRoutesById {
   '/qa-auth': typeof QaAuthRoute
   '/qa-calculations': typeof QaCalculationsRoute
   '/qa-data-integrity': typeof QaDataIntegrityRoute
+  '/qa-dish-analysis': typeof QaDishAnalysisRoute
   '/qa-ingredients': typeof QaIngredientsRoute
   '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
   '/qa-price-log-snapshot': typeof QaPriceLogSnapshotRoute
@@ -295,6 +304,7 @@ export interface FileRouteTypes {
     | '/qa-auth'
     | '/qa-calculations'
     | '/qa-data-integrity'
+    | '/qa-dish-analysis'
     | '/qa-ingredients'
     | '/qa-menu-analytics'
     | '/qa-price-log-snapshot'
@@ -325,6 +335,7 @@ export interface FileRouteTypes {
     | '/qa-auth'
     | '/qa-calculations'
     | '/qa-data-integrity'
+    | '/qa-dish-analysis'
     | '/qa-ingredients'
     | '/qa-menu-analytics'
     | '/qa-price-log-snapshot'
@@ -356,6 +367,7 @@ export interface FileRouteTypes {
     | '/qa-auth'
     | '/qa-calculations'
     | '/qa-data-integrity'
+    | '/qa-dish-analysis'
     | '/qa-ingredients'
     | '/qa-menu-analytics'
     | '/qa-price-log-snapshot'
@@ -388,6 +400,7 @@ export interface RootRouteChildren {
   QaAuthRoute: typeof QaAuthRoute
   QaCalculationsRoute: typeof QaCalculationsRoute
   QaDataIntegrityRoute: typeof QaDataIntegrityRoute
+  QaDishAnalysisRoute: typeof QaDishAnalysisRoute
   QaIngredientsRoute: typeof QaIngredientsRoute
   QaMenuAnalyticsRoute: typeof QaMenuAnalyticsRoute
   QaPriceLogSnapshotRoute: typeof QaPriceLogSnapshotRoute
@@ -464,6 +477,13 @@ declare module '@tanstack/react-router' {
       path: '/qa-ingredients'
       fullPath: '/qa-ingredients'
       preLoaderRoute: typeof QaIngredientsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qa-dish-analysis': {
+      id: '/qa-dish-analysis'
+      path: '/qa-dish-analysis'
+      fullPath: '/qa-dish-analysis'
+      preLoaderRoute: typeof QaDishAnalysisRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/qa-data-integrity': {
@@ -672,6 +692,7 @@ const rootRouteChildren: RootRouteChildren = {
   QaAuthRoute: QaAuthRoute,
   QaCalculationsRoute: QaCalculationsRoute,
   QaDataIntegrityRoute: QaDataIntegrityRoute,
+  QaDishAnalysisRoute: QaDishAnalysisRoute,
   QaIngredientsRoute: QaIngredientsRoute,
   QaMenuAnalyticsRoute: QaMenuAnalyticsRoute,
   QaPriceLogSnapshotRoute: QaPriceLogSnapshotRoute,

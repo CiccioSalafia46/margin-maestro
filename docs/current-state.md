@@ -1,15 +1,15 @@
 # Current State
 
 **Date:** 2026-05-03
-**Build:** 1.5B — Price Trend
-**Branch:** `build-1.3-recipes`
+**Build:** 1.6 — Dish Analysis
+**Branch:** `build-1.6-dish-analysis`
 **Backend:** Self-owned Supabase project `margin-maestro-dev`
 
 ---
 
 ## Actual State
 
-**Ingredients, Recipes, Menu Analytics, Price Log, Snapshots, Price Update Batches, and Price Trend use Supabase.** Dashboard, Dish Analysis, Impact Cascade, and Alerts remain mock-based.
+**Ingredients, Recipes, Menu Analytics, Price Log, Snapshots, Price Update Batches, Price Trend, and Dish Analysis use Supabase.** Dashboard, Impact Cascade, and Alerts remain mock-based.
 
 ## Backend Scope (Supabase, live)
 
@@ -31,21 +31,12 @@
 | `ingredient_price_log` | 1.5 | Live |
 | `ingredient_snapshots` | 1.5 | Live |
 
-**Derived (no table):** Menu Analytics (1.4), Price Trend (1.5B).
+**Derived (no table):** Menu Analytics (1.4), Price Trend (1.5B), Dish Analysis (1.6).
 
 ## What Remains Mock
 
-Dashboard, dish analysis, impact cascade, alerts.
+Dashboard, impact cascade, alerts.
 
 ## Next Task
 
-**Build 1.7 — Impact Cascade** or **Build 1.6 — Dish Analysis Supabase-derived.**
-
-## Known Limitations
-
-- Dashboard uses mock data
-- Dish Analysis uses mock data
-- Impact Cascade persistence awaits Build 1.7
-- Alerts persistence awaits Build 1.8
-- Batch apply is client-orchestrated (not atomic DB transaction)
-- Non-destructive baseline reset deferred
+**Build 1.7 — Impact Cascade** or **Dashboard Supabase migration.**

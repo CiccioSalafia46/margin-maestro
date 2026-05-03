@@ -376,3 +376,25 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - Dish Analysis still uses mock data.
 - Impact Cascade persistence deferred.
 - Alerts persistence deferred.
+
+---
+
+## Build 1.6 — Dish Analysis Supabase-derived
+
+**Status:** Implemented
+
+- **No new migration.** Derived from active dish recipes, recipe_lines, ingredients, ingredient_cost_state, restaurant_settings.
+- **Component:** `DishAnalysisView` rewritten from mock to Supabase.
+- **COGS breakdown:** Line-by-line cost sorted by share.
+- **Profitability:** GP, GPM, target comparison, suggested price.
+- **Scenario modeling:** Local-only sliders for cost/price adjustments.
+- **Margin Manager:** Suggested prices at multiple target GPM levels.
+- **QA:** `/qa-dish-analysis` with checks A–U.
+- **Developer QA link:** Added to Settings → Developer QA.
+
+**Limitations:**
+- Scenario data is local-only (React state), not persisted.
+- No Apply Price action.
+- Dashboard still uses mock data.
+- Impact Cascade persistence deferred.
+- Alerts persistence deferred.
