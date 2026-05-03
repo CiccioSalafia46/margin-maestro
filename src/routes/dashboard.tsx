@@ -236,7 +236,7 @@ function DashboardPage() {
             </Card>
 
             <p className="text-[11px] text-muted-foreground">
-              Build 2.3 — Automated E2E QA. All operational pages Supabase-backed.
+              Build 2.2 — Billing. All operational pages Supabase-backed.
             </p>
           </>
         )}

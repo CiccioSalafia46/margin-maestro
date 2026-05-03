@@ -305,6 +305,24 @@ export type Database = {
           },
         ]
       }
+      billing_customers: {
+        Row: { id: string; restaurant_id: string; stripe_customer_id: string; billing_email: string | null; created_by: string | null; created_at: string; updated_at: string }
+        Insert: { id?: string; restaurant_id: string; stripe_customer_id: string; billing_email?: string | null; created_by?: string | null; created_at?: string; updated_at?: string }
+        Update: { id?: string; restaurant_id?: string; stripe_customer_id?: string; billing_email?: string | null; created_by?: string | null; created_at?: string; updated_at?: string }
+        Relationships: [{ foreignKeyName: "billing_customers_restaurant_id_fkey"; columns: ["restaurant_id"]; isOneToOne: true; referencedRelation: "restaurants"; referencedColumns: ["id"] }]
+      }
+      billing_events: {
+        Row: { id: string; restaurant_id: string | null; stripe_event_id: string; event_type: string; processing_status: string; error_message: string | null; payload: unknown; received_at: string; processed_at: string | null }
+        Insert: { id?: string; restaurant_id?: string | null; stripe_event_id: string; event_type: string; processing_status?: string; error_message?: string | null; payload?: unknown; received_at?: string; processed_at?: string | null }
+        Update: { [_ in never]: never }
+        Relationships: []
+      }
+      billing_subscriptions: {
+        Row: { id: string; restaurant_id: string; stripe_customer_id: string | null; stripe_subscription_id: string | null; stripe_price_id: string | null; stripe_product_id: string | null; plan_key: string | null; status: string; current_period_start: string | null; current_period_end: string | null; cancel_at_period_end: boolean; trial_start: string | null; trial_end: string | null; quantity: number | null; metadata: unknown; created_at: string; updated_at: string }
+        Insert: { id?: string; restaurant_id: string; stripe_customer_id?: string | null; stripe_subscription_id?: string | null; stripe_price_id?: string | null; stripe_product_id?: string | null; plan_key?: string | null; status?: string; current_period_start?: string | null; current_period_end?: string | null; cancel_at_period_end?: boolean; trial_start?: string | null; trial_end?: string | null; quantity?: number | null; metadata?: unknown; created_at?: string; updated_at?: string }
+        Update: { id?: string; restaurant_id?: string; stripe_customer_id?: string | null; stripe_subscription_id?: string | null; stripe_price_id?: string | null; stripe_product_id?: string | null; plan_key?: string | null; status?: string; current_period_start?: string | null; current_period_end?: string | null; cancel_at_period_end?: boolean; trial_start?: string | null; trial_end?: string | null; quantity?: number | null; metadata?: unknown; created_at?: string; updated_at?: string }
+        Relationships: [{ foreignKeyName: "billing_subscriptions_restaurant_id_fkey"; columns: ["restaurant_id"]; isOneToOne: true; referencedRelation: "restaurants"; referencedColumns: ["id"] }]
+      }
       alerts: {
         Row: { id: string; restaurant_id: string; alert_type: string; severity: string; status: string; title: string; message: string; recommended_action: string | null; entity_type: string | null; entity_id: string | null; batch_id: string | null; impact_cascade_run_id: string | null; impact_cascade_item_id: string | null; recipe_id: string | null; ingredient_id: string | null; payload: unknown; detected_at: string; acknowledged_at: string | null; acknowledged_by: string | null; resolved_at: string | null; resolved_by: string | null; dismissed_at: string | null; dismissed_by: string | null; created_at: string; updated_at: string }
         Insert: { id?: string; restaurant_id: string; alert_type: string; severity?: string; status?: string; title: string; message: string; recommended_action?: string | null; entity_type?: string | null; entity_id?: string | null; batch_id?: string | null; impact_cascade_run_id?: string | null; impact_cascade_item_id?: string | null; recipe_id?: string | null; ingredient_id?: string | null; payload?: unknown; detected_at?: string; acknowledged_at?: string | null; acknowledged_by?: string | null; resolved_at?: string | null; resolved_by?: string | null; dismissed_at?: string | null; dismissed_by?: string | null; created_at?: string; updated_at?: string }

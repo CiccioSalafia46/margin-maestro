@@ -1,4 +1,4 @@
-// Build 2.1 — Full operational + team management API types.
+// Build 2.2 — Full operational + team management + billing API types.
 
 export type RestaurantRole = "owner" | "manager" | "viewer";
 
@@ -484,6 +484,45 @@ export interface TeamMember {
   full_name: string | null;
   role: RestaurantRole;
   joined_at: string;
+}
+
+// ---------------- Billing (Build 2.2) ----------------
+
+export interface BillingCustomerRow {
+  id: string;
+  restaurant_id: string;
+  stripe_customer_id: string;
+  billing_email: string | null;
+  created_at: string;
+}
+
+export interface BillingSubscriptionRow {
+  id: string;
+  restaurant_id: string;
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  stripe_price_id: string | null;
+  stripe_product_id: string | null;
+  plan_key: string | null;
+  status: string;
+  current_period_start: string | null;
+  current_period_end: string | null;
+  cancel_at_period_end: boolean;
+  trial_start: string | null;
+  trial_end: string | null;
+  quantity: number | null;
+  metadata: unknown;
+  created_at: string;
+}
+
+export interface BillingSummary {
+  has_customer: boolean;
+  has_subscription: boolean;
+  status: string;
+  plan_key: string | null;
+  current_period_end: string | null;
+  cancel_at_period_end: boolean;
+  billing_email: string | null;
 }
 
 export interface ApiError {

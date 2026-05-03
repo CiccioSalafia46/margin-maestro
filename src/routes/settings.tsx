@@ -113,6 +113,7 @@ function SettingsPage() {
             <TabsTrigger value="suppliers">Suppliers</TabsTrigger>
             <TabsTrigger value="thresholds">Alert Thresholds</TabsTrigger>
             <TabsTrigger value="team">Team</TabsTrigger>
+            <TabsTrigger value="billing">Billing</TabsTrigger>
           </TabsList>
 
           <TabsContent value="general" className="mt-4">
@@ -142,6 +143,10 @@ function SettingsPage() {
 
           <TabsContent value="team" className="mt-4">
             <TeamTab restaurantId={activeRestaurantId} canManage={canEditSettings} />
+          </TabsContent>
+
+          <TabsContent value="billing" className="mt-4">
+            <BillingTab restaurantId={activeRestaurantId} canManage={canEditSettings} />
           </TabsContent>
         </Tabs>
 
@@ -991,6 +996,82 @@ function TeamTab({ restaurantId, canManage }: { restaurantId: string; canManage:
   );
 }
 
+// ----------------- Billing -----------------
+function BillingTab({ restaurantId, canManage }: { restaurantId: string; canManage: boolean }) {
+  const [summary, setSummary] = useState<import("@/data/api/types").BillingSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [actionBusy, setActionBusy] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    (async () => {
+      try {
+        const { getBillingSummary } = await import("@/data/api/billingApi");
+        const s = await getBillingSummary(restaurantId);
+        if (!cancelled) setSummary(s);
+      } catch { /* billing tables may not exist yet */ }
+      finally { if (!cancelled) setLoading(false); }
+    })();
+    return () => { cancelled = true; };
+  }, [restaurantId]);
+
+  const onCheckout = async () => {
+    setActionBusy(true);
+    try {
+      const { createCheckoutSession } = await import("@/data/api/billingApi");
+      const { url } = await createCheckoutSession(restaurantId);
+      window.location.href = url;
+    } catch (e) {
+      toast.error(errMsg(e));
+    } finally {
+      setActionBusy(false);
+    }
+  };
+
+  const onPortal = async () => {
+    setActionBusy(true);
+    try {
+      const { createCustomerPortalSession } = await import("@/data/api/billingApi");
+      const { url } = await createCustomerPortalSession(restaurantId);
+      window.location.href = url;
+    } catch (e) {
+      toast.error(errMsg(e));
+    } finally {
+      setActionBusy(false);
+    }
+  };
+
+  if (loading) return <Card><CardContent className="flex items-center gap-2 p-6 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Loading…</CardContent></Card>;
+
+  return (
+    <Card>
+      <CardHeader><CardTitle className="text-base">Billing</CardTitle></CardHeader>
+      <CardContent className="space-y-4">
+        <p className="text-xs text-muted-foreground">Billing is managed securely through Stripe. Only owners can manage billing.</p>
+        <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
+          <div><p className="text-[10px] uppercase tracking-wider text-muted-foreground">Status</p><p className="mt-0.5 font-medium capitalize">{summary?.status ?? "none"}</p></div>
+          <div><p className="text-[10px] uppercase tracking-wider text-muted-foreground">Plan</p><p className="mt-0.5 font-medium">{summary?.plan_key ?? "—"}</p></div>
+          <div><p className="text-[10px] uppercase tracking-wider text-muted-foreground">Period ends</p><p className="mt-0.5 font-medium">{summary?.current_period_end ? new Date(summary.current_period_end).toLocaleDateString() : "—"}</p></div>
+          <div><p className="text-[10px] uppercase tracking-wider text-muted-foreground">Email</p><p className="mt-0.5 font-medium">{summary?.billing_email ?? "—"}</p></div>
+        </div>
+        {summary?.cancel_at_period_end && <p className="text-xs text-destructive">Subscription will cancel at end of current period.</p>}
+        {canManage && (
+          <div className="flex gap-2 pt-2">
+            {!summary?.has_subscription || summary.status === "none" ? (
+              <Button size="sm" onClick={onCheckout} disabled={actionBusy}>{actionBusy ? "Redirecting…" : "Start subscription"}</Button>
+            ) : (
+              <Button size="sm" variant="outline" onClick={onPortal} disabled={actionBusy}>{actionBusy ? "Redirecting…" : "Manage billing"}</Button>
+            )}
+          </div>
+        )}
+        {!canManage && <p className="text-xs text-muted-foreground">Contact an owner to manage billing.</p>}
+        <p className="text-[11px] text-muted-foreground">Subscription status is synchronized via Stripe webhooks. Checkout and billing portal require Edge Functions to be deployed with Stripe keys configured.</p>
+      </CardContent>
+    </Card>
+  );
+}
+
 // ----------------- Developer QA links -----------------
 function DeveloperQa() {
   return (
@@ -1014,6 +1095,7 @@ function DeveloperQa() {
         <QaLink to="/qa-dashboard" label="Dashboard QA" />
         <QaLink to="/qa-mvp-readiness" label="MVP Readiness QA" />
         <QaLink to="/qa-team-management" label="Team Management QA" />
+        <QaLink to="/qa-billing" label="Billing QA" />
       </CardContent>
     </Card>
   );

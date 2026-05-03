@@ -537,3 +537,16 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - Tests skip gracefully if E2E_EMAIL/E2E_PASSWORD missing.
 - No service-role usage. No localStorage persistence checks.
 - Documentation: `docs/e2e-testing.md`.
+
+---
+
+## Build 2.2 — Billing
+
+**Status:** Implemented
+
+- **Migration:** `billing_customers`, `billing_subscriptions`, `billing_events` with RLS.
+- **API:** `billingApi.ts` — getBillingSummary, createCheckoutSession, createCustomerPortalSession.
+- **Settings Billing tab:** Status, plan, period, checkout/portal (owner-only).
+- **Edge Functions:** Documented stubs requiring deployment with Stripe keys.
+- **QA:** `/qa-billing` with checks A–Q.
+- No Stripe secrets in browser. Owner-only via RLS.
