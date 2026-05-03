@@ -336,6 +336,32 @@ export interface SnapshotStatus {
   latest_batch_at: string | null;
 }
 
+// ---------------- Price Update Batch Flow (Build 1.5A) ----------------
+
+export interface PriceChangeInput {
+  ingredient_id: string;
+  new_total_cost: number | null;
+  new_original_quantity: number | null;
+  new_original_uom_code: string | null;
+  new_recipe_uom_code: string | null;
+  new_adjustment: number;
+  new_density_g_per_ml: number | null;
+  new_manual_recipe_unit_cost: number | null;
+}
+
+export interface PriceChangePreview {
+  ingredient_id: string;
+  ingredient_name: string;
+  ingredient_type: string;
+  supplier_name: string | null;
+  old_recipe_unit_cost: number | null;
+  new_recipe_unit_cost: number | null;
+  delta_amount: number | null;
+  delta_percent: number | null;
+  status: "valid" | "error" | "unchanged";
+  error: string | null;
+}
+
 export interface ApiError {
   code: "auth" | "permission" | "duplicate" | "validation" | "not_found" | "unknown";
   message: string;

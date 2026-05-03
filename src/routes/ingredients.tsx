@@ -37,12 +37,6 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useAuth } from "@/auth/AuthProvider";
 import {
   calculateCostState,
@@ -155,20 +149,9 @@ function IngredientsPage() {
         description={loading ? "Loading…" : `${ingredients.length} ingredient(s) in database.`}
         actions={
           <>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span tabIndex={0}>
-                    <Button variant="outline" size="sm" disabled>
-                      Run Price Update
-                    </Button>
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  Price Log and Snapshot arrive in Build 1.5.
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/price-log">Run Price Update</Link>
+            </Button>
             {canManage && (
               <Button size="sm" onClick={() => setDrawerOpen(true)}>
                 <Plus className="mr-1.5 h-4 w-4" />

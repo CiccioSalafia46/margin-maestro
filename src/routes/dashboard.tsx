@@ -388,7 +388,7 @@ function DashboardPage() {
 
         <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Bell className="h-3 w-3" />
-          Build 1.5 — Price Log + Snapshot. Ingredients, Recipes, Menu Analytics, and Price Log use Supabase; other pages still use mock data.
+          Build 1.5A — Price Update Batch. Ingredients, Recipes, Menu Analytics, Price Log, and Price Update Batches use Supabase; other pages still use mock data.
         </p>
       </div>
     </AppShell>

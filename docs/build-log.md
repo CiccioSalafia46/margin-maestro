@@ -337,7 +337,21 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - **Developer QA link:** Added to Settings → Developer QA.
 
 **Limitations:**
-- Full price update batch editing deferred.
 - Non-destructive baseline reset deferred.
 - Price Trend still uses mock data.
 - Dashboard and other operational pages still use mock data.
+
+---
+
+## Build 1.5A — Price Update Batch Flow
+
+**Status:** Implemented
+
+- **No new migration.** Uses existing Build 1.5 tables.
+- **API:** `previewPriceChanges`, `applyPriceUpdateBatch` in priceLogApi.ts.
+- **UI:** Batch drawer on /price-log: select ingredients, enter new prices, preview, apply.
+- **Writes:** Batch row, ingredient updates, cost_state, append-only log, snapshot updates.
+- **Intermediate:** Blocked — "updated through recipes, not supplier price batches."
+- **/ingredients:** "Run Price Update" button now links to /price-log.
+- Batch apply is client-orchestrated (not atomic DB transaction).
+- Normal ingredient edits do NOT write price log entries (by design).
