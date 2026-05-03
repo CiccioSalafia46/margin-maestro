@@ -55,7 +55,31 @@ Forward implementation plan for Margin IQ — Restaurant Margin Intelligence Saa
 
 **Status:** Accepted.
 
-**Goal:** Derive menu profitability analytics from active dish recipes, recipe_lines, ingredients, ingredient_cost_state, and restaurant_settings. No new tables.
+---
+
+## Build 1.5 / 1.5A / 1.5B — Price Log + Snapshot + Price Trend
+
+**Status:** Accepted.
+
+---
+
+## Build 1.6 — Dish Analysis
+
+**Status:** Accepted.
+
+---
+
+## Build 1.7 — Impact Cascade
+
+**Status:** Accepted.
+
+---
+
+## Build 1.8 / 1.8A — Alerts
+
+**Status:** Accepted.
+
+**Goal:** Supabase-backed alerts with generation from Menu Analytics, Impact Cascade, and Price Log. Status workflow: open → acknowledged → resolved/dismissed.
 
 ---
 

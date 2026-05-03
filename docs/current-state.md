@@ -1,7 +1,7 @@
 # Current State
 
 **Date:** 2026-05-03
-**Build:** 1.8 — Alerts
+**Build:** 1.8A — Alerts Accepted
 **Branch:** `build-1.8-alerts`
 **Backend:** Self-owned Supabase project `margin-maestro-dev`
 
@@ -9,7 +9,22 @@
 
 ## Actual State
 
-**Full operational chain Supabase-backed.** Ingredients → Recipes → Menu Analytics → Price Log → Price Trend → Dish Analysis → Impact Cascade → Alerts. Dashboard remains mock.
+**Full operational chain Supabase-backed.** Ingredients → Recipes → Menu Analytics → Price Log → Price Trend → Dish Analysis → Impact Cascade → Alerts. Dashboard remains the only mock page.
+
+## Accepted Baseline
+
+**Build 1.8A — Alerts Accepted.**
+
+- Auth session persistence (1.0F).
+- Settings/Admin (1.1A).
+- Ingredients (1.2A).
+- Recipes with line editor, intermediate propagation, cycle detection (1.3A/B).
+- Menu Analytics derived (1.4A).
+- Price Log + Snapshot + Price Update Batch (1.5/1.5A).
+- Price Trend (1.5B).
+- Dish Analysis with scenario modeling (1.6).
+- Impact Cascade (1.7).
+- Alerts with generation, status actions, duplicate prevention (1.8A).
 
 ## Backend Scope (Supabase, live)
 
@@ -27,12 +42,12 @@
 | `ingredient_cost_state` | 1.2 | Accepted |
 | `recipes` | 1.3 | Accepted |
 | `recipe_lines` | 1.3 | Accepted |
-| `price_update_batches` | 1.5 | Live |
-| `ingredient_price_log` | 1.5 | Live |
-| `ingredient_snapshots` | 1.5 | Live |
-| `impact_cascade_runs` | 1.7 | Live |
-| `impact_cascade_items` | 1.7 | Live |
-| `alerts` | 1.8 | **New** |
+| `price_update_batches` | 1.5 | Accepted |
+| `ingredient_price_log` | 1.5 | Accepted |
+| `ingredient_snapshots` | 1.5 | Accepted |
+| `impact_cascade_runs` | 1.7 | Accepted |
+| `impact_cascade_items` | 1.7 | Accepted |
+| `alerts` | 1.8 | Accepted |
 
 **Derived (no table):** Menu Analytics (1.4), Price Trend (1.5B), Dish Analysis (1.6).
 
@@ -42,4 +57,4 @@ Dashboard only.
 
 ## Next Task
 
-**Build 1.9 — Dashboard Supabase-backed** or **Build 2.0 — Billing.**
+**Build 1.9 — Dashboard Supabase-backed.**

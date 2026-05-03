@@ -432,3 +432,16 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - Dashboard still uses mock data.
 - No automatic alert generation (manual trigger only).
 - No email/push notifications.
+
+---
+
+## Build 1.8A — Alerts Acceptance
+
+**Status:** Accepted
+
+- Verified on self-owned Supabase project `margin-maestro-dev`.
+- /alerts is Supabase-backed with generation, status actions, duplicate prevention.
+- /qa-alerts checks A–Q verified (PASS or acceptable WARN).
+- Full operational chain now Supabase-backed: Ingredients → Recipes → Menu Analytics → Price Log → Price Trend → Dish Analysis → Impact Cascade → Alerts.
+- Dashboard remains the only mock page.
+- Build label updated to "Build 1.8A — Alerts Accepted".

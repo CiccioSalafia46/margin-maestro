@@ -388,7 +388,7 @@ function DashboardPage() {
 
         <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Bell className="h-3 w-3" />
-          Build 1.8 — Alerts. Core chain + Alerts Supabase-backed; Dashboard remains mock.
+          Build 1.8A — Alerts Accepted. Full operational chain Supabase-backed; Dashboard remains mock.
         </p>
       </div>
     </AppShell>
