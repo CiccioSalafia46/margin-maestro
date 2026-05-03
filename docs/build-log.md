@@ -621,3 +621,16 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - **Developer QA links:** All 19 QA routes linked under Settings → Developer QA.
 - Build label: "Build 2.6 — Beta Launch Prep".
 - Beta-ready MVP with full documentation.
+
+---
+
+## Build 2.7 — Monitoring & Error Logging
+
+**Status:** Implemented
+
+- **Monitoring config:** optional, config-driven via VITE_SENTRY_DSN.
+- **Logger:** sanitized logging with 14+ sensitive key pattern redaction.
+- **Sentry stub:** provider-neutral, activates with @sentry/react.
+- **Error Boundary:** wraps root component, friendly fallback.
+- **QA:** `/qa-monitoring` with checks A–T + inline redaction tests.
+- No new tables, no new dependencies, no secrets exposed.

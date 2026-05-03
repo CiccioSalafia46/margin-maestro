@@ -18,6 +18,7 @@ import { Route as QaRecipesRouteImport } from './routes/qa-recipes'
 import { Route as QaPriceTrendRouteImport } from './routes/qa-price-trend'
 import { Route as QaPriceLogSnapshotRouteImport } from './routes/qa-price-log-snapshot'
 import { Route as QaMvpReadinessRouteImport } from './routes/qa-mvp-readiness'
+import { Route as QaMonitoringRouteImport } from './routes/qa-monitoring'
 import { Route as QaMenuAnalyticsRouteImport } from './routes/qa-menu-analytics'
 import { Route as QaIngredientsRouteImport } from './routes/qa-ingredients'
 import { Route as QaImportExportRouteImport } from './routes/qa-import-export'
@@ -94,6 +95,11 @@ const QaPriceLogSnapshotRoute = QaPriceLogSnapshotRouteImport.update({
 const QaMvpReadinessRoute = QaMvpReadinessRouteImport.update({
   id: '/qa-mvp-readiness',
   path: '/qa-mvp-readiness',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QaMonitoringRoute = QaMonitoringRouteImport.update({
+  id: '/qa-monitoring',
+  path: '/qa-monitoring',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QaMenuAnalyticsRoute = QaMenuAnalyticsRouteImport.update({
@@ -283,6 +289,7 @@ export interface FileRoutesByFullPath {
   '/qa-import-export': typeof QaImportExportRoute
   '/qa-ingredients': typeof QaIngredientsRoute
   '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
+  '/qa-monitoring': typeof QaMonitoringRoute
   '/qa-mvp-readiness': typeof QaMvpReadinessRoute
   '/qa-price-log-snapshot': typeof QaPriceLogSnapshotRoute
   '/qa-price-trend': typeof QaPriceTrendRoute
@@ -325,6 +332,7 @@ export interface FileRoutesByTo {
   '/qa-import-export': typeof QaImportExportRoute
   '/qa-ingredients': typeof QaIngredientsRoute
   '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
+  '/qa-monitoring': typeof QaMonitoringRoute
   '/qa-mvp-readiness': typeof QaMvpReadinessRoute
   '/qa-price-log-snapshot': typeof QaPriceLogSnapshotRoute
   '/qa-price-trend': typeof QaPriceTrendRoute
@@ -368,6 +376,7 @@ export interface FileRoutesById {
   '/qa-import-export': typeof QaImportExportRoute
   '/qa-ingredients': typeof QaIngredientsRoute
   '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
+  '/qa-monitoring': typeof QaMonitoringRoute
   '/qa-mvp-readiness': typeof QaMvpReadinessRoute
   '/qa-price-log-snapshot': typeof QaPriceLogSnapshotRoute
   '/qa-price-trend': typeof QaPriceTrendRoute
@@ -413,6 +422,7 @@ export interface FileRouteTypes {
     | '/qa-import-export'
     | '/qa-ingredients'
     | '/qa-menu-analytics'
+    | '/qa-monitoring'
     | '/qa-mvp-readiness'
     | '/qa-price-log-snapshot'
     | '/qa-price-trend'
@@ -455,6 +465,7 @@ export interface FileRouteTypes {
     | '/qa-import-export'
     | '/qa-ingredients'
     | '/qa-menu-analytics'
+    | '/qa-monitoring'
     | '/qa-mvp-readiness'
     | '/qa-price-log-snapshot'
     | '/qa-price-trend'
@@ -497,6 +508,7 @@ export interface FileRouteTypes {
     | '/qa-import-export'
     | '/qa-ingredients'
     | '/qa-menu-analytics'
+    | '/qa-monitoring'
     | '/qa-mvp-readiness'
     | '/qa-price-log-snapshot'
     | '/qa-price-trend'
@@ -541,6 +553,7 @@ export interface RootRouteChildren {
   QaImportExportRoute: typeof QaImportExportRoute
   QaIngredientsRoute: typeof QaIngredientsRoute
   QaMenuAnalyticsRoute: typeof QaMenuAnalyticsRoute
+  QaMonitoringRoute: typeof QaMonitoringRoute
   QaMvpReadinessRoute: typeof QaMvpReadinessRoute
   QaPriceLogSnapshotRoute: typeof QaPriceLogSnapshotRoute
   QaPriceTrendRoute: typeof QaPriceTrendRoute
@@ -617,6 +630,13 @@ declare module '@tanstack/react-router' {
       path: '/qa-mvp-readiness'
       fullPath: '/qa-mvp-readiness'
       preLoaderRoute: typeof QaMvpReadinessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qa-monitoring': {
+      id: '/qa-monitoring'
+      path: '/qa-monitoring'
+      fullPath: '/qa-monitoring'
+      preLoaderRoute: typeof QaMonitoringRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/qa-menu-analytics': {
@@ -922,6 +942,7 @@ const rootRouteChildren: RootRouteChildren = {
   QaImportExportRoute: QaImportExportRoute,
   QaIngredientsRoute: QaIngredientsRoute,
   QaMenuAnalyticsRoute: QaMenuAnalyticsRoute,
+  QaMonitoringRoute: QaMonitoringRoute,
   QaMvpReadinessRoute: QaMvpReadinessRoute,
   QaPriceLogSnapshotRoute: QaPriceLogSnapshotRoute,
   QaPriceTrendRoute: QaPriceTrendRoute,

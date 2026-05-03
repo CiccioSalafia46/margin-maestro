@@ -1231,6 +1231,7 @@ function DeveloperQa() {
         <QaLink to="/qa-apply-price" label="Apply Price QA" />
         <QaLink to="/qa-import-export" label="Import/Export QA" />
         <QaLink to="/qa-beta-launch" label="Beta Launch QA" />
+        <QaLink to="/qa-monitoring" label="Monitoring QA" />
       </CardContent>
     </Card>
   );

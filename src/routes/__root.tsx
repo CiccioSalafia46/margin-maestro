@@ -4,6 +4,7 @@ import appCss from "../styles.css?url";
 import { AuthProvider } from "@/auth/AuthProvider";
 import { AuthGate } from "@/auth/AuthGate";
 import { Toaster } from "@/components/ui/sonner";
+import { AppErrorBoundary } from "@/components/errors/AppErrorBoundary";
 
 function NotFoundComponent() {
   return (
@@ -60,11 +61,13 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   return (
-    <AuthProvider>
-      <AuthGate>
-        <Outlet />
-      </AuthGate>
-      <Toaster position="top-right" richColors closeButton />
-    </AuthProvider>
+    <AppErrorBoundary>
+      <AuthProvider>
+        <AuthGate>
+          <Outlet />
+        </AuthGate>
+        <Toaster position="top-right" richColors closeButton />
+      </AuthProvider>
+    </AppErrorBoundary>
   );
 }
