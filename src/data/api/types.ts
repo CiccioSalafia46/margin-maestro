@@ -1,5 +1,5 @@
-// Build 1.5 — Auth + tenant + settings/admin + ingredients + recipes + menu analytics + price log/snapshot API types.
-// Impact cascade/alerts remain mock for now.
+// Build 1.7 — Auth + tenant + settings/admin + ingredients + recipes + menu analytics + price log/snapshot + impact cascade API types.
+// Alerts remain mock for now.
 
 export type RestaurantRole = "owner" | "manager" | "viewer";
 
@@ -360,6 +360,62 @@ export interface PriceChangePreview {
   delta_percent: number | null;
   status: "valid" | "error" | "unchanged";
   error: string | null;
+}
+
+// ---------------- Impact Cascade (Build 1.7) ----------------
+
+export type ImpactCascadeStatus = "generated" | "failed";
+export type ImpactCascadeCalcStatus = "valid" | "warning" | "error" | "incomplete";
+
+export interface ImpactCascadeRunRow {
+  id: string;
+  restaurant_id: string;
+  batch_id: string;
+  baseline_version: number;
+  status: ImpactCascadeStatus;
+  generated_by: string | null;
+  generated_at: string;
+  changed_ingredients_count: number;
+  affected_dish_count: number;
+  impact_item_count: number;
+  newly_below_target_count: number;
+  total_cogs_delta_per_serving: number | null;
+  total_margin_delta_per_serving: number | null;
+  note: string | null;
+  error_message: string | null;
+  created_at: string;
+}
+
+export interface ImpactCascadeItemRow {
+  id: string;
+  restaurant_id: string;
+  run_id: string;
+  batch_id: string;
+  dish_recipe_id: string | null;
+  dish_name_at_time: string;
+  category_name_at_time: string | null;
+  affected_ingredient_ids: string[] | null;
+  affected_ingredient_names: string[] | null;
+  impact_paths: unknown;
+  menu_price: number | null;
+  target_gpm: number | null;
+  old_cogs_per_serving: number | null;
+  new_cogs_per_serving: number | null;
+  cogs_delta_per_serving: number | null;
+  old_gp: number | null;
+  new_gp: number | null;
+  gp_delta: number | null;
+  old_gpm: number | null;
+  new_gpm: number | null;
+  gpm_delta: number | null;
+  was_on_target: boolean | null;
+  is_on_target: boolean | null;
+  newly_below_target: boolean;
+  suggested_menu_price: number | null;
+  suggested_price_delta: number | null;
+  calculation_status: ImpactCascadeCalcStatus;
+  issue_summary: string | null;
+  created_at: string;
 }
 
 export interface ApiError {

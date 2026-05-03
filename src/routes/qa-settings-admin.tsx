@@ -404,7 +404,7 @@ function QaSettingsAdminPage() {
       // ingredient_price_log, ingredient_snapshots are expected.
       // Future tables (menu_items, impact_cascade, alerts, etc.) should NOT exist yet.
       try {
-        const futureOnly = ["menu_items", "impact_cascade_runs", "impact_cascade_items", "alerts"] as const;
+        const futureOnly = ["menu_items", "alerts"] as const;
         const probes = await Promise.all(
           futureOnly.map(async (t) => {
             const { error } = await (supabase as unknown as {

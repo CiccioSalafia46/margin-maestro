@@ -215,7 +215,7 @@ function QaIngredientsPage() {
 
       // R. no future impact/alerts tables
       try {
-        const opTables = ["impact_cascade_runs", "impact_cascade_items", "alerts"] as const;
+        const opTables = ["alerts"] as const;
         const probes = await Promise.all(
           opTables.map(async (t) => {
             const { error } = await (supabase as unknown as {

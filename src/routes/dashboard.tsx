@@ -388,7 +388,7 @@ function DashboardPage() {
 
         <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Bell className="h-3 w-3" />
-          Build 1.6 — Dish Analysis. Ingredients, Recipes, Menu Analytics, Price Log, Price Trend, Dish Analysis use Supabase; Dashboard uses mock data.
+          Build 1.7 — Impact Cascade. Core chain Supabase-backed; Dashboard and Alerts remain mock.
         </p>
       </div>
     </AppShell>

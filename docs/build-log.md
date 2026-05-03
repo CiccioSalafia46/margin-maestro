@@ -396,5 +396,17 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - Scenario data is local-only (React state), not persisted.
 - No Apply Price action.
 - Dashboard still uses mock data.
-- Impact Cascade persistence deferred.
-- Alerts persistence deferred.
+
+---
+
+## Build 1.7 — Impact Cascade Foundation
+
+**Status:** Implemented
+
+- **Migration:** `impact_cascade_runs` and `impact_cascade_items` with RLS.
+- **API:** `impactCascadeApi.ts` — generate cascade, query runs/items.
+- **Routes:** `/impact-cascade` and `/impact-cascade/$batchId` rewritten from mock.
+- **Generation:** Changed ingredients → affected dishes → old/new COGS/GPM → suggested prices.
+- **Direct/indirect paths.** Only dish recipes as final impact items.
+- **QA:** `/qa-impact-cascade` with checks A–U.
+- Per-serving metrics only. Dashboard and Alerts remain mock.

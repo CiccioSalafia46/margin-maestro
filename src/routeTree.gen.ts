@@ -18,6 +18,7 @@ import { Route as QaPriceTrendRouteImport } from './routes/qa-price-trend'
 import { Route as QaPriceLogSnapshotRouteImport } from './routes/qa-price-log-snapshot'
 import { Route as QaMenuAnalyticsRouteImport } from './routes/qa-menu-analytics'
 import { Route as QaIngredientsRouteImport } from './routes/qa-ingredients'
+import { Route as QaImpactCascadeRouteImport } from './routes/qa-impact-cascade'
 import { Route as QaDishAnalysisRouteImport } from './routes/qa-dish-analysis'
 import { Route as QaDataIntegrityRouteImport } from './routes/qa-data-integrity'
 import { Route as QaCalculationsRouteImport } from './routes/qa-calculations'
@@ -32,6 +33,7 @@ import { Route as DishAnalysisRouteImport } from './routes/dish-analysis'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AlertsRouteImport } from './routes/alerts'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RecipesIndexRouteImport } from './routes/recipes.index'
 import { Route as DishAnalysisIndexRouteImport } from './routes/dish-analysis.index'
 import { Route as RecipesIdRouteImport } from './routes/recipes.$id'
 import { Route as OnboardingCreateRestaurantRouteImport } from './routes/onboarding.create-restaurant'
@@ -83,6 +85,11 @@ const QaMenuAnalyticsRoute = QaMenuAnalyticsRouteImport.update({
 const QaIngredientsRoute = QaIngredientsRouteImport.update({
   id: '/qa-ingredients',
   path: '/qa-ingredients',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QaImpactCascadeRoute = QaImpactCascadeRouteImport.update({
+  id: '/qa-impact-cascade',
+  path: '/qa-impact-cascade',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QaDishAnalysisRoute = QaDishAnalysisRouteImport.update({
@@ -155,6 +162,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RecipesIndexRoute = RecipesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => RecipesRoute,
+} as any)
 const DishAnalysisIndexRoute = DishAnalysisIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -207,6 +219,7 @@ export interface FileRoutesByFullPath {
   '/qa-calculations': typeof QaCalculationsRoute
   '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/qa-dish-analysis': typeof QaDishAnalysisRoute
+  '/qa-impact-cascade': typeof QaImpactCascadeRoute
   '/qa-ingredients': typeof QaIngredientsRoute
   '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
   '/qa-price-log-snapshot': typeof QaPriceLogSnapshotRoute
@@ -223,6 +236,7 @@ export interface FileRoutesByFullPath {
   '/onboarding/create-restaurant': typeof OnboardingCreateRestaurantRoute
   '/recipes/$id': typeof RecipesIdRoute
   '/dish-analysis/': typeof DishAnalysisIndexRoute
+  '/recipes/': typeof RecipesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -238,13 +252,13 @@ export interface FileRoutesByTo {
   '/qa-calculations': typeof QaCalculationsRoute
   '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/qa-dish-analysis': typeof QaDishAnalysisRoute
+  '/qa-impact-cascade': typeof QaImpactCascadeRoute
   '/qa-ingredients': typeof QaIngredientsRoute
   '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
   '/qa-price-log-snapshot': typeof QaPriceLogSnapshotRoute
   '/qa-price-trend': typeof QaPriceTrendRoute
   '/qa-recipes': typeof QaRecipesRoute
   '/qa-settings-admin': typeof QaSettingsAdminRoute
-  '/recipes': typeof RecipesRouteWithChildren
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -254,6 +268,7 @@ export interface FileRoutesByTo {
   '/onboarding/create-restaurant': typeof OnboardingCreateRestaurantRoute
   '/recipes/$id': typeof RecipesIdRoute
   '/dish-analysis': typeof DishAnalysisIndexRoute
+  '/recipes': typeof RecipesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -271,6 +286,7 @@ export interface FileRoutesById {
   '/qa-calculations': typeof QaCalculationsRoute
   '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/qa-dish-analysis': typeof QaDishAnalysisRoute
+  '/qa-impact-cascade': typeof QaImpactCascadeRoute
   '/qa-ingredients': typeof QaIngredientsRoute
   '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
   '/qa-price-log-snapshot': typeof QaPriceLogSnapshotRoute
@@ -287,6 +303,7 @@ export interface FileRoutesById {
   '/onboarding/create-restaurant': typeof OnboardingCreateRestaurantRoute
   '/recipes/$id': typeof RecipesIdRoute
   '/dish-analysis/': typeof DishAnalysisIndexRoute
+  '/recipes/': typeof RecipesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -305,6 +322,7 @@ export interface FileRouteTypes {
     | '/qa-calculations'
     | '/qa-data-integrity'
     | '/qa-dish-analysis'
+    | '/qa-impact-cascade'
     | '/qa-ingredients'
     | '/qa-menu-analytics'
     | '/qa-price-log-snapshot'
@@ -321,6 +339,7 @@ export interface FileRouteTypes {
     | '/onboarding/create-restaurant'
     | '/recipes/$id'
     | '/dish-analysis/'
+    | '/recipes/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -336,13 +355,13 @@ export interface FileRouteTypes {
     | '/qa-calculations'
     | '/qa-data-integrity'
     | '/qa-dish-analysis'
+    | '/qa-impact-cascade'
     | '/qa-ingredients'
     | '/qa-menu-analytics'
     | '/qa-price-log-snapshot'
     | '/qa-price-trend'
     | '/qa-recipes'
     | '/qa-settings-admin'
-    | '/recipes'
     | '/settings'
     | '/signup'
     | '/auth/callback'
@@ -352,6 +371,7 @@ export interface FileRouteTypes {
     | '/onboarding/create-restaurant'
     | '/recipes/$id'
     | '/dish-analysis'
+    | '/recipes'
   id:
     | '__root__'
     | '/'
@@ -368,6 +388,7 @@ export interface FileRouteTypes {
     | '/qa-calculations'
     | '/qa-data-integrity'
     | '/qa-dish-analysis'
+    | '/qa-impact-cascade'
     | '/qa-ingredients'
     | '/qa-menu-analytics'
     | '/qa-price-log-snapshot'
@@ -384,6 +405,7 @@ export interface FileRouteTypes {
     | '/onboarding/create-restaurant'
     | '/recipes/$id'
     | '/dish-analysis/'
+    | '/recipes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -401,6 +423,7 @@ export interface RootRouteChildren {
   QaCalculationsRoute: typeof QaCalculationsRoute
   QaDataIntegrityRoute: typeof QaDataIntegrityRoute
   QaDishAnalysisRoute: typeof QaDishAnalysisRoute
+  QaImpactCascadeRoute: typeof QaImpactCascadeRoute
   QaIngredientsRoute: typeof QaIngredientsRoute
   QaMenuAnalyticsRoute: typeof QaMenuAnalyticsRoute
   QaPriceLogSnapshotRoute: typeof QaPriceLogSnapshotRoute
@@ -477,6 +500,13 @@ declare module '@tanstack/react-router' {
       path: '/qa-ingredients'
       fullPath: '/qa-ingredients'
       preLoaderRoute: typeof QaIngredientsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qa-impact-cascade': {
+      id: '/qa-impact-cascade'
+      path: '/qa-impact-cascade'
+      fullPath: '/qa-impact-cascade'
+      preLoaderRoute: typeof QaImpactCascadeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/qa-dish-analysis': {
@@ -577,6 +607,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/recipes/': {
+      id: '/recipes/'
+      path: '/'
+      fullPath: '/recipes/'
+      preLoaderRoute: typeof RecipesIndexRouteImport
+      parentRoute: typeof RecipesRoute
+    }
     '/dish-analysis/': {
       id: '/dish-analysis/'
       path: '/'
@@ -669,10 +706,12 @@ const IngredientsRouteWithChildren = IngredientsRoute._addFileChildren(
 
 interface RecipesRouteChildren {
   RecipesIdRoute: typeof RecipesIdRoute
+  RecipesIndexRoute: typeof RecipesIndexRoute
 }
 
 const RecipesRouteChildren: RecipesRouteChildren = {
   RecipesIdRoute: RecipesIdRoute,
+  RecipesIndexRoute: RecipesIndexRoute,
 }
 
 const RecipesRouteWithChildren =
@@ -693,6 +732,7 @@ const rootRouteChildren: RootRouteChildren = {
   QaCalculationsRoute: QaCalculationsRoute,
   QaDataIntegrityRoute: QaDataIntegrityRoute,
   QaDishAnalysisRoute: QaDishAnalysisRoute,
+  QaImpactCascadeRoute: QaImpactCascadeRoute,
   QaIngredientsRoute: QaIngredientsRoute,
   QaMenuAnalyticsRoute: QaMenuAnalyticsRoute,
   QaPriceLogSnapshotRoute: QaPriceLogSnapshotRoute,

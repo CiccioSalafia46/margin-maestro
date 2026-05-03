@@ -906,6 +906,7 @@ function DeveloperQa() {
         <QaLink to="/qa-price-log-snapshot" label="Price Log + Snapshot QA" />
         <QaLink to="/qa-price-trend" label="Price Trend QA" />
         <QaLink to="/qa-dish-analysis" label="Dish Analysis QA" />
+        <QaLink to="/qa-impact-cascade" label="Impact Cascade QA" />
       </CardContent>
     </Card>
   );
