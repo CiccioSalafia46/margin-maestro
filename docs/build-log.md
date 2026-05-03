@@ -522,3 +522,18 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - Member loading fixed (two-step query, no embedded join).
 - Invite link copy-to-clipboard with clear "no email delivery" copy.
 - Build label: "Build 2.1A — Team Management Accepted".
+
+---
+
+## Build 2.3 — Automated E2E QA
+
+**Status:** Implemented
+
+- **Playwright** added as dev dependency with chromium browser.
+- **5 E2E specs:** smoke (10 routes), QA routes (15 routes), auth/session, settings/team, intelligence pages.
+- **Helper utilities:** login, goToRoute, waitForAppReady, env management.
+- **Scripts:** `test:e2e`, `test:e2e:ui`, `test:e2e:headed`.
+- **No mutations by default** — safe for CI.
+- Tests skip gracefully if E2E_EMAIL/E2E_PASSWORD missing.
+- No service-role usage. No localStorage persistence checks.
+- Documentation: `docs/e2e-testing.md`.

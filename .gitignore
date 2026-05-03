@@ -34,3 +34,7 @@ dist-ssr
 .claude/
 
 .env.local
+
+# Playwright
+test-results/
+playwright-report/
