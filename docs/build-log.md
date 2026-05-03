@@ -597,3 +597,15 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - **API:** `importExportApi.ts` — ingredient import + 5 export functions.
 - **Settings Import/Export tab.** Import preview + export buttons.
 - **QA:** `/qa-import-export` with checks A–V.
+
+---
+
+## Build 2.5A — CSV Import/Export Acceptance
+
+**Status:** Accepted
+
+- CSV import/export verified on margin-maestro-dev.
+- Ingredient import with preview, validation, and apply confirmed.
+- Export for 5 datasets confirmed with formula injection protection.
+- Import does not write price log, create batches, or create billing records.
+- Build label: "Build 2.5A — CSV Accepted".

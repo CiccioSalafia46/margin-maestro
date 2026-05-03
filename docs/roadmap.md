@@ -125,9 +125,9 @@ Forward implementation plan for Margin IQ — Restaurant Margin Intelligence Saa
 
 ---
 
-## Build 2.5 — CSV Import/Export
+## Build 2.5 / 2.5A — CSV Import/Export
 
-**Status:** Not started.
+**Status:** Accepted.
 
 ---
 

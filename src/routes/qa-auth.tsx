@@ -443,7 +443,7 @@ function QaAuthPage() {
 
         <p className="text-[11px] text-muted-foreground">
           No access tokens, refresh tokens, service-role keys, or raw session JSON are displayed.
-          Build 2.5 — CSV Import/Export.
+          Build 2.5A — CSV Accepted.
         </p>
       </div>
     </AppShell>

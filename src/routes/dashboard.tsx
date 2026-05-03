@@ -236,7 +236,7 @@ function DashboardPage() {
             </Card>
 
             <p className="text-[11px] text-muted-foreground">
-              Build 2.5 — CSV Import/Export. All operational pages Supabase-backed.
+              Build 2.5A — CSV Accepted. All operational pages Supabase-backed.
             </p>
           </>
         )}
