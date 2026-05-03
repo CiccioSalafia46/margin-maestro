@@ -1,5 +1,4 @@
-// Build 1.7 — Auth + tenant + settings/admin + ingredients + recipes + menu analytics + price log/snapshot + impact cascade API types.
-// Alerts remain mock for now.
+// Build 1.8 — Full operational API types. Dashboard remains mock.
 
 export type RestaurantRole = "owner" | "manager" | "viewer";
 
@@ -416,6 +415,47 @@ export interface ImpactCascadeItemRow {
   calculation_status: ImpactCascadeCalcStatus;
   issue_summary: string | null;
   created_at: string;
+}
+
+// ---------------- Alerts (Build 1.8) ----------------
+
+export type AlertType = "dish_below_target" | "dish_newly_below_target" | "ingredient_cost_spike" | "impact_cascade_margin_drop" | "missing_menu_price" | "incomplete_costing" | "intermediate_cost_shift";
+export type AlertSeverity = "info" | "warning" | "critical";
+export type AlertStatus = "open" | "acknowledged" | "resolved" | "dismissed";
+
+export interface AlertRow {
+  id: string;
+  restaurant_id: string;
+  alert_type: AlertType;
+  severity: AlertSeverity;
+  status: AlertStatus;
+  title: string;
+  message: string;
+  recommended_action: string | null;
+  entity_type: string | null;
+  entity_id: string | null;
+  batch_id: string | null;
+  impact_cascade_run_id: string | null;
+  impact_cascade_item_id: string | null;
+  recipe_id: string | null;
+  ingredient_id: string | null;
+  payload: unknown;
+  detected_at: string;
+  acknowledged_at: string | null;
+  resolved_at: string | null;
+  dismissed_at: string | null;
+  created_at: string;
+}
+
+export interface AlertSummary {
+  total: number;
+  open: number;
+  critical: number;
+  warning: number;
+  info: number;
+  acknowledged: number;
+  resolved: number;
+  dismissed: number;
 }
 
 export interface ApiError {

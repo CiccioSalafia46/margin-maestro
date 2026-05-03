@@ -410,3 +410,25 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - **Direct/indirect paths.** Only dish recipes as final impact items.
 - **QA:** `/qa-impact-cascade` with checks A–U.
 - Per-serving metrics only. Dashboard and Alerts remain mock.
+
+---
+
+## Build 1.8 — Alerts
+
+**Status:** Implemented
+
+- **Migration:** `alerts` table with RLS, updated_at trigger.
+- **API:** `alertsApi.ts` — getAlerts, deriveAlertSummary, generateAlertsForRestaurant, acknowledgeAlert, resolveAlert, dismissAlert.
+- **Types:** `AlertRow`, `AlertSummary`, `AlertType`, `AlertSeverity`, `AlertStatus`.
+- **Route:** `/alerts` rewritten from mock to Supabase.
+- **KPIs:** Open, critical, warning, resolved counts.
+- **Table:** Severity, type, title, message, detected at, status + actions.
+- **Generation:** Explicit "Generate Alerts" button from Menu Analytics + Impact Cascade + Price Log.
+- **Status actions:** Acknowledge, resolve, dismiss.
+- **Duplicate prevention:** Checks existing open alert before inserting.
+- **QA:** `/qa-alerts` with checks A–Q.
+
+**Limitations:**
+- Dashboard still uses mock data.
+- No automatic alert generation (manual trigger only).
+- No email/push notifications.

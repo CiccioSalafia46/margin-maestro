@@ -144,7 +144,7 @@ function QaPriceLogSnapshotPage() {
 
       // T. no future tables
       try {
-        const future = ["alerts"] as const;
+        const future = [] as const;
         const probes = await Promise.all(future.map(async (t) => {
           const { error } = await (supabase as unknown as { from: (t: string) => { select: (s: string) => { limit: (n: number) => Promise<{ error: unknown }> } } }).from(t).select("id").limit(1);
           return { t, error };
