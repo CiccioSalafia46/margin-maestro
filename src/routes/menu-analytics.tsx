@@ -63,6 +63,18 @@ function MenuAnalyticsPage() {
   const [statusFilter, setStatusFilter] = useState("all");
 
   const targetGpm = activeRestaurantSettings?.target_gpm ?? 0.78;
+  const canManage = activeMembership?.role === "owner" || activeMembership?.role === "manager";
+
+  const onApplyPrice = async (recipeId: string, dishName: string, newPrice: number) => {
+    if (!activeRestaurantId) return;
+    if (!window.confirm(`Apply menu price $${newPrice.toFixed(2)} to ${dishName}? This updates Margin Maestro only, not POS.`)) return;
+    try {
+      const { applyDishMenuPrice } = await import("@/data/api/applyPriceApi");
+      await applyDishMenuPrice(activeRestaurantId, recipeId, newPrice);
+      toast.success(`Menu price updated to $${newPrice.toFixed(2)}.`);
+      await load();
+    } catch (e) { toast.error(errMsg(e)); }
+  };
 
   const load = useCallback(async () => {
     if (!activeRestaurantId) return;
@@ -236,6 +248,9 @@ function MenuAnalyticsPage() {
                                 <span className={`ml-1 text-[10px] ${row.suggested_menu_price > row.menu_price ? "text-destructive" : "text-success"}`}>
                                   ({row.suggested_menu_price > row.menu_price ? "+" : ""}{formatMoney(row.suggested_menu_price - row.menu_price)})
                                 </span>
+                              )}
+                              {canManage && row.on_target === false && (
+                                <button className="ml-2 text-[10px] text-primary hover:underline" onClick={() => onApplyPrice(row.recipe_id, row.dish_name, row.suggested_menu_price!)}>Apply</button>
                               )}
                             </span>
                           ) : "—"}

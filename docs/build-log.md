@@ -563,3 +563,15 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - **Checkout:** Creates/reuses Stripe customer, creates subscription Checkout Session.
 - **Portal:** Creates Billing Portal session for existing customers.
 - Requires `supabase secrets set` for STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, STRIPE_PRICE_ID, SITE_URL.
+
+---
+
+## Build 2.4 — Apply Price Workflow
+
+**Status:** Implemented
+
+- **API:** `applyPriceApi.ts` — canApplyPrice, validateApplyPriceInput, applyDishMenuPrice.
+- **Menu Analytics:** "Apply" button for below-target dishes with suggested price.
+- **Dish Analysis → Margin Manager:** "Apply this price" under primary target.
+- Owner/manager only. Updates `recipes.menu_price` only.
+- **QA:** `/qa-apply-price` with checks A–S.

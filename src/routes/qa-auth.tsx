@@ -443,7 +443,7 @@ function QaAuthPage() {
 
         <p className="text-[11px] text-muted-foreground">
           No access tokens, refresh tokens, service-role keys, or raw session JSON are displayed.
-          Build 2.2A — Billing Stripe Test.
+          Build 2.4 — Apply Price.
         </p>
       </div>
     </AppShell>

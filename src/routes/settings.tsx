@@ -1096,6 +1096,7 @@ function DeveloperQa() {
         <QaLink to="/qa-mvp-readiness" label="MVP Readiness QA" />
         <QaLink to="/qa-team-management" label="Team Management QA" />
         <QaLink to="/qa-billing" label="Billing QA" />
+        <QaLink to="/qa-apply-price" label="Apply Price QA" />
       </CardContent>
     </Card>
   );

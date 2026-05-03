@@ -45,7 +45,7 @@ import { formatPercent, formatUnitCost } from "@/lib/format";
 import type { UoM } from "@/lib/types";
 
 export function DishAnalysisView({ initialDishId }: { initialDishId?: string }) {
-  const { activeRestaurantId, activeRestaurantSettings } = useAuth();
+  const { activeRestaurantId, activeMembership, activeRestaurantSettings } = useAuth();
   const [dishes, setDishes] = useState<RecipeWithLines[]>([]);
   const [ingredients, setIngredients] = useState<IngredientWithCostState[]>([]);
   const [loading, setLoading] = useState(true);
@@ -54,6 +54,21 @@ export function DishAnalysisView({ initialDishId }: { initialDishId?: string }) 
   const [scenarioPricePct, setScenarioPricePct] = useState([0]);
 
   const targetGpm = activeRestaurantSettings?.target_gpm ?? 0.78;
+  const canManagePrice = activeMembership?.role === "owner" || activeMembership?.role === "manager";
+
+  const onApplyPrice = async (newPrice: number) => {
+    if (!activeRestaurantId || !recipe) return;
+    if (!window.confirm(`Apply menu price $${newPrice.toFixed(2)} to ${recipe.name}? This updates Margin Maestro only, not POS.`)) return;
+    try {
+      const { applyDishMenuPrice } = await import("@/data/api/applyPriceApi");
+      await applyDishMenuPrice(activeRestaurantId, recipe.id, newPrice);
+      toast.success(`Menu price updated to $${newPrice.toFixed(2)}.`);
+      await load();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Failed to apply price.";
+      toast.error(msg);
+    }
+  };
 
   const load = useCallback(async () => {
     if (!activeRestaurantId) return;
@@ -251,7 +266,7 @@ export function DishAnalysisView({ initialDishId }: { initialDishId?: string }) 
         <Card className="border-primary/20">
           <CardHeader className="pb-3"><CardTitle className="text-base">Margin Manager</CardTitle></CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">Suggested menu price = COGS / (1 − target GPM). Informational only — no Apply action yet.</p>
+            <p className="text-sm text-muted-foreground">Suggested menu price = COGS / (1 − target GPM). Apply updates Margin Maestro only, not POS or external menus.</p>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {targets.map((t) => {
                 const sp = suggestedMenuPrice(metrics.cost_per_serving, t);
@@ -260,13 +275,18 @@ export function DishAnalysisView({ initialDishId }: { initialDishId?: string }) 
                   <div key={t} className={isPrimary ? "rounded-md border border-primary/40 bg-primary/5 p-3" : "rounded-md border bg-muted/30 p-3"}>
                     <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Target {(t * 100).toFixed(0)}%</p>
                     <p className="mt-1 text-xl font-semibold tabular-nums"><MoneyCell value={sp} /></p>
+                    {isPrimary && sp != null && canManagePrice && (
+                      <button className="mt-1 text-[10px] text-primary hover:underline" onClick={() => onApplyPrice(sp)}>Apply this price</button>
+                    )}
                   </div>
                 );
               })}
             </div>
-            <Button variant="link" asChild className="px-0">
-              <Link to="/recipes/$id" params={{ id: recipe.id }}>Open recipe editor →</Link>
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button variant="link" asChild className="px-0">
+                <Link to="/recipes/$id" params={{ id: recipe.id }}>Open recipe editor →</Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
