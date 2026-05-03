@@ -49,7 +49,13 @@ Forward implementation plan for Margin IQ — Restaurant Margin Intelligence Saa
 
 **Status:** Accepted.
 
-**Goal:** Introduce `recipes` and `recipe_lines` tables in Supabase. Dish and Intermediate recipes with line editor, live COGS, intermediate cost propagation, and cycle detection.
+---
+
+## Build 1.4 / 1.4A — Menu Analytics
+
+**Status:** Accepted.
+
+**Goal:** Derive menu profitability analytics from active dish recipes, recipe_lines, ingredients, ingredient_cost_state, and restaurant_settings. No new tables.
 
 ---
 

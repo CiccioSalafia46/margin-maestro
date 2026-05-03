@@ -1,7 +1,7 @@
 # Current State
 
 **Date:** 2026-05-03
-**Build:** 1.4 — Menu Analytics
+**Build:** 1.4A — Menu Analytics Accepted
 **Branch:** `build-1.3-recipes`
 **Backend:** Self-owned Supabase project `margin-maestro-dev`
 
@@ -10,6 +10,16 @@
 ## Actual State
 
 **Ingredients, Recipes, and Menu Analytics use Supabase.** Menu Analytics is derived (no new tables) from active dish recipes, recipe_lines, ingredients, ingredient_cost_state, and restaurant_settings. All other operational pages remain mock-based.
+
+## Accepted Baseline
+
+**Build 1.4A — Menu Analytics Accepted.**
+
+- Auth session persistence (Build 1.0F).
+- Settings/Admin reference data (Build 1.1A).
+- Ingredients database (Build 1.2A).
+- Recipes with line editor, intermediate propagation, cycle detection (Build 1.3A/B).
+- Menu Analytics derived from live Supabase data (Build 1.4A).
 
 ## Backend Scope (Supabase, live)
 
@@ -28,7 +38,7 @@
 | `recipes` | 1.3 | Accepted |
 | `recipe_lines` | 1.3 | Accepted |
 
-**Note:** No new table for Menu Analytics. It is derived from the tables above.
+**Note:** Menu Analytics is derived — no table.
 
 ## What Remains Mock
 
@@ -40,8 +50,10 @@ Dashboard, dish analysis, impact cascade, price trend, price log, alerts.
 
 ## Known Limitations
 
-- Menu Analytics is derived, not persisted — no snapshot deltas yet
+- No snapshot deltas yet (Build 1.5)
+- Suggested price is informational only — no Apply action
 - Dashboard uses mock data
 - Dish Analysis uses mock data
 - Price Log/Snapshot awaits Build 1.5
 - Google OAuth not enabled
+- Team management placeholder

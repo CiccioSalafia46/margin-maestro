@@ -308,3 +308,15 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - No snapshot deltas (Δ COGS, Δ GPM) — arrives in Build 1.5.
 - Suggested price is informational only — no Apply action yet.
 - Dashboard and other operational pages still use mock data.
+
+---
+
+## Build 1.4A — Menu Analytics Acceptance
+
+**Status:** Accepted
+
+- Verified on self-owned Supabase project `margin-maestro-dev`.
+- Menu Analytics derived from live Supabase data — no new tables.
+- KPIs, per-dish profitability table, suggested prices verified.
+- `/qa-menu-analytics` checks A–U verified (PASS or acceptable WARN).
+- Build label updated to "Build 1.4A — Menu Analytics Accepted".
