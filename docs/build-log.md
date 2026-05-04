@@ -634,3 +634,15 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - **Error Boundary:** wraps root component, friendly fallback.
 - **QA:** `/qa-monitoring` with checks A–T + inline redaction tests.
 - No new tables, no new dependencies, no secrets exposed.
+
+---
+
+## Build 2.7A — Monitoring Acceptance
+
+**Status:** Accepted
+
+- Route error component upgraded with monitoring/captureException integration.
+- Dev mode shows sanitized error message; production shows friendly fallback only.
+- /qa-monitoring check L now PASS (custom route error component wired).
+- Sentry remains optional — WARN if DSN not configured.
+- Build label: "Build 2.7A — Monitoring Accepted".

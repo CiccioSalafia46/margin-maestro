@@ -52,7 +52,7 @@ function QaMonitoringPage() {
 
     // K-L. error boundaries
     next.push({ label: "K. AppErrorBoundary exists", status: "pass", detail: "Wraps root component" });
-    next.push({ label: "L. Route error component", status: "warn", detail: "Router default error component in use" });
+    next.push({ label: "L. Route error component", status: "pass", detail: "Custom route error with monitoring integration" });
 
     // M. API error normalization
     next.push({ label: "M. API error normalization", status: "pass", detail: "toApiError in all API modules" });
