@@ -236,7 +236,7 @@ function DashboardPage() {
             </Card>
 
             <p className="text-[11px] text-muted-foreground">
-              Build 2.7A — Monitoring Accepted. All operational pages Supabase-backed.
+              Build 2.8 — Google OAuth. All operational pages Supabase-backed.
             </p>
           </>
         )}

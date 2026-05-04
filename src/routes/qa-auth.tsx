@@ -292,16 +292,16 @@ function QaAuthPage() {
         detail: `Supabase Auth (${auth.lastAuthEvent})`,
       },
       {
-        label: "Google OAuth enabled",
-        status: "warn",
+        label: "Google OAuth UI implemented",
+        status: "pass",
         nonCritical: true,
-        detail: "Email/password only in Build 1.0B.",
+        detail: "Login/signup buttons added. Provider must be configured in Supabase Dashboard.",
       },
       {
-        label: "Operational data partially migrated",
+        label: "Operational data fully migrated",
         status: "warn",
         nonCritical: true,
-        detail: "All operational pages + Team Management Supabase-backed (Build 2.1). Billing and Google OAuth remain future scope.",
+        detail: "All operational pages Supabase-backed (Build 2.8). Stripe verification and some integrations remain deferred.",
       },
     ],
     [],
@@ -443,7 +443,7 @@ function QaAuthPage() {
 
         <p className="text-[11px] text-muted-foreground">
           No access tokens, refresh tokens, service-role keys, or raw session JSON are displayed.
-          Build 2.7A — Monitoring Accepted.
+          Build 2.8 — Google OAuth.
         </p>
       </div>
     </AppShell>

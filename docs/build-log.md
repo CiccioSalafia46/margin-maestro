@@ -641,6 +641,30 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 
 **Status:** Accepted
 
+- Route error component with monitoring/captureException.
+- /qa-monitoring check L PASS.
+
+---
+
+## Build 2.8 — Google OAuth
+
+**Status:** Implemented
+
+- **Auth API:** `signInWithGoogle()` via Supabase `signInWithOAuth({ provider: 'google' })`.
+- **Login:** "Continue with Google" button added.
+- **Signup:** "Continue with Google" button added.
+- **Email/password** remains available.
+- Google provider must be configured manually in Supabase Dashboard.
+- No Google client secret in frontend. No provider tokens stored.
+- Invitation acceptance works with Google email via JWT claim matching.
+- **/qa-auth** Google OAuth check updated from WARN to PASS.
+
+---
+
+## Build 2.7A — Monitoring Acceptance
+
+**Status:** Accepted
+
 - Route error component upgraded with monitoring/captureException integration.
 - Dev mode shows sanitized error message; production shows friendly fallback only.
 - /qa-monitoring check L now PASS (custom route error component wired).

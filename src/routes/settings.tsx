@@ -1232,6 +1232,7 @@ function DeveloperQa() {
         <QaLink to="/qa-import-export" label="Import/Export QA" />
         <QaLink to="/qa-beta-launch" label="Beta Launch QA" />
         <QaLink to="/qa-monitoring" label="Monitoring QA" />
+        <QaLink to="/qa-google-oauth" label="Google OAuth QA" />
       </CardContent>
     </Card>
   );

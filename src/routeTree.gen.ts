@@ -23,6 +23,7 @@ import { Route as QaMenuAnalyticsRouteImport } from './routes/qa-menu-analytics'
 import { Route as QaIngredientsRouteImport } from './routes/qa-ingredients'
 import { Route as QaImportExportRouteImport } from './routes/qa-import-export'
 import { Route as QaImpactCascadeRouteImport } from './routes/qa-impact-cascade'
+import { Route as QaGoogleOauthRouteImport } from './routes/qa-google-oauth'
 import { Route as QaDishAnalysisRouteImport } from './routes/qa-dish-analysis'
 import { Route as QaDataIntegrityRouteImport } from './routes/qa-data-integrity'
 import { Route as QaDashboardRouteImport } from './routes/qa-dashboard'
@@ -120,6 +121,11 @@ const QaImportExportRoute = QaImportExportRouteImport.update({
 const QaImpactCascadeRoute = QaImpactCascadeRouteImport.update({
   id: '/qa-impact-cascade',
   path: '/qa-impact-cascade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QaGoogleOauthRoute = QaGoogleOauthRouteImport.update({
+  id: '/qa-google-oauth',
+  path: '/qa-google-oauth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QaDishAnalysisRoute = QaDishAnalysisRouteImport.update({
@@ -285,6 +291,7 @@ export interface FileRoutesByFullPath {
   '/qa-dashboard': typeof QaDashboardRoute
   '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/qa-dish-analysis': typeof QaDishAnalysisRoute
+  '/qa-google-oauth': typeof QaGoogleOauthRoute
   '/qa-impact-cascade': typeof QaImpactCascadeRoute
   '/qa-import-export': typeof QaImportExportRoute
   '/qa-ingredients': typeof QaIngredientsRoute
@@ -328,6 +335,7 @@ export interface FileRoutesByTo {
   '/qa-dashboard': typeof QaDashboardRoute
   '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/qa-dish-analysis': typeof QaDishAnalysisRoute
+  '/qa-google-oauth': typeof QaGoogleOauthRoute
   '/qa-impact-cascade': typeof QaImpactCascadeRoute
   '/qa-import-export': typeof QaImportExportRoute
   '/qa-ingredients': typeof QaIngredientsRoute
@@ -372,6 +380,7 @@ export interface FileRoutesById {
   '/qa-dashboard': typeof QaDashboardRoute
   '/qa-data-integrity': typeof QaDataIntegrityRoute
   '/qa-dish-analysis': typeof QaDishAnalysisRoute
+  '/qa-google-oauth': typeof QaGoogleOauthRoute
   '/qa-impact-cascade': typeof QaImpactCascadeRoute
   '/qa-import-export': typeof QaImportExportRoute
   '/qa-ingredients': typeof QaIngredientsRoute
@@ -418,6 +427,7 @@ export interface FileRouteTypes {
     | '/qa-dashboard'
     | '/qa-data-integrity'
     | '/qa-dish-analysis'
+    | '/qa-google-oauth'
     | '/qa-impact-cascade'
     | '/qa-import-export'
     | '/qa-ingredients'
@@ -461,6 +471,7 @@ export interface FileRouteTypes {
     | '/qa-dashboard'
     | '/qa-data-integrity'
     | '/qa-dish-analysis'
+    | '/qa-google-oauth'
     | '/qa-impact-cascade'
     | '/qa-import-export'
     | '/qa-ingredients'
@@ -504,6 +515,7 @@ export interface FileRouteTypes {
     | '/qa-dashboard'
     | '/qa-data-integrity'
     | '/qa-dish-analysis'
+    | '/qa-google-oauth'
     | '/qa-impact-cascade'
     | '/qa-import-export'
     | '/qa-ingredients'
@@ -549,6 +561,7 @@ export interface RootRouteChildren {
   QaDashboardRoute: typeof QaDashboardRoute
   QaDataIntegrityRoute: typeof QaDataIntegrityRoute
   QaDishAnalysisRoute: typeof QaDishAnalysisRoute
+  QaGoogleOauthRoute: typeof QaGoogleOauthRoute
   QaImpactCascadeRoute: typeof QaImpactCascadeRoute
   QaImportExportRoute: typeof QaImportExportRoute
   QaIngredientsRoute: typeof QaIngredientsRoute
@@ -665,6 +678,13 @@ declare module '@tanstack/react-router' {
       path: '/qa-impact-cascade'
       fullPath: '/qa-impact-cascade'
       preLoaderRoute: typeof QaImpactCascadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qa-google-oauth': {
+      id: '/qa-google-oauth'
+      path: '/qa-google-oauth'
+      fullPath: '/qa-google-oauth'
+      preLoaderRoute: typeof QaGoogleOauthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/qa-dish-analysis': {
@@ -938,6 +958,7 @@ const rootRouteChildren: RootRouteChildren = {
   QaDashboardRoute: QaDashboardRoute,
   QaDataIntegrityRoute: QaDataIntegrityRoute,
   QaDishAnalysisRoute: QaDishAnalysisRoute,
+  QaGoogleOauthRoute: QaGoogleOauthRoute,
   QaImpactCascadeRoute: QaImpactCascadeRoute,
   QaImportExportRoute: QaImportExportRoute,
   QaIngredientsRoute: QaIngredientsRoute,
