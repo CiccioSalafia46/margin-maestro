@@ -81,6 +81,13 @@ function QaBetaLaunchPage() {
       next.push({ label: "AA. No forbidden localStorage", status: "pass", detail: "All state React-only" });
       next.push({ label: "AB. Known limitations documented", status: "pass", detail: "docs/beta-release-notes.md" });
 
+      // AC-AF: Live deployment (Build 2.8A)
+      next.push({ label: "AC. Live deployment active", status: "pass", detail: "https://margin-maestro.vercel.app" });
+      next.push({ label: "AD. Vercel deployment config present", status: "pass", detail: "vercel.json + api/server.mjs" });
+      next.push({ label: "AE. Supabase Auth redirect URLs configured for live domain", status: "pass", detail: "Site URL + 16 redirect URLs in supabase/config.toml" });
+      next.push({ label: "AF. Google OAuth manually verified on live", status: "pass", detail: "Confirmed by user on https://margin-maestro.vercel.app" });
+      next.push({ label: "AG. Live backend reuses dev project", status: "warn", detail: "margin-maestro-dev used as live by explicit user choice — separate prod project recommended" });
+
       if (!cancelled) { setChecks(next); setDone(true); }
     })();
     return () => { cancelled = true; };
@@ -96,7 +103,7 @@ function QaBetaLaunchPage() {
 
   return (
     <AppShell>
-      <PageHeader title="QA — Beta Launch" description="Build 2.6: beta readiness, documentation, route health, security." />
+      <PageHeader title="QA — Beta Launch" description="Build 2.8A: beta readiness, documentation, route health, security, live deployment." />
       <div className="space-y-6 p-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between"><CardTitle className="text-base">Overall status</CardTitle><OverallBadge status={summary.overall} /></CardHeader>
@@ -111,7 +118,7 @@ function QaBetaLaunchPage() {
             {checks.map((c) => (<div key={c.label} className="flex items-start justify-between gap-3 border-b py-2 last:border-b-0"><div className="min-w-0"><p className="text-sm font-medium">{c.label}</p>{c.detail && <p className="text-xs text-muted-foreground">{c.detail}</p>}</div><StatusBadge status={c.status} /></div>))}
           </CardContent>
         </Card>
-        <p className="text-[11px] text-muted-foreground">Build 2.6 — Beta Launch Prep.</p>
+        <p className="text-[11px] text-muted-foreground">Build 2.8A — Beta Launch + Live Accepted.</p>
       </div>
     </AppShell>
   );

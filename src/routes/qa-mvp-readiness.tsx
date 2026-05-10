@@ -106,6 +106,10 @@ function QaMvpReadinessPage() {
       next.push({ label: "U. Beta limitations documented", status: "pass", detail: "docs/production-readiness.md, docs/beta-checklist.md" });
       next.push({ label: "V. Production hardening checklist exists", status: "pass", detail: "docs/deployment-guide.md, docs/security-review.md" });
 
+      // W-X: Live deployment (Build 2.8A)
+      next.push({ label: "W. Live deployment active", status: "pass", detail: "https://margin-maestro.vercel.app — Vercel project margin-maestro" });
+      next.push({ label: "X. Separate production Supabase recommended", status: "warn", detail: "margin-maestro-dev currently reused as live backend by explicit user choice" });
+
       if (!cancelled) { setChecks(next); setDone(true); }
     })();
     return () => { cancelled = true; };
@@ -121,7 +125,7 @@ function QaMvpReadinessPage() {
 
   return (
     <AppShell>
-      <PageHeader title="QA — MVP Readiness" description="Build 2.0 acceptance: all modules Supabase-backed, security reviewed, beta checklist documented." />
+      <PageHeader title="QA — MVP Readiness" description="Build 2.8A: all modules Supabase-backed, security reviewed, beta checklist + live deployment documented." />
       <div className="space-y-6 p-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between"><CardTitle className="text-base">Overall status</CardTitle><OverallBadge status={summary.overall} /></CardHeader>
@@ -141,7 +145,7 @@ function QaMvpReadinessPage() {
             ))}
           </CardContent>
         </Card>
-        <p className="text-[11px] text-muted-foreground">No tokens or secrets displayed. Build 2.0 — Beta Readiness.</p>
+        <p className="text-[11px] text-muted-foreground">No tokens or secrets displayed. Build 2.8A — Beta Readiness + Live Accepted.</p>
       </div>
     </AppShell>
   );

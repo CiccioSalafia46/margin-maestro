@@ -1,4 +1,6 @@
-# Google OAuth — Build 2.8
+# Google OAuth — Build 2.8A (live verified)
+
+> **Live status (Build 2.8A):** Google OAuth has been manually verified end-to-end on https://margin-maestro.vercel.app. Email/password sign-in remains available. Supabase Auth Site URL and Redirect URLs are configured for the live Vercel domain in `supabase/config.toml [auth]` (see `docs/live-deployment.md`).
 
 ## Overview
 
@@ -33,3 +35,4 @@ Google OAuth login is implemented via Supabase Auth's `signInWithOAuth({ provide
 - Google provider must be configured manually in Supabase Dashboard.
 - If not configured, clicking "Continue with Google" shows a friendly error.
 - No Google API access beyond authentication.
+- **Production hardening pending (Build 2.8A WARN):** OAuth consent screen, authorized domains, and verification status (e.g., consent screen "Testing" vs. "In production", logo/policy URLs, PII review) have not been audited for production readiness on the Google Cloud OAuth client. Recommended before wider rollout. Tracked as OI-21 in `docs/open-issues.md`.

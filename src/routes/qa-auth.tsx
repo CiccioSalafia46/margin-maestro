@@ -443,7 +443,8 @@ function QaAuthPage() {
 
         <p className="text-[11px] text-muted-foreground">
           No access tokens, refresh tokens, service-role keys, or raw session JSON are displayed.
-          Build 2.8 — Google OAuth.
+          Build 2.8A — Google OAuth + Live Accepted. Live URL: https://margin-maestro.vercel.app
+          (Google sign-in manually verified on live).
         </p>
       </div>
     </AppShell>

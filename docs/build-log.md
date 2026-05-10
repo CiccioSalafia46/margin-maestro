@@ -648,7 +648,7 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 
 ## Build 2.8 — Google OAuth
 
-**Status:** Implemented
+**Status:** Accepted (live verification — Build 2.8A)
 
 - **Auth API:** `signInWithGoogle()` via Supabase `signInWithOAuth({ provider: 'google' })`.
 - **Login:** "Continue with Google" button added.
@@ -658,6 +658,36 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - No Google client secret in frontend. No provider tokens stored.
 - Invitation acceptance works with Google email via JWT claim matching.
 - **/qa-auth** Google OAuth check updated from WARN to PASS.
+
+---
+
+## Build 2.8A — Google OAuth + Live Accepted
+
+**Status:** Accepted
+
+- **Live deploy:** Vercel project `margin-maestro` at https://margin-maestro.vercel.app.
+- **Build adapter:** Cloudflare plugin disabled in `vite.config.ts`; SSR output bundled into a Vercel Node.js Function via `api/server.mjs` + `vercel.json:functions.includeFiles=dist/server/**`.
+- **Routing:** `vercel.json:rewrites` sends every path that is not `/api/...`, `/assets/...`, `favicon.ico`, or `robots.txt` to the SSR function.
+- **Vercel env (names only):** `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`. No service-role / Stripe / Google secret in browser env.
+- **Supabase Auth URL configuration** pushed via `supabase config push` from `supabase/config.toml [auth]`. Site URL = live Vercel domain; 16 redirect URLs covering prod, Vercel preview wildcard, local dev (8085, 8082), plus explicit `/dashboard`, `/login`, `/signup`, `/accept-invite`, `/auth/callback`.
+- **Google OAuth manually verified on live URL.** Email/password sign-in remains available.
+- **`.env`** removed from git tracking (was previously committed to a stale Lovable sandbox project ref). `.gitignore` hardened: `.env`, `.env.*.local`, `.vercel`, `supabase/.temp/`.
+- **`supabase/config.toml`** project_id corrected from stale Lovable ref `urcijgorzjxaclfyaulc` to live `atdvrdhzcbtxvzgvoxhb`.
+- **/qa-google-oauth** check N added (live manual verification PASS), check O added (production hardening WARN).
+- **/qa-mvp-readiness** checks W (live deployment PASS) + X (separate prod project recommended WARN) added.
+- **/qa-beta-launch** checks AC–AG added (live deploy, vercel config, auth URLs, manual OAuth verification, dev-as-prod WARN).
+- **/qa-live-deployment** added — checks A through O.
+- **Settings → Developer QA** updated with link to `/qa-live-deployment`.
+- **Docs:** `docs/live-deployment.md` created. `docs/current-state.md`, `docs/build-log.md`, `docs/roadmap.md`, `docs/open-issues.md`, `docs/google-oauth.md`, `docs/deployment-guide.md`, `docs/production-readiness.md`, `docs/security-review.md` updated.
+- **No migrations.** No new tables. No RLS or schema changes. Stripe and Sentry remain deferred.
+- Build label: "Build 2.8A — Google OAuth + Live Accepted".
+
+**Known live limitations**
+
+- Dev Supabase project is reused as the live backend by explicit user choice. Migration to `margin-maestro-prod` is recommended before wider production rollout.
+- Stripe verification deferred.
+- Sentry DSN optional / not configured.
+- Google OAuth production hardening (consent screen + authorized domains final review) pending.
 
 ---
 

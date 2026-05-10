@@ -4,6 +4,40 @@ Forward implementation plan for Margin IQ — Restaurant Margin Intelligence Saa
 
 ---
 
+## Build 2.8 — Google OAuth
+
+**Status:** Accepted (Build 2.8A — live verification).
+
+---
+
+## Build 2.8A — Google OAuth + Live Accepted
+
+**Status:** Accepted.
+
+**Goal:** Live Vercel beta deployment with Google OAuth manually verified, deployment configuration documented, and supporting QA/docs updated.
+
+**Highlights:**
+- Live URL: https://margin-maestro.vercel.app
+- Vercel project `margin-maestro`, GitHub auto-deploy on push to `main`
+- Supabase Auth Site URL + Redirect URLs configured for prod, preview, local
+- Google OAuth + email/password both verified live
+- `/qa-live-deployment` added; QA copy refreshed across mvp-readiness, beta-launch, google-oauth, auth
+
+**Deferred to future builds:** Stripe verification, Sentry provider setup, separate production Supabase project, transactional invite emails.
+
+---
+
+## Recommended next builds (post 2.8A)
+
+- **Build 2.9 — Menu Price Audit Trail.** Append-only history of `recipes.menu_price` changes (who/when/old/new) for compliance and rollback.
+- **Build 2.2B — Stripe Test Verification.** Exercise checkout + portal + webhook end-to-end on the live Vercel URL with Stripe test keys.
+- **Build 3.0 — Recipe CSV Import.** Bulk import of dish recipes (header + lines) with validation and preview.
+- **Build 3.1 — Transactional Invite Emails.** Real email delivery for `restaurant_invitations` (Supabase / Resend / Postmark).
+- **Build 3.2 — Separate Production Supabase Migration.** Cut over from `margin-maestro-dev` to `margin-maestro-prod`. Migrate schema, then re-point Vercel env.
+- **Build 3.3 — Production Monitoring Provider Setup.** Configure Sentry DSN + verify capture in production deploy.
+
+---
+
 ## Build 1.0E — Persistent Supabase Session Hard Fix
 
 **Status:** Accepted.

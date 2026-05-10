@@ -1,4 +1,10 @@
-# Deployment Guide — Build 2.0
+# Deployment Guide — Build 2.8A (live)
+
+> **Live since Build 2.8A.** The app is deployed at https://margin-maestro.vercel.app via the Vercel project `margin-maestro`. For the operational runbook (Vercel adapter, Supabase Auth URL push, env rotation, rollback, log inspection), see `docs/live-deployment.md`.
+
+---
+
+## Original guide (Build 2.0 baseline)
 
 ## A. Required Environment Variables
 

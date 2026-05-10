@@ -20,6 +20,7 @@ import { Route as QaPriceLogSnapshotRouteImport } from './routes/qa-price-log-sn
 import { Route as QaMvpReadinessRouteImport } from './routes/qa-mvp-readiness'
 import { Route as QaMonitoringRouteImport } from './routes/qa-monitoring'
 import { Route as QaMenuAnalyticsRouteImport } from './routes/qa-menu-analytics'
+import { Route as QaLiveDeploymentRouteImport } from './routes/qa-live-deployment'
 import { Route as QaIngredientsRouteImport } from './routes/qa-ingredients'
 import { Route as QaImportExportRouteImport } from './routes/qa-import-export'
 import { Route as QaImpactCascadeRouteImport } from './routes/qa-impact-cascade'
@@ -106,6 +107,11 @@ const QaMonitoringRoute = QaMonitoringRouteImport.update({
 const QaMenuAnalyticsRoute = QaMenuAnalyticsRouteImport.update({
   id: '/qa-menu-analytics',
   path: '/qa-menu-analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QaLiveDeploymentRoute = QaLiveDeploymentRouteImport.update({
+  id: '/qa-live-deployment',
+  path: '/qa-live-deployment',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QaIngredientsRoute = QaIngredientsRouteImport.update({
@@ -295,6 +301,7 @@ export interface FileRoutesByFullPath {
   '/qa-impact-cascade': typeof QaImpactCascadeRoute
   '/qa-import-export': typeof QaImportExportRoute
   '/qa-ingredients': typeof QaIngredientsRoute
+  '/qa-live-deployment': typeof QaLiveDeploymentRoute
   '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
   '/qa-monitoring': typeof QaMonitoringRoute
   '/qa-mvp-readiness': typeof QaMvpReadinessRoute
@@ -339,6 +346,7 @@ export interface FileRoutesByTo {
   '/qa-impact-cascade': typeof QaImpactCascadeRoute
   '/qa-import-export': typeof QaImportExportRoute
   '/qa-ingredients': typeof QaIngredientsRoute
+  '/qa-live-deployment': typeof QaLiveDeploymentRoute
   '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
   '/qa-monitoring': typeof QaMonitoringRoute
   '/qa-mvp-readiness': typeof QaMvpReadinessRoute
@@ -384,6 +392,7 @@ export interface FileRoutesById {
   '/qa-impact-cascade': typeof QaImpactCascadeRoute
   '/qa-import-export': typeof QaImportExportRoute
   '/qa-ingredients': typeof QaIngredientsRoute
+  '/qa-live-deployment': typeof QaLiveDeploymentRoute
   '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
   '/qa-monitoring': typeof QaMonitoringRoute
   '/qa-mvp-readiness': typeof QaMvpReadinessRoute
@@ -431,6 +440,7 @@ export interface FileRouteTypes {
     | '/qa-impact-cascade'
     | '/qa-import-export'
     | '/qa-ingredients'
+    | '/qa-live-deployment'
     | '/qa-menu-analytics'
     | '/qa-monitoring'
     | '/qa-mvp-readiness'
@@ -475,6 +485,7 @@ export interface FileRouteTypes {
     | '/qa-impact-cascade'
     | '/qa-import-export'
     | '/qa-ingredients'
+    | '/qa-live-deployment'
     | '/qa-menu-analytics'
     | '/qa-monitoring'
     | '/qa-mvp-readiness'
@@ -519,6 +530,7 @@ export interface FileRouteTypes {
     | '/qa-impact-cascade'
     | '/qa-import-export'
     | '/qa-ingredients'
+    | '/qa-live-deployment'
     | '/qa-menu-analytics'
     | '/qa-monitoring'
     | '/qa-mvp-readiness'
@@ -565,6 +577,7 @@ export interface RootRouteChildren {
   QaImpactCascadeRoute: typeof QaImpactCascadeRoute
   QaImportExportRoute: typeof QaImportExportRoute
   QaIngredientsRoute: typeof QaIngredientsRoute
+  QaLiveDeploymentRoute: typeof QaLiveDeploymentRoute
   QaMenuAnalyticsRoute: typeof QaMenuAnalyticsRoute
   QaMonitoringRoute: typeof QaMonitoringRoute
   QaMvpReadinessRoute: typeof QaMvpReadinessRoute
@@ -657,6 +670,13 @@ declare module '@tanstack/react-router' {
       path: '/qa-menu-analytics'
       fullPath: '/qa-menu-analytics'
       preLoaderRoute: typeof QaMenuAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qa-live-deployment': {
+      id: '/qa-live-deployment'
+      path: '/qa-live-deployment'
+      fullPath: '/qa-live-deployment'
+      preLoaderRoute: typeof QaLiveDeploymentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/qa-ingredients': {
@@ -962,6 +982,7 @@ const rootRouteChildren: RootRouteChildren = {
   QaImpactCascadeRoute: QaImpactCascadeRoute,
   QaImportExportRoute: QaImportExportRoute,
   QaIngredientsRoute: QaIngredientsRoute,
+  QaLiveDeploymentRoute: QaLiveDeploymentRoute,
   QaMenuAnalyticsRoute: QaMenuAnalyticsRoute,
   QaMonitoringRoute: QaMonitoringRoute,
   QaMvpReadinessRoute: QaMvpReadinessRoute,

@@ -1,4 +1,10 @@
-# Production Readiness — Build 2.0
+# Production Readiness — Build 2.8A (live)
+
+> **Live since Build 2.8A.** App deployed at https://margin-maestro.vercel.app via Vercel project `margin-maestro`. Backend remains `margin-maestro-dev` (`atdvrdhzcbtxvzgvoxhb`) by explicit user choice. Migration to `margin-maestro-prod` is recommended for wider rollout (OI-16, Build 3.2). See `docs/live-deployment.md` for the operational runbook.
+
+---
+
+## Build 2.0 baseline (preserved below)
 
 ## MVP Status
 
@@ -34,10 +40,14 @@ All core operational modules are Supabase-backed or Supabase-derived:
 - [x] Beta checklist documented
 
 ### Not Yet Complete
-- [ ] Production Supabase project (separate from dev)
-- [ ] Production domain and hosting
-- [ ] Email templates configured
-- [ ] Google OAuth enabled
+- [ ] Production Supabase project (separate from dev) — **Build 3.2** (OI-16). Currently reusing dev by explicit choice.
+- [x] Production domain and hosting — Vercel `margin-maestro` at https://margin-maestro.vercel.app (Build 2.8A).
+- [ ] Email templates configured (default Supabase templates active).
+- [x] Google OAuth enabled and live verified — Build 2.8A.
+- [ ] Stripe test-mode verification — **Build 2.2B** (OI-17).
+- [ ] Sentry DSN configured — **Build 3.3** (OI-19).
+- [ ] Transactional invite emails — **Build 3.1** (OI-20).
+- [ ] Google OAuth production hardening (consent screen review) — OI-21.
 - [ ] Team management (invites, role changes)
 - [ ] Billing integration
 - [ ] Error monitoring (Sentry or similar)

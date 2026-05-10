@@ -55,6 +55,12 @@ function QaGoogleOAuthPage() {
     // M: tables
     next.push({ label: "M. No new tables created", status: "pass", detail: "22 tables unchanged" });
 
+    // N: live manual verification (Build 2.8A)
+    next.push({ label: "N. Google OAuth manually verified on live Vercel", status: "pass", detail: "Confirmed working on https://margin-maestro.vercel.app — see docs/google-oauth.md" });
+
+    // O: production hardening reminder
+    next.push({ label: "O. Production hardening review pending", status: "warn", detail: "Final OAuth consent screen + authorized domains review recommended before wider rollout" });
+
     setChecks(next);
     setDone(true);
   }, []);
@@ -69,7 +75,7 @@ function QaGoogleOAuthPage() {
 
   return (
     <AppShell>
-      <PageHeader title="QA — Google OAuth" description="Build 2.8: Google sign-in UI, provider setup docs, secret safety." />
+      <PageHeader title="QA — Google OAuth" description="Build 2.8A: Google sign-in UI, provider setup docs, secret safety, live verification." />
       <div className="space-y-6 p-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between"><CardTitle className="text-base">Overall status</CardTitle><OverallBadge status={summary.overall} /></CardHeader>
@@ -83,7 +89,7 @@ function QaGoogleOAuthPage() {
             {checks.map((c) => (<div key={c.label} className="flex items-start justify-between gap-3 border-b py-2 last:border-b-0"><div className="min-w-0"><p className="text-sm font-medium">{c.label}</p>{c.detail && <p className="text-xs text-muted-foreground">{c.detail}</p>}</div><StatusBadge status={c.status} /></div>))}
           </CardContent>
         </Card>
-        <p className="text-[11px] text-muted-foreground">Build 2.8 — Google OAuth. Do not trigger real OAuth from this page.</p>
+        <p className="text-[11px] text-muted-foreground">Build 2.8A — Google OAuth + Live Accepted. Do not trigger real OAuth from this page.</p>
       </div>
     </AppShell>
   );

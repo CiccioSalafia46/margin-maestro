@@ -1,4 +1,10 @@
-# Beta Launch Prep — Build 2.6
+# Beta Launch Prep — Build 2.8A (live)
+
+> **Live since Build 2.8A.** Vercel project `margin-maestro` at https://margin-maestro.vercel.app, Supabase backend `margin-maestro-dev` (reused as live by explicit user choice). Email/password + Google OAuth both verified live. See `docs/live-deployment.md` for the runbook.
+
+---
+
+## Original Build 2.6 prep (kept for traceability)
 
 ## Pre-Launch Checklist
 

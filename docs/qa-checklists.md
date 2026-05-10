@@ -2,6 +2,8 @@
 
 Manual and automated QA checklists for Margin IQ.
 
+> **Build 2.8A update.** New automated route `/qa-live-deployment` (checks A–O) covers live deploy config, Vercel env naming, Supabase Auth URL setup, and forbidden secret/localStorage scans. The route is linked from Settings → Developer QA. The existing `/qa-google-oauth`, `/qa-mvp-readiness`, `/qa-beta-launch`, and `/qa-auth` routes were extended to reference live verification. See `docs/live-deployment.md`.
+
 ---
 
 ## Auth QA

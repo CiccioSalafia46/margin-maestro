@@ -1,4 +1,10 @@
-# Security Review — Build 2.0
+# Security Review — Build 2.8A (live)
+
+> **Live update (Build 2.8A).** Live URL https://margin-maestro.vercel.app. Vercel env vars set for the frontend contain only `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID`, and the non-prefixed `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` fallbacks. Service role, Stripe, and Google secrets are explicitly NOT configured in Vercel frontend env. See `docs/live-deployment.md` for the env table. `.env` is no longer tracked in git (was previously committed pointing at a stale Lovable sandbox; cleaned in Build 2.8A — see OI-15).
+
+---
+
+## Build 2.0 baseline (preserved below)
 
 ## A. Supabase Client Safety
 

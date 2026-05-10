@@ -1,139 +1,117 @@
 # Open Issues
 
-Known issues and limitations for Margin IQ.
+Known issues and limitations for Margin IQ. Updated for Build 2.8A.
 
 ---
 
 ## Resolved
 
 ### OI-01 — Auth session lost on refresh / navigation
-
-**Severity:** Critical
-**Status:** Resolved — Build 1.0E/1.0F
-**Resolution:** Removed Proxy singleton and explicit `storage` option from Supabase client. Removed `/qa-auth` from AuthGate's `PUBLIC_PATHS`.
-
----
+**Severity:** Critical · **Status:** Resolved — Build 1.0E/1.0F.
 
 ### OI-02 — /qa-auth shows sign-in required after login
+**Severity:** Critical · **Status:** Resolved — Build 1.0E-A/1.0F.
 
-**Severity:** Critical
-**Status:** Resolved — Build 1.0E-A/1.0F
-**Resolution:** `/qa-auth` removed from `PUBLIC_PATHS` so authenticated users are no longer redirected to `/dashboard`.
+### OI-03 — Settings/Admin pending re-acceptance
+**Severity:** High · **Status:** Resolved — Build 1.1A.
+
+### OI-05 — Google OAuth not enabled
+**Severity:** Medium · **Status:** Resolved — Build 2.8 (implementation) and Build 2.8A (live verification on https://margin-maestro.vercel.app).
+
+### OI-12 — Vercel deployment not configured
+**Severity:** High · **Status:** Resolved — Build 2.8A.
+**Resolution:** Vercel project `margin-maestro` linked, `vercel.json` + `api/server.mjs` SSR wrapper added, env vars configured for Production and Preview.
+
+### OI-13 — Live deployment not documented
+**Severity:** Medium · **Status:** Resolved — Build 2.8A.
+**Resolution:** `docs/live-deployment.md` created; `docs/current-state.md` and `docs/build-log.md` refreshed.
+
+### OI-14 — Supabase Auth redirect URLs not documented
+**Severity:** Medium · **Status:** Resolved — Build 2.8A.
+**Resolution:** Site URL and 16 redirect URLs configured in `supabase/config.toml [auth]` and pushed to remote. Pattern documented in `docs/live-deployment.md`.
+
+### OI-15 — `.env` tracked in git
+**Severity:** Medium · **Status:** Resolved — Build 2.8A.
+**Resolution:** `.env` removed from git tracking via `git rm --cached .env`. `.gitignore` hardened (`.env`, `.env.*.local`, `.vercel`, `supabase/.temp/`). The previously committed `.env` only contained URL + anon key for a stale Lovable sandbox project (`urcijgorzjxaclfyaulc`) that is not the current backend. No service-role / Stripe / Google secrets were ever in the file.
 
 ---
 
 ## High
 
-### OI-03 — Settings/Admin pending re-acceptance
-
-**Severity:** High
-**Status:** Resolved — Build 1.1A
-**Resolution:** Settings/Admin re-accepted. `/qa-settings-admin` checks A through U pass (or warn for non-critical/role-specific items). Auth stable since Build 1.0F.
+### OI-16 — Separate production Supabase project not created
+**Severity:** High · **Status:** Open · **Planned build:** 3.2.
+**Description:** The live frontend (https://margin-maestro.vercel.app) currently points at `margin-maestro-dev` (`atdvrdhzcbtxvzgvoxhb`) by explicit user choice. Test/demo/beta data may coexist with real beta data.
+**Acceptance criteria:** New `margin-maestro-prod` Supabase project created, schema migrated, Vercel env re-pointed, dev project demoted back to non-production status.
 
 ---
 
 ## Medium
 
-### OI-04 — Operational data still mock
+### OI-17 — Stripe test-mode verification not complete
+**Severity:** Medium · **Status:** Open · **Planned build:** 2.2B.
+**Description:** Billing UI and Edge Function stubs (`create-checkout-session`, `create-customer-portal-session`, `stripe-webhook`) are present, but the Stripe test-mode flow has not been exercised end-to-end on the live Vercel URL. `/qa-billing` reports WARN.
+**Acceptance criteria:** Test checkout completes against live Supabase Edge Functions; webhook updates `billing_subscriptions`; customer portal accessible.
 
-**Severity:** Medium
-**Affected area:** Dashboard, ingredients, recipes, menu analytics, dish analysis, impact cascade, price log, price trend, alerts
-**Status:** By design — migration planned per build
-**Planned build:** Builds 1.2 through 1.8
+### OI-18 — Billing production rollout not complete
+**Severity:** Medium · **Status:** Open · **Depends on:** OI-17.
+**Description:** Beyond test verification, production rollout (live Stripe keys, public price IDs, plan tiers in UI) is not done.
 
-**Description:** All operational pages render from `src/data/mock.ts`. Data is not tenant-scoped and does not reflect real restaurant data.
+### OI-19 — Sentry provider DSN not configured
+**Severity:** Medium · **Status:** Open · **Planned build:** 3.3.
+**Description:** Monitoring scaffolding exists (`src/lib/monitoring.ts`, `src/lib/logger.ts`, error boundary). Without `VITE_SENTRY_DSN` the helpers are no-ops. `/qa-monitoring` reports WARN for the DSN check.
+**Acceptance criteria:** Sentry DSN configured in Vercel Production env; one verified test event captured; alerting wired.
 
-**Acceptance criteria:** Each domain migrates to Supabase in its designated build.
+### OI-20 — Transactional invite email delivery not implemented
+**Severity:** Medium · **Status:** Open · **Planned build:** 3.1.
+**Description:** Team invitations create rows in `restaurant_invitations` and the inviter copies the link manually. No email is sent.
+**Acceptance criteria:** New invitations trigger an email containing the accept-invite link, via Supabase email or an external provider (Resend/Postmark).
 
----
-
-### OI-05 — Google OAuth not enabled
-
-**Severity:** Medium
-**Affected area:** `/login`, `/signup`
-**Status:** Open
-**Planned build:** Not yet scheduled
-
-**Description:** Auth is email/password only. Google OAuth redirect URL is configured in code (`emailRedirectTo: /auth/callback`) but Google provider is not enabled in the Supabase project.
-
-**Acceptance criteria:** Google sign-in works end-to-end with proper redirect handling.
-
----
+### OI-21 — Google OAuth production hardening pending
+**Severity:** Medium · **Status:** Open.
+**Description:** Google OAuth works on the live URL, but the OAuth consent screen, authorized domains, and verification status have not been audited for production readiness (e.g., consent screen "Testing" vs. "In production", logo/policy URLs, PII review).
+**Acceptance criteria:** Google Cloud OAuth client moved to "In production" with verified domains and complete consent screen content.
 
 ### OI-06 — Restaurant switcher limited
-
-**Severity:** Medium
-**Affected area:** Topbar, all operational pages
-**Status:** Open — by design for current builds
-**Planned build:** Build 1.2+ (when operational data is tenant-scoped)
-
-**Description:** The restaurant switcher only changes the in-memory `activeRestaurantId`. Operational pages still render mock data and do not re-query per restaurant.
-
-**Acceptance criteria:** Switching restaurants re-scopes all data queries to the selected tenant.
-
----
+**Severity:** Medium · **Status:** Open by design.
 
 ### OI-07 — Production session strategy
-
-**Severity:** Medium
-**Affected area:** Auth
-**Status:** Open
-**Planned build:** Build 1.0E (initial fix), future hardening
-
-**Description:** Current session persistence uses `localStorage` via Supabase's built-in mechanism. Production deployment on Cloudflare Workers may require additional considerations for cookie-based sessions or token refresh strategy.
-
-**Acceptance criteria:** Sessions persist reliably in production deployment.
+**Severity:** Medium · **Status:** Tracking — current Supabase default localStorage session works on Vercel SSR; deeper hardening (httpOnly cookies, server-rendered session) not yet pursued.
 
 ---
 
 ## Low
 
+### OI-22 — POS / external menu publishing not implemented
+**Severity:** Low · **Status:** Out of MVP scope · **Planned build:** none.
+**Description:** No integration with POS systems or external menu publishing. Margin IQ remains a decision layer.
+
+### OI-23 — XLS/XLSM import not implemented
+**Severity:** Low · **Status:** Open · **Planned build:** TBD.
+**Description:** Only CSV import is supported. XLS/XLSM (with formulas) is not parsed.
+
+### OI-24 — Recipe CSV import not implemented
+**Severity:** Low · **Status:** Open · **Planned build:** 3.0.
+**Description:** Build 2.5 covers ingredient CSV import only. Recipe header + lines bulk import is not yet supported.
+
+### OI-25 — Supplier Marketplace not implemented
+**Severity:** Low · **Status:** Out of approved scope per CLAUDE.md guardrails.
+
+### OI-26 — Multi-location advanced management not implemented
+**Severity:** Low · **Status:** Open.
+**Description:** Restaurant switcher works across owned/joined restaurants, but advanced cross-location operations (consolidated dashboard, shared reference data, location-aware reporting) are not implemented.
+
+### OI-27 — Menu price audit trail not implemented
+**Severity:** Low · **Status:** Open · **Planned build:** 2.9.
+**Description:** Apply Price (Build 2.4) updates `recipes.menu_price` directly with no append-only history. A dedicated audit trail (who/when/old/new/scenario context) is needed before regulated rollout.
+
 ### OI-08 — Team management placeholder
-
-**Severity:** Low
-**Affected area:** `/settings` → Team tab
-**Status:** Placeholder UI
-**Planned build:** Not yet scheduled
-
-**Description:** The Team tab in Settings shows a read-only list of current members and their roles. No invite, role change, or member removal functionality.
-
-**Acceptance criteria:** Owner can invite members, change roles, and remove members.
-
----
+**Severity:** Low · **Status:** Resolved — Build 2.1A. (Kept here for traceability.)
 
 ### OI-09 — Suppliers not linked to ingredients
-
-**Severity:** Low
-**Affected area:** `/settings` → Suppliers, future `/ingredients`
-**Status:** By design for current builds
-**Planned build:** Build 1.2
-
-**Description:** Suppliers exist as reference data in Settings but are not yet linked to ingredients via a foreign key.
-
-**Acceptance criteria:** Ingredients reference `supplier_id` from the `suppliers` table.
-
----
+**Severity:** Low · **Status:** Resolved — Build 1.2.
 
 ### OI-10 — Custom unit management not exposed
-
-**Severity:** Low
-**Affected area:** `/settings` → Units tab
-**Status:** By design
-**Planned build:** Not yet scheduled
-
-**Description:** The Units tab is read-only. Custom units cannot be added or modified by users. The `units` table is global (not per-restaurant).
-
-**Acceptance criteria:** TBD — may remain read-only if the standard unit set covers all use cases.
-
----
+**Severity:** Low · **Status:** Open by design.
 
 ### OI-11 — Mobile polish
-
-**Severity:** Low
-**Affected area:** All pages
-**Status:** Functional but not polished
-**Planned build:** Not yet scheduled
-
-**Description:** The app is functional on mobile via responsive layout but not optimized for mobile-first workflows.
-
-**Acceptance criteria:** Key workflows (dashboard, alerts, price log) are comfortable on mobile.
+**Severity:** Low · **Status:** Open.
