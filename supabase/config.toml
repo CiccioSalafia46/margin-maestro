@@ -1,1 +1,42 @@
-project_id = "urcijgorzjxaclfyaulc"
+project_id = "atdvrdhzcbtxvzgvoxhb"
+
+[auth]
+enabled = true
+site_url = "https://margin-maestro.vercel.app"
+additional_redirect_urls = [
+  # Production
+  "https://margin-maestro.vercel.app",
+  "https://margin-maestro.vercel.app/**",
+  "https://margin-maestro.vercel.app/dashboard",
+  "https://margin-maestro.vercel.app/login",
+  "https://margin-maestro.vercel.app/signup",
+  "https://margin-maestro.vercel.app/accept-invite",
+  "https://margin-maestro.vercel.app/auth/callback",
+  # Vercel preview deployments
+  "https://*-salafiafrancescos-projects.vercel.app/**",
+  # Local development
+  "http://localhost:8085",
+  "http://localhost:8085/**",
+  "http://localhost:8085/dashboard",
+  "http://localhost:8085/login",
+  "http://localhost:8085/signup",
+  "http://localhost:8085/accept-invite",
+  "http://localhost:8085/auth/callback",
+  # Legacy local port (covered for safety, e.g., Lovable sandbox previews)
+  "http://localhost:8082/**",
+]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = true
+secure_password_change = false
+max_frequency = "1m0s"
+otp_length = 8
+otp_expiry = 3600
