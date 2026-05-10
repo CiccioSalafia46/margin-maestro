@@ -111,8 +111,11 @@ function QaMvpReadinessPage() {
       next.push({ label: "W. Live deployment active", status: "pass", detail: "https://margin-maestro.vercel.app — Vercel project margin-maestro" });
       next.push({ label: "X. Separate production Supabase recommended", status: "warn", detail: "margin-maestro-dev currently reused as live backend by explicit user choice" });
 
-      // Y: Menu Price Audit Trail (Build 2.9)
-      next.push({ label: "Y. Menu price audit trail implemented", status: "pass", detail: "menu_price_audit_log + Apply Price + manual recipe edit integrations (Build 2.9)" });
+      // Y: Menu Price Audit Trail (Build 2.9A — Accepted)
+      next.push({ label: "Y. Menu price audit trail accepted", status: "pass", detail: "Build 2.9A: live-verified — RLS, append-only (no UPDATE/DELETE), Apply Price + manual recipe edit integrations." });
+
+      // Z: Recipe CSV Import (Build 3.0)
+      next.push({ label: "Z. Recipe CSV Import implemented", status: "pass", detail: "Build 3.0 — two-file CSV (recipes + lines), preview with validations, append/replace line modes, audit on dish menu prices (source=import). Does not create ingredients, suppliers, batches, or billing rows." });
 
       if (!cancelled) { setChecks(next); setDone(true); }
     })();
@@ -129,7 +132,7 @@ function QaMvpReadinessPage() {
 
   return (
     <AppShell>
-      <PageHeader title="QA — MVP Readiness" description="Build 2.9: all modules Supabase-backed, security reviewed, beta checklist + live deployment + menu price audit." />
+      <PageHeader title="QA — MVP Readiness" description="Build 3.0: all modules Supabase-backed; menu price audit accepted; recipe CSV import added." />
       <div className="space-y-6 p-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between"><CardTitle className="text-base">Overall status</CardTitle><OverallBadge status={summary.overall} /></CardHeader>
@@ -149,7 +152,7 @@ function QaMvpReadinessPage() {
             ))}
           </CardContent>
         </Card>
-        <p className="text-[11px] text-muted-foreground">No tokens or secrets displayed. Build 2.9 — Menu Price Audit Trail.</p>
+        <p className="text-[11px] text-muted-foreground">No tokens or secrets displayed. Build 3.0 — Recipe CSV Import.</p>
       </div>
     </AppShell>
   );

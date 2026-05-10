@@ -1,6 +1,6 @@
 # Dashboard — Build 1.9
 
-> **Build 2.9 note.** Dashboard does not currently surface menu price audit activity. Audit history is consulted on `/dish-analysis/$id`. Adding a "recent menu price changes" panel to the dashboard is a low-effort follow-up if requested.
+> **Build 2.9A note.** Dashboard does not currently surface menu price audit activity. Audit history is consulted on `/dish-analysis/$id`. Adding a "recent menu price changes" panel to the dashboard is a low-effort follow-up if requested.
 
 ## Overview
 

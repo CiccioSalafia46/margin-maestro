@@ -1116,9 +1116,11 @@ function ImportExportTab({ restaurantId, canManage }: { restaurantId: string; ca
     setExporting(fn);
     try {
       const mod = await import("@/data/api/importExportApi");
+      const recipeLinesMod = await import("@/data/api/recipeImportApi");
       const fnMap: Record<string, (id: string) => Promise<void>> = {
         ingredients: mod.exportIngredientsCsv,
         recipes: mod.exportRecipesCsv,
+        recipeLines: recipeLinesMod.exportRecipeLinesCsv,
         menuAnalytics: mod.exportMenuAnalyticsCsv,
         priceLog: mod.exportPriceLogCsv,
         alerts: mod.exportAlertsCsv,
@@ -1180,12 +1182,15 @@ function ImportExportTab({ restaurantId, canManage }: { restaurantId: string; ca
         </Card>
       )}
 
+      {canManage && <RecipeImportCard restaurantId={restaurantId} />}
+
       <Card>
         <CardHeader><CardTitle className="text-base">Export Data</CardTitle></CardHeader>
         <CardContent className="space-y-2">
           {[
             { key: "ingredients", label: "Ingredients" },
             { key: "recipes", label: "Recipes" },
+            { key: "recipeLines", label: "Recipe Lines" },
             { key: "menuAnalytics", label: "Menu Analytics" },
             { key: "priceLog", label: "Price Log" },
             { key: "alerts", label: "Alerts" },
@@ -1200,6 +1205,175 @@ function ImportExportTab({ restaurantId, canManage }: { restaurantId: string; ca
           <p className="text-[11px] text-muted-foreground">Exports respect RLS and include active restaurant data only. Formula-risky cells are sanitized.</p>
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+// ----------------- Recipe CSV Import (Build 3.0) -----------------
+function RecipeImportCard({ restaurantId }: { restaurantId: string }) {
+  const [recipesText, setRecipesText] = useState("");
+  const [linesText, setLinesText] = useState("");
+  const [duplicateMode, setDuplicateMode] = useState<"skip" | "update" | "block">("skip");
+  const [lineMode, setLineMode] = useState<"append" | "replace">("append");
+  const [preview, setPreview] = useState<import("@/data/api/types").RecipeImportPreview | null>(null);
+  const [importing, setImporting] = useState(false);
+
+  const onRecipesFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setRecipesText(reader.result as string);
+    reader.readAsText(file);
+  };
+  const onLinesFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setLinesText(reader.result as string);
+    reader.readAsText(file);
+  };
+
+  const onDownloadRecipesTemplate = async () => {
+    const { downloadRecipeImportTemplate } = await import("@/data/api/recipeImportApi");
+    downloadRecipeImportTemplate();
+  };
+  const onDownloadLinesTemplate = async () => {
+    const { downloadRecipeLinesImportTemplate } = await import("@/data/api/recipeImportApi");
+    downloadRecipeLinesImportTemplate();
+  };
+
+  const onPreview = async () => {
+    try {
+      const { previewRecipeImport } = await import("@/data/api/recipeImportApi");
+      const p = await previewRecipeImport(restaurantId, recipesText, linesText, {
+        duplicate_mode: duplicateMode,
+        line_mode: lineMode,
+      });
+      setPreview(p);
+    } catch (e) { toast.error(errMsg(e)); }
+  };
+
+  const onApply = async () => {
+    if (!preview) return;
+    if (lineMode === "replace") {
+      const ok = window.confirm(
+        "Replace mode will REPLACE all recipe lines for any recipe present in the lines CSV (existing lines will be deleted). Continue?",
+      );
+      if (!ok) return;
+    }
+    setImporting(true);
+    try {
+      const { applyRecipeImport } = await import("@/data/api/recipeImportApi");
+      const r = await applyRecipeImport(restaurantId, preview, {
+        duplicate_mode: duplicateMode,
+        line_mode: lineMode,
+      });
+      const audit = r.audit_recorded > 0
+        ? `Audit entries recorded: ${r.audit_recorded}.`
+        : "No menu price audit entries needed.";
+      const auditWarn = r.audit_failed > 0 ? ` ${r.audit_failed} audit insert(s) failed; recipes still updated. Please review later.` : "";
+      const errs = r.errors.length > 0 ? ` ${r.errors.length} error(s) — see report.` : "";
+      toast.success(
+        `Import applied: ${r.recipes_created} created, ${r.recipes_updated} updated, ${r.recipes_skipped} skipped, ${r.lines_inserted} line(s) inserted across ${r.lines_replaced_for} replace target(s). ${audit}${auditWarn}${errs}`,
+      );
+      setRecipesText(""); setLinesText(""); setPreview(null);
+    } catch (e) { toast.error(errMsg(e)); } finally { setImporting(false); }
+  };
+
+  const onClear = () => { setRecipesText(""); setLinesText(""); setPreview(null); };
+
+  const errorCount = (preview?.error_recipes ?? 0) + (preview?.error_lines ?? 0);
+
+  return (
+    <Card>
+      <CardHeader><CardTitle className="text-base">Import Recipes</CardTitle></CardHeader>
+      <CardContent className="space-y-3">
+        <div className="flex flex-wrap gap-2">
+          <Button size="sm" variant="outline" onClick={onDownloadRecipesTemplate}>Download Recipes template</Button>
+          <Button size="sm" variant="outline" onClick={onDownloadLinesTemplate}>Download Recipe Lines template</Button>
+        </div>
+        <div className="flex flex-col gap-2 md:flex-row md:items-center">
+          <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm hover:bg-accent">
+            {recipesText ? "Recipes CSV loaded" : "Upload Recipes CSV"}
+            <input type="file" accept=".csv" className="hidden" onChange={onRecipesFile} />
+          </label>
+          <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm hover:bg-accent">
+            {linesText ? "Recipe Lines CSV loaded" : "Upload Recipe Lines CSV"}
+            <input type="file" accept=".csv" className="hidden" onChange={onLinesFile} />
+          </label>
+        </div>
+
+        {(recipesText || linesText) && (
+          <div className="flex flex-wrap items-center gap-2">
+            <Label className="text-xs">Duplicate handling:</Label>
+            <Select value={duplicateMode} onValueChange={(v) => setDuplicateMode(v as "skip" | "update" | "block")}>
+              <SelectTrigger className="h-8 w-32"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="skip">Skip existing</SelectItem>
+                <SelectItem value="update">Update existing</SelectItem>
+                <SelectItem value="block">Block duplicates</SelectItem>
+              </SelectContent>
+            </Select>
+            <Label className="text-xs">Line handling:</Label>
+            <Select value={lineMode} onValueChange={(v) => setLineMode(v as "append" | "replace")}>
+              <SelectTrigger className="h-8 w-32"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="append">Append lines</SelectItem>
+                <SelectItem value="replace">Replace lines</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button size="sm" onClick={onPreview}>Preview</Button>
+            <Button size="sm" variant="ghost" onClick={onClear}>Clear</Button>
+          </div>
+        )}
+
+        {preview && (
+          <div className="space-y-2">
+            <div className="grid grid-cols-3 gap-2 text-center text-sm md:grid-cols-6">
+              <Stat label="Recipes" value={preview.total_recipes} />
+              <Stat label="Lines" value={preview.total_lines} />
+              <Stat label="Create" value={preview.creates} />
+              <Stat label="Update" value={preview.updates} />
+              <Stat label="Skip" value={preview.skipped} />
+              <Stat label="Errors" value={errorCount} tone={errorCount > 0 ? "destructive" : undefined} />
+            </div>
+            {preview.messages.map((m, i) => (
+              <p key={`m-${i}`} className="text-xs text-muted-foreground">{m}</p>
+            ))}
+            {[...preview.recipe_rows, ...preview.line_rows.map((l) => ({ row_number: l.row_number, status: l.status, messages: l.messages, source: "line" as const }))]
+              .filter((r) => "messages" in r && r.messages.length > 0)
+              .slice(0, 12)
+              .map((r, i) => (
+                <p key={`row-${i}`} className="text-xs">
+                  <span className="font-mono">Row {r.row_number}:</span>{" "}
+                  <span className={r.status === "error" ? "text-destructive" : "text-muted-foreground"}>
+                    {r.messages.join(" ")}
+                  </span>
+                </p>
+              ))}
+            <Button size="sm" onClick={onApply} disabled={importing || errorCount > 0}>
+              {importing ? "Importing…" : `Apply (${preview.creates} new, ${preview.updates} updated, ${preview.total_lines} lines)`}
+            </Button>
+            {errorCount > 0 && <p className="text-xs text-destructive">Fix all error rows before applying.</p>}
+          </div>
+        )}
+
+        <div className="space-y-1 border-t pt-2 text-[11px] text-muted-foreground">
+          <p>Recipe import requires existing ingredients. It does NOT create ingredients, suppliers, or menu categories.</p>
+          <p>It does not write the ingredient price log. It does not create price update batches. It does not create billing records. It does not publish to a POS or external menu.</p>
+          <p>Imported dish menu prices may record append-only entries in <code>menu_price_audit_log</code> (source = <code>import</code>).</p>
+          <p>Import is client-orchestrated, not atomic. If a step fails after another succeeds, the prior writes remain.</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function Stat({ label, value, tone }: { label: string; value: number; tone?: "destructive" }) {
+  return (
+    <div>
+      <p className={`text-2xl font-semibold ${tone === "destructive" ? "text-destructive" : ""}`}>{value}</p>
+      <p className="text-[10px] text-muted-foreground uppercase">{label}</p>
     </div>
   );
 }
@@ -1235,6 +1409,7 @@ function DeveloperQa() {
         <QaLink to="/qa-google-oauth" label="Google OAuth QA" />
         <QaLink to="/qa-live-deployment" label="Live Deployment QA" />
         <QaLink to="/qa-menu-price-audit" label="Menu Price Audit QA" />
+        <QaLink to="/qa-recipe-import" label="Recipe Import QA" />
       </CardContent>
     </Card>
   );

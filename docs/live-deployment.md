@@ -105,9 +105,9 @@ Authorization continues to come exclusively from Supabase Auth + RLS + `restaura
 
 ---
 
-## Expected public tables (23 from Build 2.9)
+## Expected public tables (23 — unchanged at Build 3.0)
 
-`profiles`, `restaurants`, `restaurant_members`, `restaurant_settings`, `restaurant_invitations`, `units`, `unit_conversions`, `menu_categories`, `suppliers`, `ingredients`, `ingredient_cost_state`, `recipes`, `recipe_lines`, `price_update_batches`, `ingredient_price_log`, `ingredient_snapshots`, `impact_cascade_runs`, `impact_cascade_items`, `alerts`, `billing_customers`, `billing_subscriptions`, `billing_events`, `menu_price_audit_log` (Build 2.9).
+`profiles`, `restaurants`, `restaurant_members`, `restaurant_settings`, `restaurant_invitations`, `units`, `unit_conversions`, `menu_categories`, `suppliers`, `ingredients`, `ingredient_cost_state`, `recipes`, `recipe_lines`, `price_update_batches`, `ingredient_price_log`, `ingredient_snapshots`, `impact_cascade_runs`, `impact_cascade_items`, `alerts`, `billing_customers`, `billing_subscriptions`, `billing_events`, `menu_price_audit_log` (Build 2.9 — verified live at 2.9A; Build 3.0 added recipe CSV import code paths but no schema changes).
 
 **Intentionally not present:** `menu_items`, `invoices`, `usage_billing`, supplier marketplace tables.
 

@@ -143,7 +143,7 @@ function QaMenuPriceAuditPage() {
     <AppShell>
       <PageHeader
         title="QA — Menu Price Audit"
-        description="Build 2.9: append-only audit of dish menu_price changes; Apply Price + manual recipe edit integration."
+        description="Build 2.9A — Accepted. Append-only audit of dish menu_price changes; Apply Price + manual recipe edit integration."
       />
       <div className="space-y-6 p-6">
         <Card>
@@ -179,7 +179,9 @@ function QaMenuPriceAuditPage() {
         </Card>
 
         <p className="text-[11px] text-muted-foreground">
-          Build 2.9 — Menu Price Audit Trail. This QA page does not apply prices or mutate data.
+          Build 2.9A — Menu Price Audit Accepted. This QA page does not apply prices or mutate data.
+          Audit table verified live: RLS enabled, SELECT for members, INSERT for owner/manager,
+          no UPDATE policy, no DELETE policy. Append-only.
         </p>
       </div>
     </AppShell>

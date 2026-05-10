@@ -15,6 +15,7 @@ import { Route as RecipesRouteImport } from './routes/recipes'
 import { Route as QaTeamManagementRouteImport } from './routes/qa-team-management'
 import { Route as QaSettingsAdminRouteImport } from './routes/qa-settings-admin'
 import { Route as QaRecipesRouteImport } from './routes/qa-recipes'
+import { Route as QaRecipeImportRouteImport } from './routes/qa-recipe-import'
 import { Route as QaPriceTrendRouteImport } from './routes/qa-price-trend'
 import { Route as QaPriceLogSnapshotRouteImport } from './routes/qa-price-log-snapshot'
 import { Route as QaMvpReadinessRouteImport } from './routes/qa-mvp-readiness'
@@ -83,6 +84,11 @@ const QaSettingsAdminRoute = QaSettingsAdminRouteImport.update({
 const QaRecipesRoute = QaRecipesRouteImport.update({
   id: '/qa-recipes',
   path: '/qa-recipes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QaRecipeImportRoute = QaRecipeImportRouteImport.update({
+  id: '/qa-recipe-import',
+  path: '/qa-recipe-import',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QaPriceTrendRoute = QaPriceTrendRouteImport.update({
@@ -314,6 +320,7 @@ export interface FileRoutesByFullPath {
   '/qa-mvp-readiness': typeof QaMvpReadinessRoute
   '/qa-price-log-snapshot': typeof QaPriceLogSnapshotRoute
   '/qa-price-trend': typeof QaPriceTrendRoute
+  '/qa-recipe-import': typeof QaRecipeImportRoute
   '/qa-recipes': typeof QaRecipesRoute
   '/qa-settings-admin': typeof QaSettingsAdminRoute
   '/qa-team-management': typeof QaTeamManagementRoute
@@ -360,6 +367,7 @@ export interface FileRoutesByTo {
   '/qa-mvp-readiness': typeof QaMvpReadinessRoute
   '/qa-price-log-snapshot': typeof QaPriceLogSnapshotRoute
   '/qa-price-trend': typeof QaPriceTrendRoute
+  '/qa-recipe-import': typeof QaRecipeImportRoute
   '/qa-recipes': typeof QaRecipesRoute
   '/qa-settings-admin': typeof QaSettingsAdminRoute
   '/qa-team-management': typeof QaTeamManagementRoute
@@ -407,6 +415,7 @@ export interface FileRoutesById {
   '/qa-mvp-readiness': typeof QaMvpReadinessRoute
   '/qa-price-log-snapshot': typeof QaPriceLogSnapshotRoute
   '/qa-price-trend': typeof QaPriceTrendRoute
+  '/qa-recipe-import': typeof QaRecipeImportRoute
   '/qa-recipes': typeof QaRecipesRoute
   '/qa-settings-admin': typeof QaSettingsAdminRoute
   '/qa-team-management': typeof QaTeamManagementRoute
@@ -456,6 +465,7 @@ export interface FileRouteTypes {
     | '/qa-mvp-readiness'
     | '/qa-price-log-snapshot'
     | '/qa-price-trend'
+    | '/qa-recipe-import'
     | '/qa-recipes'
     | '/qa-settings-admin'
     | '/qa-team-management'
@@ -502,6 +512,7 @@ export interface FileRouteTypes {
     | '/qa-mvp-readiness'
     | '/qa-price-log-snapshot'
     | '/qa-price-trend'
+    | '/qa-recipe-import'
     | '/qa-recipes'
     | '/qa-settings-admin'
     | '/qa-team-management'
@@ -548,6 +559,7 @@ export interface FileRouteTypes {
     | '/qa-mvp-readiness'
     | '/qa-price-log-snapshot'
     | '/qa-price-trend'
+    | '/qa-recipe-import'
     | '/qa-recipes'
     | '/qa-settings-admin'
     | '/qa-team-management'
@@ -596,6 +608,7 @@ export interface RootRouteChildren {
   QaMvpReadinessRoute: typeof QaMvpReadinessRoute
   QaPriceLogSnapshotRoute: typeof QaPriceLogSnapshotRoute
   QaPriceTrendRoute: typeof QaPriceTrendRoute
+  QaRecipeImportRoute: typeof QaRecipeImportRoute
   QaRecipesRoute: typeof QaRecipesRoute
   QaSettingsAdminRoute: typeof QaSettingsAdminRoute
   QaTeamManagementRoute: typeof QaTeamManagementRoute
@@ -648,6 +661,13 @@ declare module '@tanstack/react-router' {
       path: '/qa-recipes'
       fullPath: '/qa-recipes'
       preLoaderRoute: typeof QaRecipesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qa-recipe-import': {
+      id: '/qa-recipe-import'
+      path: '/qa-recipe-import'
+      fullPath: '/qa-recipe-import'
+      preLoaderRoute: typeof QaRecipeImportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/qa-price-trend': {
@@ -1009,6 +1029,7 @@ const rootRouteChildren: RootRouteChildren = {
   QaMvpReadinessRoute: QaMvpReadinessRoute,
   QaPriceLogSnapshotRoute: QaPriceLogSnapshotRoute,
   QaPriceTrendRoute: QaPriceTrendRoute,
+  QaRecipeImportRoute: QaRecipeImportRoute,
   QaRecipesRoute: QaRecipesRoute,
   QaSettingsAdminRoute: QaSettingsAdminRoute,
   QaTeamManagementRoute: QaTeamManagementRoute,

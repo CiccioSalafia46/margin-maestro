@@ -10,19 +10,45 @@ Forward implementation plan for Margin IQ — Restaurant Margin Intelligence Saa
 
 ---
 
+## Build 3.0 — Recipe CSV Import
+
+**Status:** Implemented (acceptance pending — Build 3.0A).
+
+**Goal:** Two-file CSV import (recipes + recipe lines) with preview, validation, duplicate-handling and line-handling modes. Owner/manager only. Recipe import does **not** create ingredients/suppliers/categories/batches/billing rows and does **not** publish to a POS. Imported dish menu prices write `source = 'import'` rows to `menu_price_audit_log`.
+
+**Out of scope:** XLS/XLSM, POS publishing, supplier marketplace import, atomic server transaction, approval workflow.
+
+---
+
 ## Build 2.9 — Menu Price Audit Trail
 
-**Status:** Implemented (acceptance pending — Build 2.9A).
+**Status:** Accepted (Build 2.9A — live verification).
 
-**Goal:** Append-only audit log for dish recipe `menu_price` changes, integrated with Apply Price and manual recipe edits.
+---
+
+## Build 2.9A — Menu Price Audit Accepted
+
+**Status:** Accepted.
+
+**Goal:** Live verification + acceptance polish for Build 2.9.
 
 **Highlights:**
-- New table `menu_price_audit_log` with append-only RLS (no UPDATE / no DELETE policy).
-- `applyDishMenuPrice` writes `source='apply_price'` rows; `updateRecipe` writes `source='manual_recipe_edit'` rows when a dish menu price changes.
-- UI: read-only audit history on `/dish-analysis/$id`; new automated QA `/qa-menu-price-audit`.
-- `EXPECTED_TABLES` in `/qa-mvp-readiness` and `/qa-beta-launch` extended.
+- Migration applied live; one-line RLS fix patched in place (`has_restaurant_role(uuid, text[])` signature).
+- `pg_policies` confirms only SELECT and INSERT policies exist on `menu_price_audit_log` — append-only at DB level.
+- Apply Price + manual recipe edit audit writes verified live.
+- Apply Price does not write ingredient_price_log, batches, or billing.
+- QA copy + docs refreshed to reflect accepted status.
 
-**Out of scope:** POS publishing, external menu sync, ingredient price log writes from Apply Price, billing rows from Apply Price, atomic server-side wrapper, approval workflow.
+---
+
+## Recommended next builds (post 3.0)
+
+- **Build 3.0A — Recipe CSV Import Acceptance.** Live verification on `https://margin-maestro.vercel.app` with real recipes; QA `/qa-recipe-import` accepted; copy refresh.
+- **Build 3.2 — Separate Production Supabase Migration.** Cut over from `margin-maestro-dev` to `margin-maestro-prod`.
+- **Build 2.2B — Stripe Test Verification.** Exercise checkout + portal + webhook end-to-end on the live Vercel URL with Stripe test keys.
+- **Build 3.1 — Transactional Invite Emails.** Email delivery for `restaurant_invitations`.
+- **Build 3.3 — Production Monitoring Provider Setup.** Configure Sentry DSN.
+- **Build 3.4 — Menu Price Audit / Recipe Import Atomic RPC.** Server-side function(s) wrapping `recipes.menu_price` updates and recipe-import phases in a single transaction. Closes OI-28 and the equivalent recipe-import limitation.
 
 ---
 

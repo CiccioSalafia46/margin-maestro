@@ -90,8 +90,13 @@ Known issues and limitations for Margin IQ. Updated for Build 2.8A.
 **Description:** Only CSV import is supported. XLS/XLSM (with formulas) is not parsed.
 
 ### OI-24 — Recipe CSV import not implemented
-**Severity:** Low · **Status:** Open · **Planned build:** 3.0.
-**Description:** Build 2.5 covers ingredient CSV import only. Recipe header + lines bulk import is not yet supported.
+**Severity:** Low · **Status:** Resolved — Build 3.0.
+**Resolution:** Two-file recipe CSV import implemented (`recipes` + `recipe_lines`) via `src/data/api/recipeImportApi.ts` with preview, duplicate-handling and line-handling modes. Owner/manager only. Imported dish menu prices write `source='import'` rows to `menu_price_audit_log`. Recipe import does NOT create ingredients/suppliers/categories/batches/billing rows. See `docs/recipe-csv-import.md`.
+
+### OI-29 — Recipe CSV import is not atomic
+**Severity:** Low · **Status:** Open · **Planned build:** 3.4.
+**Description:** Recipe import orchestrates recipe writes, line writes, and menu-price audit writes as separate client calls. A failure in a later phase does not roll back earlier phases; partial-success counts and an error list are surfaced to the operator.
+**Acceptance criteria:** A server-side SQL function (e.g. `apply_recipe_import_atomic(...)`) wraps the three phases in a single transaction, equivalent to the planned audit-atomic RPC for Apply Price (OI-28).
 
 ### OI-25 — Supplier Marketplace not implemented
 **Severity:** Low · **Status:** Out of approved scope per CLAUDE.md guardrails.
@@ -101,8 +106,8 @@ Known issues and limitations for Margin IQ. Updated for Build 2.8A.
 **Description:** Restaurant switcher works across owned/joined restaurants, but advanced cross-location operations (consolidated dashboard, shared reference data, location-aware reporting) are not implemented.
 
 ### OI-27 — Menu price audit trail not implemented
-**Severity:** Low · **Status:** Resolved — Build 2.9.
-**Resolution:** `menu_price_audit_log` introduced with append-only RLS (no UPDATE / no DELETE policy). Apply Price (Build 2.4) and manual dish recipe `menu_price` edits both write audit rows. Read-only history panel on `/dish-analysis/$id`. New `/qa-menu-price-audit` route. See `docs/menu-price-audit-trail.md`.
+**Severity:** Low · **Status:** Resolved — Build 2.9 / accepted Build 2.9A.
+**Resolution:** `menu_price_audit_log` introduced with append-only RLS (no UPDATE / no DELETE policy). Apply Price (Build 2.4) and manual dish recipe `menu_price` edits both write audit rows. Read-only history panel on `/dish-analysis/$id`. New `/qa-menu-price-audit` route. Live verified at Build 2.9A: `pg_policies` confirms only SELECT (members) and INSERT (owner/manager) policies; no UPDATE / no DELETE; Apply Price does not write ingredient_price_log / batches / billing rows. See `docs/menu-price-audit-trail.md`.
 
 ### OI-28 — Menu price audit insert is not atomic with price update
 **Severity:** Low · **Status:** Open · **Planned build:** TBD.

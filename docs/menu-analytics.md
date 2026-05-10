@@ -1,6 +1,6 @@
-# Menu Analytics — Build 1.4 (Apply Price audit: Build 2.9)
+# Menu Analytics — Build 1.4 (Apply Price audit: Build 2.9, accepted: Build 2.9A)
 
-> **Build 2.9 update.** Apply Price from Menu Analytics now writes a `menu_price_audit_log` row (`source='apply_price'`) after the price update. The success toast confirms whether the audit was recorded. See `docs/menu-price-audit-trail.md`.
+> **Build 2.9A update.** Apply Price from Menu Analytics writes a `menu_price_audit_log` row (`source='apply_price'`) after the price update — live-verified. The success toast confirms whether the audit was recorded; degraded path shows a clear warning. See `docs/menu-price-audit-trail.md`.
 
 ## Overview
 

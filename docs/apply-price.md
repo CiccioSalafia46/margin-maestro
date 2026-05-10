@@ -1,6 +1,6 @@
-# Apply Price — Build 2.4 (audit integration: Build 2.9)
+# Apply Price — Build 2.4 (audit integration: Build 2.9, accepted: Build 2.9A)
 
-> **Build 2.9 update.** After a successful menu_price update, Apply Price now best-effort writes an append-only row to `menu_price_audit_log` with `source='apply_price'` and a structured `context` (origin route, target_gpm, cost_per_serving, suggested_price, reason). The function returns `ApplyPriceResult { audit_recorded, audit_error, old_menu_price, new_menu_price }`. The UI shows different toast copy depending on whether the audit row was recorded. **Apply Price still does not write `ingredient_price_log`, create `price_update_batches`, create billing rows, or publish to a POS.** See `docs/menu-price-audit-trail.md`.
+> **Build 2.9A update.** Apply Price audit writes are live-verified. After a successful menu_price update, Apply Price best-effort writes an append-only row to `menu_price_audit_log` with `source='apply_price'` and a structured `context` (origin route, target_gpm, cost_per_serving, suggested_price, reason). The function returns `ApplyPriceResult { audit_recorded, audit_error, old_menu_price, new_menu_price }`. The UI shows distinct toast copy depending on whether the audit row was recorded. **Apply Price still does not write `ingredient_price_log`, create `price_update_batches`, create billing rows, or publish to a POS.** See `docs/menu-price-audit-trail.md`.
 
 ## Overview
 

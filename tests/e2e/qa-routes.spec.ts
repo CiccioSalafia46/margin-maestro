@@ -13,6 +13,7 @@ const QA_ROUTES = [
   "/qa-price-log-snapshot",
   "/qa-menu-analytics",
   "/qa-menu-price-audit",
+  "/qa-recipe-import",
   "/qa-recipes",
   "/qa-ingredients",
   "/qa-settings-admin",

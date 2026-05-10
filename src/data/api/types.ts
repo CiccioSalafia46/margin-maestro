@@ -579,3 +579,77 @@ export interface MenuPriceAuditSummary {
   last_delta_amount: number | null;
   last_delta_percent: number | null;
 }
+
+// ----- Build 3.0 — Recipe CSV Import -----
+
+export type RecipeImportStatus = "valid" | "warning" | "error" | "skipped";
+export type RecipeImportAction = "create" | "update" | "skip";
+export type RecipeImportDuplicateMode = "skip" | "update" | "block";
+export type RecipeImportLineMode = "append" | "replace";
+
+export interface RecipeImportRecipeRow {
+  row_number: number;
+  data: Record<string, string>;
+  status: RecipeImportStatus;
+  action: RecipeImportAction;
+  messages: string[];
+  /** Existing recipe id when matched by name (for update or skip). */
+  existing_id: string | null;
+  /** Existing recipe kind when matched, used to validate kind transitions. */
+  existing_kind: string | null;
+  /** Resolved menu_category_id for category_name (null if not found / not provided). */
+  resolved_category_id: string | null;
+  /** Resolved linked_intermediate_ingredient_id (null if not found / not provided). */
+  resolved_linked_ingredient_id: string | null;
+  /** Resolved old menu_price (used to derive audit row when updating). */
+  old_menu_price: number | null;
+}
+
+export interface RecipeImportLineRow {
+  row_number: number;
+  data: Record<string, string>;
+  status: RecipeImportStatus;
+  messages: string[];
+  /** The recipe name this line attaches to. */
+  recipe_name: string;
+  /** True when the recipe is found among preview recipe rows. */
+  matched_in_preview: boolean;
+  /** True when the recipe is found among existing DB recipes. */
+  matched_existing: boolean;
+  /** Resolved ingredient id if found and active. */
+  resolved_ingredient_id: string | null;
+}
+
+export interface RecipeImportPreview {
+  total_recipes: number;
+  total_lines: number;
+  valid_recipes: number;
+  warning_recipes: number;
+  error_recipes: number;
+  valid_lines: number;
+  warning_lines: number;
+  error_lines: number;
+  creates: number;
+  updates: number;
+  skipped: number;
+  recipe_rows: RecipeImportRecipeRow[];
+  line_rows: RecipeImportLineRow[];
+  /** Aggregated messages not bound to a specific row. */
+  messages: string[];
+}
+
+export interface RecipeImportOptions {
+  duplicate_mode: RecipeImportDuplicateMode;
+  line_mode: RecipeImportLineMode;
+}
+
+export interface RecipeImportApplyResult {
+  recipes_created: number;
+  recipes_updated: number;
+  recipes_skipped: number;
+  lines_inserted: number;
+  lines_replaced_for: number;
+  errors: string[];
+  audit_recorded: number;
+  audit_failed: number;
+}

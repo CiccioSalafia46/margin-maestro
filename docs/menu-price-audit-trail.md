@@ -1,4 +1,6 @@
-# Menu Price Audit Trail — Build 2.9
+# Menu Price Audit Trail — Build 2.9A (accepted)
+
+> **Build 2.9A — Accepted (2026-05-10).** Migration applied to live Supabase (`atdvrdhzcbtxvzgvoxhb`) after a one-line RLS signature fix. `pg_policies` confirms append-only design at the database level (SELECT + INSERT only, no UPDATE, no DELETE). Apply Price and manual dish recipe edits both write audit rows live. Apply Price does not write `ingredient_price_log`, does not create `price_update_batches`, does not create `billing_*` rows, and does not publish to a POS.
 
 ## Purpose
 
@@ -87,9 +89,15 @@ When the patch includes `menu_price`, the function reads the recipe's prior `men
 
 Intermediate recipes never produce menu price audit rows (their `menu_price` is irrelevant).
 
-### 3. Import / System / Other
+### 3. Import (`source = 'import'` — wired in Build 3.0)
 
-The `source` field also accepts `'import'`, `'system'`, and `'other'` for future bulk-import or automated-process integrations. None of these are wired in Build 2.9.
+Recipe CSV Import (Build 3.0) writes `source = 'import'` audit rows for every imported dish whose `menu_price` is set or changed (created or updated). The `context` payload contains `{ origin: "recipe-csv-import", action: "create" | "update", row_number }`. See `docs/recipe-csv-import.md`.
+
+Note: when an import update path runs (`duplicate_mode = 'update'` and price changed), `updateRecipe` also independently writes a `source = 'manual_recipe_edit'` row from its Build 2.9 wiring. Both rows coexist intentionally so the historical record reflects both the import operator action and the underlying recipe-edit code path.
+
+### 4. System / Other
+
+The `source` field also accepts `'system'` and `'other'` for future automated-process integrations. None of these are wired yet.
 
 ## API helpers
 
@@ -130,7 +138,7 @@ This guarantees that historical entries cannot silently drift even if the applic
 
 ## Recommended follow-ups
 
-- **Build 2.9A — Menu Price Audit Acceptance.** Verify on a real dish on the live URL, confirm RLS scoping, confirm append-only nature, capture acceptance copy.
+- **Build 2.9A — Menu Price Audit Acceptance.** ✅ Done (this build).
 - **Build 2.2B — Stripe Test Verification.** Independent of audit work but next on the live readiness backlog.
 - **Build 3.0 — Recipe CSV Import.** Will use `source = 'import'` for any menu-price-bearing import.
-- **Server-side atomic wrapper.** A SQL function `apply_dish_menu_price_with_audit(...)` could remove the client-orchestration limitation.
+- **Build 3.4 — Menu Price Audit Atomic RPC.** A SQL function `apply_dish_menu_price_with_audit(...)` would close OI-28 by wrapping the price update and audit insert in a single transaction.

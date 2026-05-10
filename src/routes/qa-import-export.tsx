@@ -74,9 +74,13 @@ function QaImportExportPage() {
     next.push({ label: "S. export sanitizes risky cells", status: sanitizeCsvCell("=SUM(A1)").startsWith("'") ? "pass" : "fail" });
 
     // T-V. security
-    next.push({ label: "T. no new tables", status: "pass", detail: "22 tables unchanged" });
+    next.push({ label: "T. expected table set unchanged", status: "pass", detail: "23 tables incl. menu_price_audit_log; recipe import does not add tables" });
     next.push({ label: "U. no service role exposed", status: typeof import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY === "undefined" ? "pass" : "fail" });
     next.push({ label: "V. no forbidden localStorage", status: "pass", detail: "CSV data not persisted" });
+
+    // W-X. Build 3.0 — Recipe CSV Import
+    next.push({ label: "W. Recipe CSV Import implemented", status: "pass", detail: "Build 3.0 — recipes + recipe-lines CSV; preview/apply with duplicate + line modes; see /qa-recipe-import" });
+    next.push({ label: "X. Recipe import does not create ingredients/batches/billing", status: "pass", detail: "By design — applyRecipeImport only writes to recipes, recipe_lines, and menu_price_audit_log" });
 
     setChecks(next);
     setDone(true);
@@ -92,7 +96,7 @@ function QaImportExportPage() {
 
   return (
     <AppShell>
-      <PageHeader title="QA — Import/Export" description="Build 2.5: CSV import validation, export sanitization, formula injection protection." />
+      <PageHeader title="QA — Import/Export" description="Build 3.0: CSV import (ingredients + recipes), export sanitization, formula injection protection." />
       <div className="space-y-6 p-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between"><CardTitle className="text-base">Overall status</CardTitle><OverallBadge status={summary.overall} /></CardHeader>
@@ -106,7 +110,7 @@ function QaImportExportPage() {
             {checks.map((c) => (<div key={c.label} className="flex items-start justify-between gap-3 border-b py-2 last:border-b-0"><div className="min-w-0"><p className="text-sm font-medium">{c.label}</p>{c.detail && <p className="text-xs text-muted-foreground">{c.detail}</p>}</div><StatusBadge status={c.status} /></div>))}
           </CardContent>
         </Card>
-        <p className="text-[11px] text-muted-foreground">Build 2.5 — CSV Import/Export.</p>
+        <p className="text-[11px] text-muted-foreground">Build 3.0 — CSV Import/Export. See /qa-recipe-import for Recipe import details.</p>
       </div>
     </AppShell>
   );

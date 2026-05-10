@@ -4,7 +4,9 @@ Manual and automated QA checklists for Margin IQ.
 
 > **Build 2.8A update.** New automated route `/qa-live-deployment` (checks A–O) covers live deploy config, Vercel env naming, Supabase Auth URL setup, and forbidden secret/localStorage scans. The route is linked from Settings → Developer QA. The existing `/qa-google-oauth`, `/qa-mvp-readiness`, `/qa-beta-launch`, and `/qa-auth` routes were extended to reference live verification. See `docs/live-deployment.md`.
 
-> **Build 2.9 update.** New automated route `/qa-menu-price-audit` (checks A–U) covers `menu_price_audit_log` readability, RLS scoping, append-only design, dish-only constraint, finite deltas, Apply-Price side-effect absence, secret exposure, and forbidden localStorage. `/qa-mvp-readiness` adds the new table to its `EXPECTED_TABLES` and a new check Y; `/qa-beta-launch` adds the new table and check AH. See `docs/menu-price-audit-trail.md`.
+> **Build 2.9A update.** `/qa-menu-price-audit` accepted — live-verified. `pg_policies` shows SELECT + INSERT only on `menu_price_audit_log` (no UPDATE, no DELETE). `/qa-mvp-readiness` check Y and `/qa-beta-launch` check AH report "accepted". See `docs/menu-price-audit-trail.md`.
+
+> **Build 3.0 update.** New automated route `/qa-recipe-import` (checks A–Y) covers parsers, validators (synthetic in-memory rows), preview-doesn't-mutate, role gating, side-effect absence (no ingredient creation, no `ingredient_price_log`, no `price_update_batches`, no `billing_*`), `menu_price_audit_log source='import'` integration, `menu_items` absence, secret exposure, localStorage persistence. `/qa-mvp-readiness` adds check Z; `/qa-beta-launch` adds check AI; `/qa-import-export` adds checks W–X. See `docs/recipe-csv-import.md`.
 
 ---
 

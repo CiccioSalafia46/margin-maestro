@@ -693,7 +693,7 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 
 ## Build 2.9 — Menu Price Audit Trail
 
-**Status:** Implemented (acceptance pending — Build 2.9A).
+**Status:** Accepted (Build 2.9A — live verification).
 
 - **Migration:** `supabase/migrations/20260510170000_build_2_9_menu_price_audit_trail.sql` (not auto-applied; deploy with `supabase db push`).
 - **New table:** `menu_price_audit_log` (id, restaurant_id, recipe_id, recipe_name_at_time, recipe_kind_at_time, category_name_at_time, old_menu_price, new_menu_price, delta_amount, delta_percent, source, context, note, changed_by, changed_at, created_at). CHECK `new_menu_price > 0` and `recipe_kind_at_time = 'dish'`. CHECK source in (`apply_price`, `manual_recipe_edit`, `import`, `system`, `other`).
@@ -717,6 +717,85 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 - No menu price approval workflow.
 - No POS / external menu publishing (intentional, per CLAUDE.md guardrails).
 - `source='import'` is reserved but not exercised in this build.
+
+---
+
+## Build 2.9A — Menu Price Audit Accepted
+
+**Status:** Accepted.
+
+- **Migration applied** to live Supabase (`atdvrdhzcbtxvzgvoxhb`) successfully after a one-line RLS fix: `has_restaurant_role(restaurant_id, 'owner') OR has_restaurant_role(restaurant_id, 'manager')` was incompatible with the project-wide `has_restaurant_role(uuid, text[])` signature. Patched to `has_restaurant_role(restaurant_id, array['owner','manager'])`. Migration is now re-runnable (`CREATE TABLE IF NOT EXISTS`, `DROP POLICY IF EXISTS` before `CREATE POLICY`).
+- **Live verification (`pg_policies` query):** policies present and correct:
+
+  | policyname | cmd |
+  |---|---|
+  | `menu_price_audit_log_insert_owner_manager` | INSERT |
+  | `menu_price_audit_log_select_members` | SELECT |
+
+  No UPDATE, no DELETE policy → append-only confirmed at the database level.
+- **Apply Price audit verified live.** Dish menu price changes via `/menu-analytics` and `/dish-analysis/$id` insert rows into `menu_price_audit_log` with `source='apply_price'` and the structured `context` payload. UI distinguishes success and degraded-audit paths in the toast.
+- **Manual recipe edit audit verified live.** Saving a dish recipe with a changed `menu_price` writes a `source='manual_recipe_edit'` audit row. Intermediate recipes do not produce menu price audit rows. Non-price recipe edits do not produce audit rows.
+- **Apply Price side-effects checked:**
+  - Does **not** write `ingredient_price_log`.
+  - Does **not** create `price_update_batches`.
+  - Does **not** create `billing_*` rows.
+  - Does **not** publish to a POS or external menu.
+- **Dish Analysis audit panel:** recent 25 entries with friendly source labels, MoneyCell / PercentCell formatting, no raw user IDs, no raw JSON, append-only subtitle.
+- **QA copy refreshed:** `/qa-menu-price-audit`, `/qa-mvp-readiness` (check Y → "accepted"), `/qa-beta-launch` (check AH → "accepted"), `/qa-auth` (footer note).
+- **Docs updated:** `current-state.md`, `build-log.md`, `roadmap.md`, `open-issues.md`, `menu-price-audit-trail.md`, `apply-price.md`, `dish-analysis.md`, `menu-analytics.md`, `dashboard.md`, `qa-checklists.md`, `beta-checklist.md`, `live-deployment.md`.
+- **No new tables.** **No RLS changes.** **No schema changes.** No new dependencies.
+- Build label: "Build 2.9A — Menu Price Audit Accepted".
+
+**Known remaining limitations (carried forward):**
+- OI-28 — client-orchestrated price update + audit insert is not atomic.
+- OI-16/17/18/19/20/21 — separate prod project, Stripe verification, billing rollout, Sentry DSN, transactional invite emails, OAuth production hardening.
+
+---
+
+## Build 3.0 — Recipe CSV Import
+
+**Status:** Implemented (acceptance pending — Build 3.0A).
+
+- **No migration.** No new tables. No RLS changes.
+- **New API file** `src/data/api/recipeImportApi.ts` exposing:
+  - `getRecipeImportTemplate()`, `getRecipeLinesImportTemplate()`, `downloadRecipeImportTemplate()`, `downloadRecipeLinesImportTemplate()`.
+  - `parseRecipeCsv(text)` / `parseRecipeLinesCsv(text)` — wraps `parseCsv` + `normalizeCsvHeader`.
+  - `validateRecipeImportRows(rows, ctx)` / `validateRecipeLineImportRows(rows, ctx)` — synchronous client-side validation.
+  - `previewRecipeImport(restaurantId, recipesCsv, linesCsv, options)` — fetches existing recipes / ingredients / categories and returns `RecipeImportPreview` (counts + per-row messages). **Read-only.**
+  - `applyRecipeImport(restaurantId, preview, options)` — orchestrates `createRecipe` / `updateRecipe` / `replaceRecipeLines` (or direct line inserts) and writes `menu_price_audit_log` rows with `source = 'import'`. Returns `RecipeImportApplyResult` with counts + errors + audit success/fail counters.
+  - `exportRecipeLinesCsv(restaurantId)` — joins recipes + ingredients to produce a lines CSV.
+  - `canImportRecipes(role)` — owner/manager only.
+- **New types** in `src/data/api/types.ts`:
+  - `RecipeImportStatus`, `RecipeImportAction`, `RecipeImportDuplicateMode` (`skip` | `update` | `block`), `RecipeImportLineMode` (`append` | `replace`).
+  - `RecipeImportRecipeRow`, `RecipeImportLineRow`, `RecipeImportPreview`, `RecipeImportOptions`, `RecipeImportApplyResult`.
+- **UI — Settings → Import / Export → Import Recipes** (`RecipeImportCard`):
+  - Owner/manager only (rendered behind `canManage`).
+  - Two file inputs (Recipes CSV + Recipe Lines CSV) — operators can upload either or both.
+  - Duplicate handling (`skip existing`/`update existing`/`block duplicates`) and Line handling (`append`/`replace`) selectors.
+  - Preview shows per-row error/warning messages and counts (recipes, lines, create, update, skip, errors).
+  - Apply button disabled while errors exist; replace mode triggers a `window.confirm` warning.
+  - Static legal block clarifies what recipe import does NOT do (no ingredient creation, no batches, no price log writes, no billing rows, no POS publishing).
+- **Export Recipe Lines** added to the Export Data card.
+- **Menu price audit (Build 2.9 integration):** for each imported dish whose `menu_price` was set or changed, an append-only audit row is added with `source = 'import'` and `context = { origin: "recipe-csv-import", action: "create" | "update", row_number }`. `audit_recorded` and `audit_failed` counts are surfaced in the apply result toast.
+- **Cycle detection (best-effort):** before writing lines, `detectCycle(recipeId, projectedIngredientIds, allRecipes, allIngredients)` is called per recipe. Recipes that would introduce a cycle are skipped with an explicit error message in the apply result.
+- **/qa-recipe-import** (Build 3.0): 25 checks (A–Y) — auth, parser, validators (synthetic in-memory rows), no-mutation guarantee, role gating, side-effect absence (no ingredient creation, no `ingredient_price_log`, no `price_update_batches`, no `billing_*`), `menu_price_audit_log` source = import behaviour, `menu_items` absence, secret exposure, localStorage persistence.
+- **/qa-mvp-readiness** check Z added.
+- **/qa-beta-launch** check AI added.
+- **/qa-import-export** checks W–X added.
+- **/qa-auth** footer reflects Build 3.0.
+- **Settings → Developer QA** gains link to `/qa-recipe-import`.
+- **E2E:** `tests/e2e/qa-routes.spec.ts` includes `/qa-recipe-import`. No mutating tests added by default.
+- **Docs:** `docs/recipe-csv-import.md` created (full spec). `docs/current-state.md`, `docs/build-log.md`, `docs/roadmap.md`, `docs/open-issues.md`, `docs/csv-import-export.md`, `docs/recipes.md`, `docs/menu-price-audit-trail.md`, `docs/qa-checklists.md`, `docs/beta-checklist.md`, `docs/live-deployment.md` updated.
+- Build label: "Build 3.0 — Recipe CSV Import".
+
+**Known limitations:**
+
+- Apply phase is **client-orchestrated, not atomic.** A failure in Phase 2 (lines) or Phase 3 (audit) does not roll back Phase 1 (recipe header writes). The UI reports partial counts. Build 3.4 will introduce a server-side RPC.
+- Cycle detection runs against the projected post-import line set captured during apply; subsequent imports against the same data should re-run.
+- `target_gpm` is read but not stored per-recipe (the schema stores it in `restaurant_settings`).
+- Categories, ingredients, suppliers are **never auto-created**.
+- No XLS / XLSX / XLSM support (CSV only).
+- No POS / external menu publishing (intentional).
 
 ---
 

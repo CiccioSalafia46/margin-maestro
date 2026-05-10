@@ -2,7 +2,9 @@
 
 Manual acceptance flows for beta readiness.
 
-> **Build 2.9 add-on.** When verifying Apply Price or manual recipe `menu_price` edits, also confirm a row appears in `menu_price_audit_log` for the affected dish (visible in the read-only panel on `/dish-analysis/$id`).
+> **Build 2.9A add-on.** When verifying Apply Price or manual recipe `menu_price` edits, also confirm a row appears in `menu_price_audit_log` for the affected dish (visible in the read-only panel on `/dish-analysis/$id`). Live-verified during Build 2.9A.
+
+> **Build 3.0 add-on.** Recipe CSV Import (Settings → Import / Export → Import Recipes): try a small CSV with an existing ingredient, confirm preview shows correct counts, apply with `duplicate_mode = 'skip'` and `line_mode = 'append'`, then verify the new dish menu_price produced a `source = 'import'` row in `menu_price_audit_log` (visible on `/dish-analysis/$id`). Recipe import is owner/manager only; viewers should not see the card.
 
 ## A. Auth and Onboarding
 - [ ] Signup with email/password
