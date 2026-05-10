@@ -550,37 +550,43 @@ export async function applyRecipeImport(
           }
         }
       } else if (row.action === "update" && row.existing_id) {
-        // updateRecipe already audits dish menu_price changes (Build 2.9 wiring).
-        // We pass an enriched patch and rely on that integration.
-        const updated = await updateRecipe(restaurantId, row.existing_id, input);
+        // Build 3.4: when a dish menu_price actually changes, do the price
+        // update + audit via the atomic RPC (source='import'). Other recipe
+        // fields are still patched via updateRecipe — non-atomic with the
+        // price update but this is by design (no recipe-wide RPC in 3.4).
+        const isDishPriceChange =
+          row.existing_kind === "dish" &&
+          input.menu_price != null &&
+          input.menu_price > 0 &&
+          input.menu_price !== row.old_menu_price;
+
+        const patchForUpdateRecipe = isDishPriceChange
+          ? { ...input, menu_price: undefined as unknown as number | null }
+          : input;
+
+        const updated = await updateRecipe(restaurantId, row.existing_id, patchForUpdateRecipe);
         ctx.recipes_by_name.set(updated.name.trim().toLowerCase(), { id: updated.id, kind: updated.kind });
         result.recipes_updated++;
 
-        // If updateRecipe wrote an audit row internally, count it; otherwise our
-        // own check below would write one. updateRecipe writes source='manual_recipe_edit'.
-        // Spec for import expects source='import' — write our own with that source if
-        // the menu_price actually changed; updateRecipe already wrote one too, but we
-        // intentionally still emit the import-specific audit row so the source field
-        // reflects the operator-visible origin.
-        if (
-          updated.kind === "dish" &&
-          updated.menu_price != null &&
-          updated.menu_price > 0 &&
-          updated.menu_price !== row.old_menu_price
-        ) {
+        if (isDishPriceChange) {
           try {
-            await createMenuPriceAuditEntry({
-              restaurant_id: restaurantId,
-              recipe_id: updated.id,
-              recipe_name_at_time: updated.name,
-              old_menu_price: row.old_menu_price,
-              new_menu_price: updated.menu_price,
-              source: "import",
-              context: { origin: "recipe-csv-import", action: "update", row_number: row.row_number },
+            const { data, error } = await supabase.rpc("apply_dish_menu_price_with_audit", {
+              p_restaurant_id: restaurantId,
+              p_recipe_id: updated.id,
+              p_new_menu_price: input.menu_price as number,
+              p_source: "import",
+              p_note: null,
+              p_context: { origin: "recipe-csv-import", action: "update", row_number: row.row_number } as never,
             });
-            result.audit_recorded++;
-          } catch {
+            if (error) throw error;
+            const audit = Array.isArray(data) ? data[0] : data;
+            if (audit) result.audit_recorded++;
+            else result.audit_failed++;
+          } catch (e) {
+            // RPC failed — price change for this dish did not happen.
             result.audit_failed++;
+            const msg = e instanceof Error ? e.message : "atomic price update failed";
+            result.errors.push(`Row ${row.row_number}: ${msg}`);
           }
         }
       }

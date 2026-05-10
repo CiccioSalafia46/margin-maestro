@@ -105,7 +105,11 @@ Authorization continues to come exclusively from Supabase Auth + RLS + `restaura
 
 ---
 
-## Expected public tables (23 — unchanged at Build 3.0)
+## SQL functions added at Build 3.4
+
+`public.apply_dish_menu_price_with_audit(uuid, uuid, numeric, text, text, jsonb)` — atomic dish menu_price update + menu_price_audit_log insert. `SECURITY INVOKER`. Owner/manager only via defensive `has_restaurant_role` check + RLS. `REVOKE`d from `public`/`anon`, `GRANT EXECUTE` to `authenticated`. **Migration not auto-applied; run `supabase db push` after taking a PITR checkpoint** (single-Supabase-backend live decision means a shared backend with dev).
+
+## Expected public tables (23 — unchanged at Build 3.4)
 
 `profiles`, `restaurants`, `restaurant_members`, `restaurant_settings`, `restaurant_invitations`, `units`, `unit_conversions`, `menu_categories`, `suppliers`, `ingredients`, `ingredient_cost_state`, `recipes`, `recipe_lines`, `price_update_batches`, `ingredient_price_log`, `ingredient_snapshots`, `impact_cascade_runs`, `impact_cascade_items`, `alerts`, `billing_customers`, `billing_subscriptions`, `billing_events`, `menu_price_audit_log` (Build 2.9 — verified live at 2.9A; Build 3.0 added recipe CSV import code paths but no schema changes).
 
@@ -117,7 +121,7 @@ All tables have RLS enabled.
 
 ## Known live limitations / risks
 
-1. **Dev project reused as live backend.** `margin-maestro-dev` was chosen as the live backend by explicit user decision. Test/demo/beta data may coexist with real beta data. Migration to a separate `margin-maestro-prod` project is recommended before wider production rollout (Build 3.2).
+1. **Single Supabase backend reused for live beta (intentional).** `margin-maestro-dev` was chosen as the live backend by intentional user decision to avoid an additional Supabase project cost during beta. Test/demo/beta data may coexist with real beta data. Mitigation for this phase: stronger backup + QA discipline. Migration to a separate `margin-maestro-prod` (Build 3.2) is **future optional hardening** to revisit before wider commercial rollout, not an immediate next build.
 2. **Stripe verification deferred.** Billing UI and Edge Function stubs exist but the Stripe test-mode flow has not been exercised end-to-end on the live URL.
 3. **Sentry DSN optional / unset.** Monitoring helpers are no-ops without `VITE_SENTRY_DSN`.
 4. **Google OAuth production hardening.** OAuth consent screen and authorized domains have not been audited for production verification status.

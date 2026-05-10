@@ -109,13 +109,16 @@ function QaMvpReadinessPage() {
 
       // W-X: Live deployment (Build 2.8A)
       next.push({ label: "W. Live deployment active", status: "pass", detail: "https://margin-maestro.vercel.app — Vercel project margin-maestro" });
-      next.push({ label: "X. Separate production Supabase recommended", status: "warn", detail: "margin-maestro-dev currently reused as live backend by explicit user choice" });
+      next.push({ label: "X. Single Supabase backend reused for live beta", status: "warn", detail: "Intentional decision to avoid additional cost during beta. Separate margin-maestro-prod is future optional hardening, not an immediate next build." });
 
       // Y: Menu Price Audit Trail (Build 2.9A — Accepted)
       next.push({ label: "Y. Menu price audit trail accepted", status: "pass", detail: "Build 2.9A: live-verified — RLS, append-only (no UPDATE/DELETE), Apply Price + manual recipe edit integrations." });
 
-      // Z: Recipe CSV Import (Build 3.0)
-      next.push({ label: "Z. Recipe CSV Import implemented", status: "pass", detail: "Build 3.0 — two-file CSV (recipes + lines), preview with validations, append/replace line modes, audit on dish menu prices (source=import). Does not create ingredients, suppliers, batches, or billing rows." });
+      // Z: Recipe CSV Import (Build 3.0A — Accepted; update path atomic since 3.4)
+      next.push({ label: "Z. Recipe CSV Import accepted (update path atomic via RPC since 3.4)", status: "pass", detail: "Two-file CSV; preview/apply with duplicate + line modes; source=import audit. Update path's menu_price uses atomic RPC; create path remains best-effort." });
+
+      // AA: Atomic RPC Hardening (Build 3.4)
+      next.push({ label: "AA. Apply Price + audit atomic via RPC", status: "pass", detail: "Build 3.4 — apply_dish_menu_price_with_audit RPC writes menu_price + menu_price_audit_log in one transaction. See /qa-atomic-rpc." });
 
       if (!cancelled) { setChecks(next); setDone(true); }
     })();
@@ -132,7 +135,7 @@ function QaMvpReadinessPage() {
 
   return (
     <AppShell>
-      <PageHeader title="QA — MVP Readiness" description="Build 3.0: all modules Supabase-backed; menu price audit accepted; recipe CSV import added." />
+      <PageHeader title="QA — MVP Readiness" description="Build 3.4: atomic RPC hardening of Apply Price + audit; recipe CSV import update path atomic on menu_price." />
       <div className="space-y-6 p-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between"><CardTitle className="text-base">Overall status</CardTitle><OverallBadge status={summary.overall} /></CardHeader>
@@ -152,7 +155,7 @@ function QaMvpReadinessPage() {
             ))}
           </CardContent>
         </Card>
-        <p className="text-[11px] text-muted-foreground">No tokens or secrets displayed. Build 3.0 — Recipe CSV Import.</p>
+        <p className="text-[11px] text-muted-foreground">No tokens or secrets displayed. Build 3.4 — Atomic RPC Hardening.</p>
       </div>
     </AppShell>
   );

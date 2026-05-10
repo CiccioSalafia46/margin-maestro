@@ -65,17 +65,14 @@ export function DishAnalysisView({ initialDishId }: { initialDishId?: string }) 
     if (!window.confirm(`Apply menu price $${newPrice.toFixed(2)} to ${recipe.name}? This updates Margin Maestro only, not POS.`)) return;
     try {
       const { applyDishMenuPrice } = await import("@/data/api/applyPriceApi");
-      const result = await applyDishMenuPrice(activeRestaurantId, recipe.id, newPrice, {
+      await applyDishMenuPrice(activeRestaurantId, recipe.id, newPrice, {
         origin: "dish-analysis",
         target_gpm: targetGpm,
         cost_per_serving: metrics?.cost_per_serving ?? undefined,
         suggested_price: metrics?.suggested_menu_price ?? undefined,
       });
-      if (result.audit_recorded) {
-        toast.success(`Menu price updated to $${newPrice.toFixed(2)}. Audit entry recorded.`);
-      } else {
-        toast.warning(`Price updated to $${newPrice.toFixed(2)}, but audit entry could not be recorded. Please review later.`);
-      }
+      // Build 3.4: atomic RPC — success means price + audit committed together.
+      toast.success(`Menu price updated to $${newPrice.toFixed(2)} and audit entry recorded.`);
       await load();
       void loadAuditHistory();
     } catch (e) {

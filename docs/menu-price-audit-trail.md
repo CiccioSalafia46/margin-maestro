@@ -62,7 +62,9 @@ No service-role usage in the browser. No cross-tenant reads. No broad `authentic
 
 ## Where audit rows come from
 
-### 1. Apply Price (`source = 'apply_price'`)
+> **Build 3.4 update.** Apply Price and Recipe CSV Import's update path now write the dish `menu_price` change and the audit row in a single SQL RPC call (`public.apply_dish_menu_price_with_audit`), so the two writes are atomic. See `docs/atomic-rpc-hardening.md`. Manual recipe edits and recipe-import create paths remain best-effort by design.
+
+### 1. Apply Price (`source = 'apply_price'`) — atomic since Build 3.4
 
 `src/data/api/applyPriceApi.ts:applyDishMenuPrice` (Build 2.4 + 2.9):
 
@@ -89,9 +91,9 @@ When the patch includes `menu_price`, the function reads the recipe's prior `men
 
 Intermediate recipes never produce menu price audit rows (their `menu_price` is irrelevant).
 
-### 3. Import (`source = 'import'` — wired in Build 3.0)
+### 3. Import (`source = 'import'` — wired in Build 3.0, accepted in Build 3.0A)
 
-Recipe CSV Import (Build 3.0) writes `source = 'import'` audit rows for every imported dish whose `menu_price` is set or changed (created or updated). The `context` payload contains `{ origin: "recipe-csv-import", action: "create" | "update", row_number }`. See `docs/recipe-csv-import.md`.
+Recipe CSV Import writes `source = 'import'` audit rows for every imported dish whose `menu_price` is set or changed (created or updated). The `context` payload contains `{ origin: "recipe-csv-import", action: "create" | "update", row_number }`. Live-verified during Build 3.0A. See `docs/recipe-csv-import.md`.
 
 Note: when an import update path runs (`duplicate_mode = 'update'` and price changed), `updateRecipe` also independently writes a `source = 'manual_recipe_edit'` row from its Build 2.9 wiring. Both rows coexist intentionally so the historical record reflects both the import operator action and the underlying recipe-edit code path.
 

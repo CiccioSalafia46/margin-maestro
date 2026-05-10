@@ -87,13 +87,16 @@ function QaBetaLaunchPage() {
       next.push({ label: "AD. Vercel deployment config present", status: "pass", detail: "vercel.json + api/server.mjs" });
       next.push({ label: "AE. Supabase Auth redirect URLs configured for live domain", status: "pass", detail: "Site URL + 16 redirect URLs in supabase/config.toml" });
       next.push({ label: "AF. Google OAuth manually verified on live", status: "pass", detail: "Confirmed by user on https://margin-maestro.vercel.app" });
-      next.push({ label: "AG. Live backend reuses dev project", status: "warn", detail: "margin-maestro-dev used as live by explicit user choice — separate prod project recommended" });
+      next.push({ label: "AG. Single Supabase backend reused for live beta", status: "warn", detail: "Intentional decision to avoid additional cost during beta. Separate margin-maestro-prod is future optional hardening; recommend stronger backup/QA discipline instead." });
 
       // AH: Menu Price Audit Trail (Build 2.9A — Accepted)
       next.push({ label: "AH. Menu price audit trail accepted", status: "pass", detail: "Build 2.9A: live-verified — RLS append-only; Apply Price + manual recipe edit; not ingredient price log; no POS publishing." });
 
-      // AI: Recipe CSV Import (Build 3.0)
-      next.push({ label: "AI. Recipe CSV Import implemented", status: "pass", detail: "Build 3.0 — recipes + recipe-lines CSV, preview/apply, audit dish menu prices (source=import); no ingredient creation, no batches, no billing, no POS." });
+      // AI: Recipe CSV Import (Build 3.0A — Accepted)
+      next.push({ label: "AI. Recipe CSV Import accepted", status: "pass", detail: "Build 3.0A: live-verified — recipes + recipe-lines CSV, preview/apply, audit dish menu prices (source=import); no ingredient creation, no batches, no billing, no POS." });
+
+      // AJ: Atomic RPC Hardening (Build 3.4)
+      next.push({ label: "AJ. Apply Price + audit atomic via RPC", status: "pass", detail: "Build 3.4 — apply_dish_menu_price_with_audit RPC. Recipe import update path also uses RPC for menu_price changes. See /qa-atomic-rpc." });
 
       if (!cancelled) { setChecks(next); setDone(true); }
     })();
@@ -110,7 +113,7 @@ function QaBetaLaunchPage() {
 
   return (
     <AppShell>
-      <PageHeader title="QA — Beta Launch" description="Build 3.0: beta readiness, route health, security, live deployment, menu price audit, recipe CSV import." />
+      <PageHeader title="QA — Beta Launch" description="Build 3.4: beta readiness + atomic Apply Price/audit via SQL RPC." />
       <div className="space-y-6 p-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between"><CardTitle className="text-base">Overall status</CardTitle><OverallBadge status={summary.overall} /></CardHeader>
@@ -125,7 +128,7 @@ function QaBetaLaunchPage() {
             {checks.map((c) => (<div key={c.label} className="flex items-start justify-between gap-3 border-b py-2 last:border-b-0"><div className="min-w-0"><p className="text-sm font-medium">{c.label}</p>{c.detail && <p className="text-xs text-muted-foreground">{c.detail}</p>}</div><StatusBadge status={c.status} /></div>))}
           </CardContent>
         </Card>
-        <p className="text-[11px] text-muted-foreground">Build 3.0 — Recipe CSV Import.</p>
+        <p className="text-[11px] text-muted-foreground">Build 3.4 — Atomic RPC Hardening.</p>
       </div>
     </AppShell>
   );

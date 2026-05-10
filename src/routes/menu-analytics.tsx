@@ -70,14 +70,11 @@ function MenuAnalyticsPage() {
     if (!window.confirm(`Apply menu price $${newPrice.toFixed(2)} to ${dishName}? This updates Margin Maestro only, not POS.`)) return;
     try {
       const { applyDishMenuPrice } = await import("@/data/api/applyPriceApi");
-      const result = await applyDishMenuPrice(activeRestaurantId, recipeId, newPrice, {
+      await applyDishMenuPrice(activeRestaurantId, recipeId, newPrice, {
         origin: "menu-analytics",
       });
-      if (result.audit_recorded) {
-        toast.success(`Menu price updated to $${newPrice.toFixed(2)}. Audit entry recorded.`);
-      } else {
-        toast.warning(`Price updated to $${newPrice.toFixed(2)}, but audit entry could not be recorded. Please review later.`);
-      }
+      // Build 3.4: atomic RPC — success means price + audit committed together.
+      toast.success(`Menu price updated to $${newPrice.toFixed(2)} and audit entry recorded.`);
       await load();
     } catch (e) { toast.error(errMsg(e)); }
   };

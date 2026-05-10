@@ -1,18 +1,27 @@
-// Apply Price API — Build 2.4 (audit integration added in Build 2.9).
-// Updates recipe menu_price only. Does not write ingredient_price_log,
-// price_update_batches, billing rows, or POS publishing.
-// Build 2.9: after a successful menu_price update, an append-only
-// menu_price_audit_log row is recorded with source = "apply_price".
+// Apply Price API — Build 2.4, atomic via RPC since Build 3.4.
+// Updates a dish recipe's menu_price AND inserts the corresponding
+// menu_price_audit_log row in one server-side SQL function call, so the price
+// update and the audit row succeed or fail together.
+//
+// Build 3.4 RPC: public.apply_dish_menu_price_with_audit(...).
+// Does NOT write ingredient_price_log, does NOT create price_update_batches,
+// does NOT create billing rows, and does NOT publish to a POS.
 
 import { supabase } from "./supabaseClient";
-import { createMenuPriceAuditEntry } from "./menuPriceAuditApi";
 import type { ApiError, RestaurantRole } from "./types";
 
 function toApiError(e: unknown): ApiError {
   const raw = typeof e === "object" && e !== null && "message" in e ? String((e as { message?: unknown }).message ?? "") : String(e ?? "");
   const code = (e as { code?: string } | null)?.code;
   if (raw.includes("not authenticated")) return { code: "auth", message: "Please sign in again." };
-  if (code === "42501" || /permission denied|row-level security/i.test(raw)) return { code: "permission", message: "You don't have permission." };
+  if (code === "42501" || /permission denied|row-level security|requires owner or manager/i.test(raw)) {
+    return { code: "permission", message: "You don't have permission." };
+  }
+  if (/recipe not found/i.test(raw)) return { code: "not_found", message: "Recipe not found." };
+  if (/must be greater than zero/i.test(raw)) return { code: "validation", message: "Price must be greater than zero." };
+  if (/only valid for dish/i.test(raw)) return { code: "validation", message: "Apply Price is only available for dish recipes." };
+  if (/recipe is inactive/i.test(raw)) return { code: "validation", message: "This dish is inactive." };
+  if (/invalid source/i.test(raw)) return { code: "validation", message: "Invalid audit source." };
   return { code: "unknown", message: raw || "Something went wrong." };
 }
 
@@ -40,28 +49,18 @@ export interface ApplyPriceContext {
 }
 
 export interface ApplyPriceResult {
-  /** True when the menu_price_audit_log row was inserted successfully. */
+  /** Always true on success since Build 3.4: the RPC writes both atomically. */
   audit_recorded: boolean;
-  /** Friendly message when audit insert failed; raw DB errors never leak here. */
+  /** Reserved for future fallback paths; unused with the atomic RPC. */
   audit_error?: string;
-  /** The previous menu_price (may be null if recipe had no price). */
+  /** The previous menu_price (may be null if recipe had no prior price). */
   old_menu_price: number | null;
   /** The new menu_price persisted on the recipe. */
   new_menu_price: number;
-}
-
-interface RecipeReadback {
-  id: string;
-  restaurant_id: string;
-  name: string;
-  kind: string;
-  is_active: boolean;
-  menu_price: number | null;
-  menu_category_id: string | null;
-}
-
-interface CategoryReadback {
-  name: string | null;
+  /** Audit row id (Build 3.4). */
+  audit_log_id?: string;
+  /** Server-side timestamp of the atomic write (Build 3.4). */
+  changed_at?: string;
 }
 
 export async function applyDishMenuPrice(
@@ -73,76 +72,37 @@ export async function applyDishMenuPrice(
   const err = validateApplyPriceInput(newMenuPrice);
   if (err) throw { code: "validation", message: err } as ApiError;
 
-  // 1. Read current recipe to capture old price + recipe-name-at-time + kind.
-  const { data: existing, error: readError } = await supabase
-    .from("recipes")
-    .select("id, restaurant_id, name, kind, is_active, menu_price, menu_category_id")
-    .eq("id", recipeId)
-    .eq("restaurant_id", restaurantId)
-    .maybeSingle();
-  if (readError) throw toApiError(readError);
-  if (!existing) throw { code: "not_found", message: "Recipe not found." } as ApiError;
+  // Build a JSON-safe context payload. Undefined values become null so the
+  // audit row's jsonb column stores them as keys with null values rather than
+  // dropping them silently.
+  const contextPayload = {
+    origin: context.origin ?? null,
+    target_gpm: context.target_gpm ?? null,
+    cost_per_serving: context.cost_per_serving ?? null,
+    suggested_price: context.suggested_price ?? null,
+    reason: context.reason ?? null,
+  };
 
-  const recipe = existing as RecipeReadback;
-  if (recipe.kind !== "dish")
-    throw { code: "validation", message: "Apply Price is only available for dish recipes." } as ApiError;
-  if (!recipe.is_active)
-    throw { code: "validation", message: "This dish is inactive." } as ApiError;
+  const { data, error } = await supabase.rpc("apply_dish_menu_price_with_audit", {
+    p_restaurant_id: restaurantId,
+    p_recipe_id: recipeId,
+    p_new_menu_price: newMenuPrice,
+    p_source: "apply_price",
+    p_note: null,
+    p_context: contextPayload as never,
+  });
 
-  const oldMenuPrice = recipe.menu_price;
+  if (error) throw toApiError(error);
 
-  // 2. Optionally read category name (best-effort, non-blocking on failure).
-  let categoryName: string | null = null;
-  if (recipe.menu_category_id) {
-    const { data: cat } = await supabase
-      .from("menu_categories")
-      .select("name")
-      .eq("id", recipe.menu_category_id)
-      .eq("restaurant_id", restaurantId)
-      .maybeSingle();
-    categoryName = (cat as CategoryReadback | null)?.name ?? null;
-  }
-
-  // 3. Update menu_price.
-  const { error: updateError } = await supabase
-    .from("recipes")
-    .update({ menu_price: newMenuPrice })
-    .eq("id", recipeId)
-    .eq("restaurant_id", restaurantId);
-  if (updateError) throw toApiError(updateError);
-
-  // 4. Best-effort audit insert. Failure here does NOT roll back the price update
-  //    (client-orchestrated, not atomic) — the caller is told via ApplyPriceResult.
-  let audit_recorded = true;
-  let audit_error: string | undefined;
-  try {
-    await createMenuPriceAuditEntry({
-      restaurant_id: restaurantId,
-      recipe_id: recipeId,
-      recipe_name_at_time: recipe.name,
-      category_name_at_time: categoryName,
-      old_menu_price: oldMenuPrice,
-      new_menu_price: newMenuPrice,
-      source: "apply_price",
-      context: {
-        origin: context.origin ?? null,
-        target_gpm: context.target_gpm ?? null,
-        cost_per_serving: context.cost_per_serving ?? null,
-        suggested_price: context.suggested_price ?? null,
-        reason: context.reason ?? null,
-      },
-    });
-  } catch (e) {
-    audit_recorded = false;
-    const apiErr = e as ApiError | undefined;
-    audit_error = apiErr?.message ?? "Audit entry could not be recorded.";
-  }
+  const row = Array.isArray(data) ? data[0] : data;
+  if (!row) throw { code: "unknown", message: "Atomic apply price returned no row." } as ApiError;
 
   return {
-    audit_recorded,
-    audit_error,
-    old_menu_price: oldMenuPrice,
+    audit_recorded: true,
+    old_menu_price: (row as { old_menu_price: number | null }).old_menu_price ?? null,
     new_menu_price: newMenuPrice,
+    audit_log_id: (row as { audit_log_id: string }).audit_log_id,
+    changed_at: (row as { changed_at: string }).changed_at,
   };
 }
 

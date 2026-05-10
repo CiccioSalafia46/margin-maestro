@@ -8,6 +8,10 @@ Manual and automated QA checklists for Margin IQ.
 
 > **Build 3.0 update.** New automated route `/qa-recipe-import` (checks A–Y) covers parsers, validators (synthetic in-memory rows), preview-doesn't-mutate, role gating, side-effect absence (no ingredient creation, no `ingredient_price_log`, no `price_update_batches`, no `billing_*`), `menu_price_audit_log source='import'` integration, `menu_items` absence, secret exposure, localStorage persistence. `/qa-mvp-readiness` adds check Z; `/qa-beta-launch` adds check AI; `/qa-import-export` adds checks W–X. See `docs/recipe-csv-import.md`.
 
+> **Build 3.0A update.** Recipe CSV Import accepted live. `/qa-recipe-import` description + footer bumped to 3.0A; `/qa-mvp-readiness` check Z and `/qa-beta-launch` check AI report "accepted". `/qa-import-export` adds check Y (XLS/XLSM remains future). `/qa-mvp-readiness` check X and `/qa-beta-launch` check AG reframed: single-backend live reuse is an **intentional cost decision**, not an open recommendation. See `docs/recipe-csv-import.md`.
+
+> **Build 3.4 update.** New automated route `/qa-atomic-rpc` (22 checks A–V) probes the new `apply_dish_menu_price_with_audit` SQL RPC, documents grant model, covers defensive role/kind/price/source validation, atomicity guarantee, API integration, recipe-import audit atomicity, manual recipe edit limitation, side-effect absence. `/qa-apply-price` adds T+U; `/qa-menu-price-audit` and `/qa-recipe-import` rephrased; `/qa-mvp-readiness` adds AA; `/qa-beta-launch` adds AJ. See `docs/atomic-rpc-hardening.md`.
+
 ---
 
 ## Auth QA

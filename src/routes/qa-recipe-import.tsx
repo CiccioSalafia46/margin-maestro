@@ -147,8 +147,8 @@ function QaRecipeImportPage() {
       next.push({ label: "S. Import does not create price_update_batches", status: "pass", detail: "no insert path into price_update_batches" });
       next.push({ label: "T. Import does not create billing records", status: "pass", detail: "no insert path into billing_*" });
 
-      // U. menu_price_audit_log writes for dish menu prices
-      next.push({ label: "U. May create menu_price_audit_log entries (source=import) for dish menu prices", status: "pass", detail: "applyRecipeImport calls createMenuPriceAuditEntry with source='import'" });
+      // U. menu_price_audit_log writes for dish menu prices (Build 3.4 update path atomic)
+      next.push({ label: "U. May create menu_price_audit_log entries (source=import) for dish menu prices", status: "pass", detail: "Build 3.4: update path uses apply_dish_menu_price_with_audit RPC (atomic). Create path still best-effort." });
 
       // V. menu_items absent
       try {
@@ -200,7 +200,7 @@ function QaRecipeImportPage() {
     <AppShell>
       <PageHeader
         title="QA — Recipe Import"
-        description="Build 3.0: Recipe CSV Import — parser, validators, side-effect absence, secret + localStorage scan."
+        description="Build 3.4: Recipe CSV Import — update path uses atomic RPC for dish menu_price changes."
       />
       <div className="space-y-6 p-6">
         <Card>
@@ -236,7 +236,10 @@ function QaRecipeImportPage() {
         </Card>
 
         <p className="text-[11px] text-muted-foreground">
-          Build 3.0 — Recipe CSV Import. This QA page does not import recipes or mutate data.
+          Build 3.4 — Atomic RPC integration. This QA page does not import recipes or mutate data.
+          Recipe import is owner/manager only, requires existing ingredients, does NOT create ingredients/suppliers/batches/billing rows,
+          does NOT publish to POS. Update path's dish menu_price uses atomic RPC (source=import);
+          create path is still best-effort, manual recipe edit audit remains best-effort.
         </p>
       </div>
     </AppShell>

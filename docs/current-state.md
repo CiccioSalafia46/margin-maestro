@@ -1,8 +1,8 @@
 # Current State
 
 **Date:** 2026-05-10
-**Build:** 3.0 — Recipe CSV Import
-**Branch:** `build-2.9-menu-price-audit` (3.0 implemented on top of 2.9A)
+**Build:** 3.4 — Atomic RPC Hardening
+**Branch:** `main` (Build 2.9 → 2.9A → 3.0 → 3.0A merged in; 3.4 implemented on top)
 **Backend:** Self-owned Supabase project `margin-maestro-dev` (`atdvrdhzcbtxvzgvoxhb`) — currently reused as live backend by explicit user choice.
 **Frontend hosting:** Vercel project `margin-maestro` — https://margin-maestro.vercel.app
 
@@ -34,12 +34,32 @@
 
 ## Known live limitations / risks
 
-- Live backend reuses dev Supabase project (OI-16, → Build 3.2).
+- Live backend reuses dev Supabase project (OI-16) — **intentional cost decision; Build 3.2 future optional**. Mitigation: strengthen backup + QA discipline. Test/demo/beta data may coexist with real beta data.
 - Stripe verification deferred (OI-17, → Build 2.2B).
 - Sentry DSN optional / unset (OI-19, → Build 3.3).
 - Transactional invite emails deferred (OI-20, → Build 3.1).
 - Google OAuth production hardening pending (OI-21).
 - Audit insert is client-orchestrated, not atomic with the price update — the UI surfaces a warning when the audit row fails; price update remains.
+
+## Build 3.4 highlights
+
+- New SQL RPC `public.apply_dish_menu_price_with_audit(...)` — atomic dish `menu_price` update + `menu_price_audit_log` insert in one transaction.
+- **No new tables.** **No RLS changes.** Functions-only migration `20260510180000_build_3_4_atomic_rpc_hardening.sql`. **Not auto-applied** — run `supabase db push` when ready.
+- `SECURITY INVOKER`. Existing RLS still enforced. `set search_path = public`. Defensive `auth.uid()` + `has_restaurant_role(..., array['owner','manager'])` check. `REVOKE` from `public`/`anon`; `GRANT EXECUTE` to `authenticated` only.
+- `src/data/api/applyPriceApi.ts` — `applyDishMenuPrice` rewritten to call the RPC; `audit_recorded` is always `true` on success.
+- `src/data/api/recipeImportApi.ts` — update path's dish `menu_price` change now goes through the RPC (`source='import'`); price field stripped from the `updateRecipe` patch to avoid double-update.
+- UI: success toast simplified to "Menu price updated to $X and audit entry recorded." Degraded warning path no longer needed.
+- New automated QA `/qa-atomic-rpc` (22 checks). `/qa-apply-price` adds T+U; `/qa-menu-price-audit` rephrased; `/qa-recipe-import` rephrased; `/qa-mvp-readiness` adds AA; `/qa-beta-launch` adds AJ.
+- Settings → Developer QA adds `/qa-atomic-rpc`. E2E `qa-routes.spec.ts` includes the new route.
+- Documentation: `docs/atomic-rpc-hardening.md` created. `current-state`, `build-log`, `roadmap`, `open-issues`, `apply-price`, `menu-price-audit-trail`, `recipe-csv-import`, `qa-checklists`, `beta-checklist`, `live-deployment`, `security-review` updated.
+
+## Build 3.0A acceptance highlights
+
+- Recipe CSV Import (Build 3.0) functionally verified on https://margin-maestro.vercel.app.
+- `/qa-recipe-import` accepted as PASS (24 PASS / 1 contextual WARN / 0 FAIL for owner/manager session).
+- QA copy refreshed across `/qa-recipe-import`, `/qa-import-export`, `/qa-mvp-readiness` (check Z), `/qa-beta-launch` (check AI), `/qa-auth` (footer).
+- **Single-backend decision reframed.** `margin-maestro-dev` remains the live backend by intentional cost decision. Separate `margin-maestro-prod` is future optional hardening — not the next recommended build. Build 3.2 is no longer pinned as immediate next.
+- No new code paths; no migrations; no RLS changes.
 
 ## Build 3.0 highlights
 
@@ -69,9 +89,9 @@
 
 ## Next Steps
 
-1. Build 3.0A — Recipe CSV Import Acceptance (live verification).
-2. Build 3.2 — Separate Production Supabase Migration.
+1. **Build 3.4A — Atomic RPC Acceptance.** Run `supabase db push` to deploy `20260510180000_build_3_4_atomic_rpc_hardening.sql`. Live-verify `/qa-atomic-rpc`, exercise Apply Price + Recipe Import update path, confirm audit rows record `audit_log_id` from RPC.
+2. Build 3.1 — Transactional Invite Emails.
 3. Build 2.2B — Stripe Test Verification.
-4. Build 3.1 — Transactional Invite Emails.
-5. Build 3.3 — Production Monitoring Provider Setup.
-6. Build 3.4 — Menu Price Audit / Recipe Import Atomic RPC (closes OI-28).
+4. Build 3.3 — Production Monitoring Provider Setup.
+5. Build 3.5 — XLS/XLSM Analysis / Formula Gap Review.
+6. Build 3.2 — Separate Production Supabase Migration (future optional hardening, **not** immediate). Strengthen backup + QA discipline on `margin-maestro-dev` in the meantime.

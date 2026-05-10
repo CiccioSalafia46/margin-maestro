@@ -10,9 +10,32 @@ Forward implementation plan for Margin IQ — Restaurant Margin Intelligence Saa
 
 ---
 
+## Build 3.4 — Atomic RPC Hardening
+
+**Status:** Implemented (acceptance pending — Build 3.4A).
+
+**Goal:** Move Apply Price + audit into a single SQL function so the price update and the audit row commit or roll back together. Same RPC is also used by Recipe CSV Import's update path for dish `menu_price` changes (source = 'import'). Manual recipe edit audit and recipe-import create path remain best-effort by design.
+
+**Highlights:**
+- New SQL function `apply_dish_menu_price_with_audit(...)` (SECURITY INVOKER, role-checked, REVOKED from anon/public).
+- No new tables. No RLS changes. Functions-only migration.
+- `/qa-atomic-rpc` (22 checks) added.
+
+**Out of scope:** broader recipe-edit RPC, recipe-creation RPC, ingredient import RPC, POS publishing, atomic batches.
+
+---
+
 ## Build 3.0 — Recipe CSV Import
 
-**Status:** Implemented (acceptance pending — Build 3.0A).
+**Status:** Accepted (Build 3.0A — live verification).
+
+---
+
+## Build 3.0A — Recipe CSV Import Accepted
+
+**Status:** Accepted.
+
+**Goal:** Live verification + acceptance polish for Build 3.0. QA copy refreshed; single-backend live decision reframed as intentional cost choice rather than open recommendation.
 
 **Goal:** Two-file CSV import (recipes + recipe lines) with preview, validation, duplicate-handling and line-handling modes. Owner/manager only. Recipe import does **not** create ingredients/suppliers/categories/batches/billing rows and does **not** publish to a POS. Imported dish menu prices write `source = 'import'` rows to `menu_price_audit_log`.
 
@@ -41,14 +64,17 @@ Forward implementation plan for Margin IQ — Restaurant Margin Intelligence Saa
 
 ---
 
-## Recommended next builds (post 3.0)
+## Recommended next builds (post 3.4)
 
-- **Build 3.0A — Recipe CSV Import Acceptance.** Live verification on `https://margin-maestro.vercel.app` with real recipes; QA `/qa-recipe-import` accepted; copy refresh.
-- **Build 3.2 — Separate Production Supabase Migration.** Cut over from `margin-maestro-dev` to `margin-maestro-prod`.
-- **Build 2.2B — Stripe Test Verification.** Exercise checkout + portal + webhook end-to-end on the live Vercel URL with Stripe test keys.
+- **Build 3.4A — Atomic RPC Acceptance (recommended next).** Deploy the RPC migration to live (`supabase db push`), live-verify `/qa-atomic-rpc`, run real Apply Price + Recipe Import update path, sign off as accepted.
 - **Build 3.1 — Transactional Invite Emails.** Email delivery for `restaurant_invitations`.
+- **Build 2.2B — Stripe Test Verification.** Exercise checkout + portal + webhook end-to-end on the live Vercel URL with Stripe test keys.
 - **Build 3.3 — Production Monitoring Provider Setup.** Configure Sentry DSN.
-- **Build 3.4 — Menu Price Audit / Recipe Import Atomic RPC.** Server-side function(s) wrapping `recipes.menu_price` updates and recipe-import phases in a single transaction. Closes OI-28 and the equivalent recipe-import limitation.
+- **Build 3.5 — XLS/XLSM Analysis / Formula Gap Review.** Scope what XLS/XLSM support would entail (parsing library options, formula evaluation, named ranges) before deciding whether to implement.
+
+### Future optional hardening (not next)
+
+- **Build 3.2 — Separate Production Supabase Migration.** Intentionally deferred. The user has chosen to keep `margin-maestro-dev` as the live backend during beta to avoid an additional Supabase project cost. Pragmatic mitigation is stronger backup + QA discipline on the current backend. Migration can be revisited before wider commercial rollout if the beta scales.
 
 ---
 

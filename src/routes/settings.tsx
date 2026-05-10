@@ -1410,6 +1410,7 @@ function DeveloperQa() {
         <QaLink to="/qa-live-deployment" label="Live Deployment QA" />
         <QaLink to="/qa-menu-price-audit" label="Menu Price Audit QA" />
         <QaLink to="/qa-recipe-import" label="Recipe Import QA" />
+        <QaLink to="/qa-atomic-rpc" label="Atomic RPC QA" />
       </CardContent>
     </Card>
   );

@@ -891,6 +891,23 @@ export type Database = {
         Args: { p_token: string }
         Returns: unknown
       }
+      apply_dish_menu_price_with_audit: {
+        Args: {
+          p_restaurant_id: string
+          p_recipe_id: string
+          p_new_menu_price: number
+          p_source?: string
+          p_note?: string | null
+          p_context?: Json | null
+        }
+        Returns: {
+          recipe_id: string
+          old_menu_price: number | null
+          new_menu_price: number
+          audit_log_id: string
+          changed_at: string
+        }[]
+      }
       create_restaurant_with_owner: {
         Args: { p_name: string }
         Returns: string

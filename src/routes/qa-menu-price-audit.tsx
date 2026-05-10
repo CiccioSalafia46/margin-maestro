@@ -62,8 +62,8 @@ function QaMenuPriceAuditPage() {
       // H. audit API exists
       next.push({ label: "H. audit API exists", status: "pass", detail: "src/data/api/menuPriceAuditApi.ts" });
 
-      // I. Apply Price integration
-      next.push({ label: "I. Apply Price integration writes audit", status: "pass", detail: "applyDishMenuPrice → createMenuPriceAuditEntry source=apply_price" });
+      // I. Apply Price integration (Build 3.4 — atomic RPC)
+      next.push({ label: "I. Apply Price integration writes audit atomically (RPC)", status: "pass", detail: "Build 3.4: applyDishMenuPrice → apply_dish_menu_price_with_audit RPC writes menu_price + audit in one transaction (source=apply_price)" });
 
       // J. Manual recipe edit integration
       next.push({ label: "J. Manual recipe edit writes audit", status: "pass", detail: "updateRecipe writes audit when dish menu_price changes (source=manual_recipe_edit)" });
@@ -143,7 +143,7 @@ function QaMenuPriceAuditPage() {
     <AppShell>
       <PageHeader
         title="QA — Menu Price Audit"
-        description="Build 2.9A — Accepted. Append-only audit of dish menu_price changes; Apply Price + manual recipe edit integration."
+        description="Build 3.4: append-only audit of dish menu_price changes; Apply Price + audit atomic via SQL RPC."
       />
       <div className="space-y-6 p-6">
         <Card>
@@ -179,9 +179,9 @@ function QaMenuPriceAuditPage() {
         </Card>
 
         <p className="text-[11px] text-muted-foreground">
-          Build 2.9A — Menu Price Audit Accepted. This QA page does not apply prices or mutate data.
-          Audit table verified live: RLS enabled, SELECT for members, INSERT for owner/manager,
-          no UPDATE policy, no DELETE policy. Append-only.
+          Build 3.4 — Apply Price + audit now atomic via SQL RPC. Audit table remains append-only
+          (RLS enabled, SELECT for members, INSERT for owner/manager, no UPDATE/DELETE).
+          This QA page does not mutate data.
         </p>
       </div>
     </AppShell>

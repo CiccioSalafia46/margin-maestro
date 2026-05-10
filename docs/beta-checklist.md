@@ -4,7 +4,9 @@ Manual acceptance flows for beta readiness.
 
 > **Build 2.9A add-on.** When verifying Apply Price or manual recipe `menu_price` edits, also confirm a row appears in `menu_price_audit_log` for the affected dish (visible in the read-only panel on `/dish-analysis/$id`). Live-verified during Build 2.9A.
 
-> **Build 3.0 add-on.** Recipe CSV Import (Settings → Import / Export → Import Recipes): try a small CSV with an existing ingredient, confirm preview shows correct counts, apply with `duplicate_mode = 'skip'` and `line_mode = 'append'`, then verify the new dish menu_price produced a `source = 'import'` row in `menu_price_audit_log` (visible on `/dish-analysis/$id`). Recipe import is owner/manager only; viewers should not see the card.
+> **Build 3.0 / 3.0A add-on (accepted).** Recipe CSV Import (Settings → Import / Export → Import Recipes): live-verified. The acceptance flow: small CSV with an existing ingredient → preview shows correct counts → apply with `duplicate_mode = 'skip'` and `line_mode = 'append'` → new dish menu_price produces a `source = 'import'` row in `menu_price_audit_log` (visible on `/dish-analysis/$id`). Recipe import is owner/manager only; viewers do not see the card.
+
+> **Build 3.4 add-on.** After deploying the new RPC migration, exercise Apply Price on a live dish from `/menu-analytics` and `/dish-analysis/$id` — confirm success toast says "Menu price updated to $X and audit entry recorded.", and verify the audit row appears with `audit_log_id` returned by the RPC. Then run an UPDATE-mode Recipe CSV Import on an existing dish to confirm the import path also writes an atomic audit row with `source = 'import'`.
 
 ## A. Auth and Onboarding
 - [ ] Signup with email/password

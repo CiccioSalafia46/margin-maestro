@@ -45,6 +45,7 @@ menu analytics → price log → snapshot → impact cascade → alerts
 | Alerts persistence (`alerts`, `audit_events`) | Build 1.8 |
 | Billing / subscriptions | Build 2.0 |
 | `menu_price_audit_log` | Build 2.9 |
+| RPC `apply_dish_menu_price_with_audit` (no new table) | Build 3.4 |
 
 ### Auth & Security
 

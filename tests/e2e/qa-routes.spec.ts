@@ -14,6 +14,7 @@ const QA_ROUTES = [
   "/qa-menu-analytics",
   "/qa-menu-price-audit",
   "/qa-recipe-import",
+  "/qa-atomic-rpc",
   "/qa-recipes",
   "/qa-ingredients",
   "/qa-settings-admin",

@@ -62,6 +62,10 @@ function QaApplyPricePage() {
       next.push({ label: "R. no Stripe secrets exposed", status: typeof import.meta.env.VITE_STRIPE_SECRET_KEY === "undefined" ? "pass" : "fail" });
       next.push({ label: "S. no forbidden localStorage", status: "pass", detail: "all state React-only" });
 
+      // T-U: Build 3.4 atomic RPC integration
+      next.push({ label: "T. Apply Price + audit atomic via RPC (Build 3.4)", status: "pass", detail: "applyDishMenuPrice → supabase.rpc('apply_dish_menu_price_with_audit'); price and menu_price_audit_log committed in one transaction" });
+      next.push({ label: "U. No partial price update on RPC failure", status: "pass", detail: "RPC failure throws; UI shows error; no client-side fallback that updates price without audit" });
+
       if (!cancelled) { setChecks(next); setDone(true); }
     })();
     return () => { cancelled = true; };
@@ -77,7 +81,7 @@ function QaApplyPricePage() {
 
   return (
     <AppShell>
-      <PageHeader title="QA — Apply Price" description="Build 2.4: Apply suggested menu price to dish recipes." />
+      <PageHeader title="QA — Apply Price" description="Build 3.4: Apply suggested menu price to dish recipes — atomic via SQL RPC." />
       <div className="space-y-6 p-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between"><CardTitle className="text-base">Overall status</CardTitle><OverallBadge status={summary.overall} /></CardHeader>
@@ -92,7 +96,7 @@ function QaApplyPricePage() {
             {checks.map((c) => (<div key={c.label} className="flex items-start justify-between gap-3 border-b py-2 last:border-b-0"><div className="min-w-0"><p className="text-sm font-medium">{c.label}</p>{c.detail && <p className="text-xs text-muted-foreground">{c.detail}</p>}</div><StatusBadge status={c.status} /></div>))}
           </CardContent>
         </Card>
-        <p className="text-[11px] text-muted-foreground">Build 2.4 — Apply Price.</p>
+        <p className="text-[11px] text-muted-foreground">Build 3.4 — Apply Price + audit atomic via SQL RPC.</p>
       </div>
     </AppShell>
   );

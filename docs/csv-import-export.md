@@ -1,6 +1,6 @@
-# CSV Import/Export — Build 3.0
+# CSV Import/Export — Build 3.0A (accepted)
 
-> **Build 3.0 update.** Recipe CSV Import (two-file: `recipes` + `recipe_lines`) is now available alongside the existing Ingredient Import. See `docs/recipe-csv-import.md` for the full specification, validation rules, duplicate/line modes, and audit integration. Recipe import does NOT create ingredients, suppliers, categories, batches, or billing rows; it does NOT publish to a POS. Build 3.0 also adds `Export Recipe Lines` to the Export Data card.
+> **Build 3.0A update (accepted).** Recipe CSV Import (two-file: `recipes` + `recipe_lines`) is live-verified alongside the existing Ingredient Import. See `docs/recipe-csv-import.md`. Recipe import does NOT create ingredients/suppliers/categories/batches/billing rows; it does NOT publish to a POS. `Export Recipe Lines` is available in the Export Data card.
 
 ## Import
 

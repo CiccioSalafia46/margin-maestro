@@ -799,6 +799,68 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 
 ---
 
+## Build 3.0A — Recipe CSV Import Accepted
+
+**Status:** Accepted.
+
+- Recipe CSV Import (Build 3.0) functionally verified on the live URL https://margin-maestro.vercel.app.
+- **No code changes** beyond label/copy/docs. No migration. No new tables. No RLS changes.
+- Build label: "Build 3.0A — Recipe CSV Import Accepted".
+- `/qa-recipe-import`: description + footer bumped to 3.0A.
+- `/qa-mvp-readiness`: check Z reads "Recipe CSV Import accepted"; check X reframed to "Single Supabase backend reused for live beta — intentional decision". Footer + description bumped.
+- `/qa-beta-launch`: check AI reads "Recipe CSV Import accepted"; check AG reframed to "Single Supabase backend reused for live beta — intentional decision". Footer + description bumped.
+- `/qa-import-export`: checks W–X bumped to 3.0A; new check Y notes XLS/XLSM remains future.
+- `/qa-auth`: footer reflects 3.0A and the intentional single-backend decision.
+- **Strategic reframing.** Separate `margin-maestro-prod` project is no longer the "recommended next" — it remains future optional hardening. The pragmatic mitigation for the current beta phase is stronger backup + QA discipline on `margin-maestro-dev`.
+- Roadmap reordered: **Build 3.4 — Atomic RPC Hardening** moves up to the recommended next build; Build 3.2 demoted to optional future hardening.
+- Docs updated: `current-state.md`, `build-log.md`, `roadmap.md`, `open-issues.md`, `recipe-csv-import.md`, `menu-price-audit-trail.md` (light), `csv-import-export.md` (light), `recipes.md` (light), `live-deployment.md` (reframe single-backend), `production-readiness.md`, `deployment-guide.md` (light), `qa-checklists.md` (light), `beta-checklist.md` (light).
+
+**Known remaining limitations (carried forward):**
+- OI-28 — Apply Price + audit not atomic.
+- OI-29 — Recipe import not atomic.
+- OI-16 — single Supabase backend reused for live beta (intentional; mitigation: backup + QA discipline).
+- OI-17/18 — Stripe verification + billing rollout deferred.
+- OI-19 — Sentry DSN optional.
+- OI-20 — Transactional invite emails not implemented.
+- OI-21 — Google OAuth production hardening pending.
+- No XLS/XLSM. No POS/marketplace publishing.
+
+---
+
+## Build 3.4 — Atomic RPC Hardening
+
+**Status:** Implemented (acceptance pending — Build 3.4A).
+
+- **Migration** `supabase/migrations/20260510180000_build_3_4_atomic_rpc_hardening.sql` — functions only, **no new tables**, no RLS changes, no schema changes. Not auto-applied; deploy with `supabase db push`.
+- **New SQL function** `public.apply_dish_menu_price_with_audit(p_restaurant_id, p_recipe_id, p_new_menu_price, p_source default 'apply_price', p_note default null, p_context default '{}'::jsonb)` returns `(recipe_id, old_menu_price, new_menu_price, audit_log_id, changed_at)`.
+  - `SECURITY INVOKER`. `SET search_path = public`. No dynamic SQL.
+  - Defensive checks: `auth.uid()` non-null, `p_new_menu_price > 0`, `p_source ∈ {apply_price, manual_recipe_edit, import, system, other}`, `has_restaurant_role(p_restaurant_id, array['owner','manager'])`.
+  - Reads recipe `FOR UPDATE`, validates `kind = 'dish'` and `is_active = true`, looks up category name, updates `recipes.menu_price` + `updated_at`, computes `delta_amount` / `delta_percent` safely (null for null/zero old), inserts `menu_price_audit_log` row with `changed_by = auth.uid()`, `changed_at = now()`.
+  - `REVOKE ALL ... FROM public, anon`; `GRANT EXECUTE ... TO authenticated`.
+- **`src/data/api/applyPriceApi.ts`** rewritten: `applyDishMenuPrice` now performs a single `supabase.rpc('apply_dish_menu_price_with_audit', ...)` call. Returns `ApplyPriceResult { audit_recorded: true, old_menu_price, new_menu_price, audit_log_id, changed_at }` on success. On RPC failure, throws — no client-side fallback writes the price.
+- **`src/data/api/recipeImportApi.ts`** update path: for dish recipes whose imported `menu_price` differs from prior, the price column is stripped from the `updateRecipe` patch and a separate `supabase.rpc('apply_dish_menu_price_with_audit', { ..., p_source: 'import' })` call handles the price update + audit atomically. Other recipe fields still go through `updateRecipe`. Create path remains best-effort (`createRecipe` + `createMenuPriceAuditEntry`).
+- **UI toast copy** in `/menu-analytics` and `/dish-analysis/$id` simplified to "Menu price updated to $X and audit entry recorded." The degraded "audit could not be recorded" path was removed (cannot fire with atomic RPC).
+- **`integrations/supabase/types.ts`** — added `Functions.apply_dish_menu_price_with_audit` typing.
+- **New QA route** `/qa-atomic-rpc` (22 checks A–V): RPC reachability probe with intentionally-invalid args, grant model documentation, defensive role/kind/price/source validation, atomicity guarantee, API integration, recipe-import audit atomicity status, manual-recipe-edit limitation, side-effect absence, secret + localStorage scans.
+- **`/qa-apply-price`** extended with checks T (atomic via RPC) and U (no partial price update on RPC failure). Description + footer bumped to 3.4.
+- **`/qa-menu-price-audit`** check I rephrased to describe atomic RPC. Description + footer bumped to 3.4.
+- **`/qa-recipe-import`** check U rephrased to "update path uses RPC; create path best-effort". Description + footer bumped to 3.4.
+- **`/qa-mvp-readiness`** new check AA; description + footer bumped to 3.4.
+- **`/qa-beta-launch`** new check AJ; description + footer bumped to 3.4.
+- **`/qa-auth`** footer bumped to 3.4.
+- **Settings → Developer QA** adds link to `/qa-atomic-rpc`.
+- **E2E** `tests/e2e/qa-routes.spec.ts` includes `/qa-atomic-rpc`. No mutating tests added.
+- **Docs** created `docs/atomic-rpc-hardening.md`; updated `current-state`, `build-log`, `roadmap`, `open-issues` (OI-28 resolved on Apply Price front; OI-29 partially mitigated), `apply-price`, `menu-price-audit-trail`, `recipe-csv-import`, `qa-checklists`, `beta-checklist`, `live-deployment`, `security-review`.
+- Build label: "Build 3.4 — Atomic RPC Hardening".
+
+**Known limitations:**
+- Manual recipe edit (`updateRecipe`) still writes a best-effort `manual_recipe_edit` audit row — not atomic with the recipe-fields update. Splitting that path was deemed too risky for this build.
+- Recipe CSV Import **create** path still does `createRecipe` + best-effort audit insert. A "create-recipe-with-audit" RPC was deferred.
+- Recipe CSV Import update path: non-price recipe fields (name, category, serving, etc.) are still patched via `updateRecipe` — only the `menu_price` column + audit row are atomic with each other.
+- Single Supabase backend remains intentional for live beta — recommend taking a PITR checkpoint before applying the migration to the shared backend.
+
+---
+
 ## Build 2.7A — Monitoring Acceptance
 
 **Status:** Accepted

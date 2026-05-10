@@ -34,6 +34,7 @@ import { Route as QaCalculationsRouteImport } from './routes/qa-calculations'
 import { Route as QaBillingRouteImport } from './routes/qa-billing'
 import { Route as QaBetaLaunchRouteImport } from './routes/qa-beta-launch'
 import { Route as QaAuthRouteImport } from './routes/qa-auth'
+import { Route as QaAtomicRpcRouteImport } from './routes/qa-atomic-rpc'
 import { Route as QaApplyPriceRouteImport } from './routes/qa-apply-price'
 import { Route as QaAlertsRouteImport } from './routes/qa-alerts'
 import { Route as PriceTrendRouteImport } from './routes/price-trend'
@@ -181,6 +182,11 @@ const QaAuthRoute = QaAuthRouteImport.update({
   path: '/qa-auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const QaAtomicRpcRoute = QaAtomicRpcRouteImport.update({
+  id: '/qa-atomic-rpc',
+  path: '/qa-atomic-rpc',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const QaApplyPriceRoute = QaApplyPriceRouteImport.update({
   id: '/qa-apply-price',
   path: '/qa-apply-price',
@@ -302,6 +308,7 @@ export interface FileRoutesByFullPath {
   '/price-trend': typeof PriceTrendRoute
   '/qa-alerts': typeof QaAlertsRoute
   '/qa-apply-price': typeof QaApplyPriceRoute
+  '/qa-atomic-rpc': typeof QaAtomicRpcRoute
   '/qa-auth': typeof QaAuthRoute
   '/qa-beta-launch': typeof QaBetaLaunchRoute
   '/qa-billing': typeof QaBillingRoute
@@ -349,6 +356,7 @@ export interface FileRoutesByTo {
   '/price-trend': typeof PriceTrendRoute
   '/qa-alerts': typeof QaAlertsRoute
   '/qa-apply-price': typeof QaApplyPriceRoute
+  '/qa-atomic-rpc': typeof QaAtomicRpcRoute
   '/qa-auth': typeof QaAuthRoute
   '/qa-beta-launch': typeof QaBetaLaunchRoute
   '/qa-billing': typeof QaBillingRoute
@@ -397,6 +405,7 @@ export interface FileRoutesById {
   '/price-trend': typeof PriceTrendRoute
   '/qa-alerts': typeof QaAlertsRoute
   '/qa-apply-price': typeof QaApplyPriceRoute
+  '/qa-atomic-rpc': typeof QaAtomicRpcRoute
   '/qa-auth': typeof QaAuthRoute
   '/qa-beta-launch': typeof QaBetaLaunchRoute
   '/qa-billing': typeof QaBillingRoute
@@ -447,6 +456,7 @@ export interface FileRouteTypes {
     | '/price-trend'
     | '/qa-alerts'
     | '/qa-apply-price'
+    | '/qa-atomic-rpc'
     | '/qa-auth'
     | '/qa-beta-launch'
     | '/qa-billing'
@@ -494,6 +504,7 @@ export interface FileRouteTypes {
     | '/price-trend'
     | '/qa-alerts'
     | '/qa-apply-price'
+    | '/qa-atomic-rpc'
     | '/qa-auth'
     | '/qa-beta-launch'
     | '/qa-billing'
@@ -541,6 +552,7 @@ export interface FileRouteTypes {
     | '/price-trend'
     | '/qa-alerts'
     | '/qa-apply-price'
+    | '/qa-atomic-rpc'
     | '/qa-auth'
     | '/qa-beta-launch'
     | '/qa-billing'
@@ -590,6 +602,7 @@ export interface RootRouteChildren {
   PriceTrendRoute: typeof PriceTrendRoute
   QaAlertsRoute: typeof QaAlertsRoute
   QaApplyPriceRoute: typeof QaApplyPriceRoute
+  QaAtomicRpcRoute: typeof QaAtomicRpcRoute
   QaAuthRoute: typeof QaAuthRoute
   QaBetaLaunchRoute: typeof QaBetaLaunchRoute
   QaBillingRoute: typeof QaBillingRoute
@@ -794,6 +807,13 @@ declare module '@tanstack/react-router' {
       path: '/qa-auth'
       fullPath: '/qa-auth'
       preLoaderRoute: typeof QaAuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qa-atomic-rpc': {
+      id: '/qa-atomic-rpc'
+      path: '/qa-atomic-rpc'
+      fullPath: '/qa-atomic-rpc'
+      preLoaderRoute: typeof QaAtomicRpcRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/qa-apply-price': {
@@ -1011,6 +1031,7 @@ const rootRouteChildren: RootRouteChildren = {
   PriceTrendRoute: PriceTrendRoute,
   QaAlertsRoute: QaAlertsRoute,
   QaApplyPriceRoute: QaApplyPriceRoute,
+  QaAtomicRpcRoute: QaAtomicRpcRoute,
   QaAuthRoute: QaAuthRoute,
   QaBetaLaunchRoute: QaBetaLaunchRoute,
   QaBillingRoute: QaBillingRoute,

@@ -1,6 +1,6 @@
-# Recipes — Build 1.3 (CSV import: Build 3.0)
+# Recipes — Build 1.3 (CSV import: Build 3.0, accepted: Build 3.0A)
 
-> **Build 3.0 update.** Recipes can now be created/updated in bulk via Settings → Import / Export → Import Recipes (owner/manager only). Existing manual recipe edit flow is unchanged. See `docs/recipe-csv-import.md`.
+> **Build 3.0A update.** Recipes can be created/updated in bulk via Settings → Import / Export → Import Recipes (owner/manager only) — live-verified. Existing manual recipe edit flow unchanged. See `docs/recipe-csv-import.md`.
 
 ## Tables
 

@@ -38,10 +38,11 @@ Known issues and limitations for Margin IQ. Updated for Build 2.8A.
 
 ## High
 
-### OI-16 — Separate production Supabase project not created
-**Severity:** High · **Status:** Open · **Planned build:** 3.2.
-**Description:** The live frontend (https://margin-maestro.vercel.app) currently points at `margin-maestro-dev` (`atdvrdhzcbtxvzgvoxhb`) by explicit user choice. Test/demo/beta data may coexist with real beta data.
-**Acceptance criteria:** New `margin-maestro-prod` Supabase project created, schema migrated, Vercel env re-pointed, dev project demoted back to non-production status.
+### OI-16 — Single Supabase backend reused for live beta (intentional)
+**Severity:** Medium · **Status:** Open by intentional decision · **Planned build:** 3.2 (future optional, **not** immediate).
+**Description:** The live frontend (https://margin-maestro.vercel.app) points at `margin-maestro-dev` (`atdvrdhzcbtxvzgvoxhb`). The user has explicitly decided to keep a single Supabase backend during the beta phase to avoid an additional project cost (~$10/month). Test/demo/beta data may coexist with real beta data.
+**Mitigation (current phase):** stronger backup + QA discipline on `margin-maestro-dev`. Recipe import preview-before-apply, append-only audit logs, RLS on every table, and "no automatic ingredient/category creation" rules limit the blast radius of data accidents.
+**Acceptance criteria for Build 3.2 (when revisited):** new `margin-maestro-prod` project created, schema migrated, Vercel env re-pointed, dev project demoted back to non-production status. Trigger conditions: wider commercial rollout, paying customers onboarded, or compliance requirement.
 
 ---
 
@@ -93,10 +94,14 @@ Known issues and limitations for Margin IQ. Updated for Build 2.8A.
 **Severity:** Low · **Status:** Resolved — Build 3.0.
 **Resolution:** Two-file recipe CSV import implemented (`recipes` + `recipe_lines`) via `src/data/api/recipeImportApi.ts` with preview, duplicate-handling and line-handling modes. Owner/manager only. Imported dish menu prices write `source='import'` rows to `menu_price_audit_log`. Recipe import does NOT create ingredients/suppliers/categories/batches/billing rows. See `docs/recipe-csv-import.md`.
 
-### OI-29 — Recipe CSV import is not atomic
-**Severity:** Low · **Status:** Open · **Planned build:** 3.4.
-**Description:** Recipe import orchestrates recipe writes, line writes, and menu-price audit writes as separate client calls. A failure in a later phase does not roll back earlier phases; partial-success counts and an error list are surfaced to the operator.
-**Acceptance criteria:** A server-side SQL function (e.g. `apply_recipe_import_atomic(...)`) wraps the three phases in a single transaction, equivalent to the planned audit-atomic RPC for Apply Price (OI-28).
+### OI-29 — Recipe CSV import is not fully atomic
+**Severity:** Low · **Status:** Partially resolved — Build 3.4. Open for create path and non-price fields.
+**Build 3.4 partial resolution:** Recipe import's UPDATE path for dish `menu_price` now uses `apply_dish_menu_price_with_audit` RPC (source = 'import'). The menu_price column + audit row commit or roll back together.
+**Remaining open:**
+- Recipe creation (`createRecipe` + audit) is still client-orchestrated.
+- Non-price recipe fields (name, category, serving, etc.) on the update path are still patched via `updateRecipe` separately from the RPC.
+- Phase 2 (recipe lines `replaceRecipeLines` / append) is still separate from Phase 1.
+**Acceptance criteria:** A broader `apply_recipe_import_atomic(...)` SQL function wrapping create + lines + audit. Lower priority now that the menu_price column is atomic.
 
 ### OI-25 — Supplier Marketplace not implemented
 **Severity:** Low · **Status:** Out of approved scope per CLAUDE.md guardrails.
@@ -110,9 +115,14 @@ Known issues and limitations for Margin IQ. Updated for Build 2.8A.
 **Resolution:** `menu_price_audit_log` introduced with append-only RLS (no UPDATE / no DELETE policy). Apply Price (Build 2.4) and manual dish recipe `menu_price` edits both write audit rows. Read-only history panel on `/dish-analysis/$id`. New `/qa-menu-price-audit` route. Live verified at Build 2.9A: `pg_policies` confirms only SELECT (members) and INSERT (owner/manager) policies; no UPDATE / no DELETE; Apply Price does not write ingredient_price_log / batches / billing rows. See `docs/menu-price-audit-trail.md`.
 
 ### OI-28 — Menu price audit insert is not atomic with price update
-**Severity:** Low · **Status:** Open · **Planned build:** TBD.
-**Description:** Build 2.9 wires the audit insert client-side after the `recipes.menu_price` update. If the audit insert fails after the price update succeeds, the price change persists without an audit entry. The UI surfaces a clear warning (`Price updated, but audit entry could not be recorded.`), but historical traceability is best-effort.
-**Acceptance criteria:** A server-side SQL function (e.g. `apply_dish_menu_price_with_audit(restaurant_id, recipe_id, new_price, source, context)`) wraps both writes in a single transaction. Apply Price + manual recipe edit call this function instead of two separate statements.
+**Severity:** Low · **Status:** Resolved for Apply Price — Build 3.4 (pending acceptance Build 3.4A). Partially resolved for Recipe CSV Import update path.
+**Resolution:** SQL function `public.apply_dish_menu_price_with_audit(...)` writes both `recipes.menu_price` and `menu_price_audit_log` in a single transaction. `applyDishMenuPrice` (Menu Analytics + Dish Analysis) calls this RPC exclusively. Recipe CSV Import update path also calls it for dish `menu_price` changes (source = 'import'). See `docs/atomic-rpc-hardening.md`.
+**Remaining gap → OI-30 below:** `updateRecipe` (manual recipe edit) still writes a best-effort `manual_recipe_edit` audit row after a multi-field recipe update — not atomic. Deferred to keep the recipe save flow stable.
+
+### OI-30 — Manual recipe edit audit is not atomic with recipe-fields update
+**Severity:** Low · **Status:** Open · **Planned build:** TBD (Build 3.4+).
+**Description:** When `/recipes/$id` saves a dish recipe with a changed `menu_price`, `updateRecipe` patches the row (name, category, serving, price, …) via a standard UPDATE, then best-effort inserts a `manual_recipe_edit` audit row. A failure of the audit insert leaves the row updated without an audit entry. The Build 3.4 atomic RPC only covers the `menu_price` column, not arbitrary recipe-field patches.
+**Acceptance criteria:** Either a broader RPC `apply_dish_recipe_patch_with_audit(...)` covering common field combinations, or splitting the manual edit save into "non-price fields via updateRecipe + price via atomic RPC".
 
 ### OI-08 — Team management placeholder
 **Severity:** Low · **Status:** Resolved — Build 2.1A. (Kept here for traceability.)

@@ -40,7 +40,7 @@ All core operational modules are Supabase-backed or Supabase-derived:
 - [x] Beta checklist documented
 
 ### Not Yet Complete
-- [ ] Production Supabase project (separate from dev) — **Build 3.2** (OI-16). Currently reusing dev by explicit choice.
+- [ ] Production Supabase project (separate from dev) — **Build 3.2 future optional** (OI-16). User has intentionally chosen to keep a single Supabase backend during beta to avoid additional cost. Revisit before wider commercial rollout.
 - [x] Production domain and hosting — Vercel `margin-maestro` at https://margin-maestro.vercel.app (Build 2.8A).
 - [ ] Email templates configured (default Supabase templates active).
 - [x] Google OAuth enabled and live verified — Build 2.8A.
