@@ -34,8 +34,10 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/auth/AuthProvider";
 import { getIngredients } from "@/data/api/ingredientsApi";
 import { getRecipes, calculateRecipeMetrics } from "@/data/api/recipesApi";
+import { getMenuPriceAuditForRecipe } from "@/data/api/menuPriceAuditApi";
 import type {
   IngredientWithCostState,
+  MenuPriceAuditLogRow,
   RecipeMetrics,
   RecipeWithLines,
 } from "@/data/api/types";
@@ -52,6 +54,8 @@ export function DishAnalysisView({ initialDishId }: { initialDishId?: string }) 
   const [selectedId, setSelectedId] = useState(initialDishId ?? "");
   const [scenarioCostPct, setScenarioCostPct] = useState([0]);
   const [scenarioPricePct, setScenarioPricePct] = useState([0]);
+  const [auditEntries, setAuditEntries] = useState<MenuPriceAuditLogRow[]>([]);
+  const [auditLoading, setAuditLoading] = useState(false);
 
   const targetGpm = activeRestaurantSettings?.target_gpm ?? 0.78;
   const canManagePrice = activeMembership?.role === "owner" || activeMembership?.role === "manager";
@@ -61,14 +65,42 @@ export function DishAnalysisView({ initialDishId }: { initialDishId?: string }) 
     if (!window.confirm(`Apply menu price $${newPrice.toFixed(2)} to ${recipe.name}? This updates Margin Maestro only, not POS.`)) return;
     try {
       const { applyDishMenuPrice } = await import("@/data/api/applyPriceApi");
-      await applyDishMenuPrice(activeRestaurantId, recipe.id, newPrice);
-      toast.success(`Menu price updated to $${newPrice.toFixed(2)}.`);
+      const result = await applyDishMenuPrice(activeRestaurantId, recipe.id, newPrice, {
+        origin: "dish-analysis",
+        target_gpm: targetGpm,
+        cost_per_serving: metrics?.cost_per_serving ?? undefined,
+        suggested_price: metrics?.suggested_menu_price ?? undefined,
+      });
+      if (result.audit_recorded) {
+        toast.success(`Menu price updated to $${newPrice.toFixed(2)}. Audit entry recorded.`);
+      } else {
+        toast.warning(`Price updated to $${newPrice.toFixed(2)}, but audit entry could not be recorded. Please review later.`);
+      }
       await load();
+      void loadAuditHistory();
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Failed to apply price.";
       toast.error(msg);
     }
   };
+
+  const loadAuditHistory = useCallback(async () => {
+    if (!activeRestaurantId || !selectedId) {
+      setAuditEntries([]);
+      return;
+    }
+    setAuditLoading(true);
+    try {
+      const rows = await getMenuPriceAuditForRecipe(activeRestaurantId, selectedId, 25);
+      setAuditEntries(rows);
+    } catch {
+      setAuditEntries([]);
+    } finally {
+      setAuditLoading(false);
+    }
+  }, [activeRestaurantId, selectedId]);
+
+  useEffect(() => { void loadAuditHistory(); }, [loadAuditHistory]);
 
   const load = useCallback(async () => {
     if (!activeRestaurantId) return;
@@ -289,9 +321,77 @@ export function DishAnalysisView({ initialDishId }: { initialDishId?: string }) 
             </div>
           </CardContent>
         </Card>
+
+        {/* Build 2.9 — Menu Price Audit Trail (read-only) */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Menu price audit history</CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            {auditLoading ? (
+              <div className="flex items-center gap-2 p-6 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" /> Loading audit entries…
+              </div>
+            ) : auditEntries.length === 0 ? (
+              <p className="p-6 text-sm text-muted-foreground">
+                No menu price changes recorded for this dish yet. Apply Price actions and dish menu price edits will appear here.
+              </p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Changed at</TableHead>
+                    <TableHead>Source</TableHead>
+                    <TableHead className="text-right">Old price</TableHead>
+                    <TableHead className="text-right">New price</TableHead>
+                    <TableHead className="text-right">Δ</TableHead>
+                    <TableHead className="text-right">Δ%</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {auditEntries.map((e) => (
+                    <TableRow key={e.id}>
+                      <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
+                        {new Date(e.changed_at).toLocaleString()}
+                      </TableCell>
+                      <TableCell className="text-xs">
+                        {labelForSource(e.source)}
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        <MoneyCell value={e.old_menu_price} />
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        <MoneyCell value={e.new_menu_price} />
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        <MoneyCell value={e.delta_amount} />
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        <PercentCell value={e.delta_percent} />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+            <p className="border-t px-4 py-2 text-[11px] text-muted-foreground">
+              Audit log is append-only. Records updates to this dish's menu price only — not ingredient prices, batches, or POS publishing.
+            </p>
+          </CardContent>
+        </Card>
       </div>
     </AppShell>
   );
+}
+
+function labelForSource(source: string): string {
+  switch (source) {
+    case "apply_price": return "Apply Price";
+    case "manual_recipe_edit": return "Manual edit";
+    case "import": return "Import";
+    case "system": return "System";
+    default: return "Other";
+  }
 }
 
 function Field({ label, value }: { label: string; value: React.ReactNode }) {

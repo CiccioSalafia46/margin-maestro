@@ -529,3 +529,53 @@ export interface ApiError {
   code: "auth" | "permission" | "duplicate" | "validation" | "not_found" | "unknown";
   message: string;
 }
+
+// ----- Build 2.9 — Menu Price Audit Trail -----
+
+export type MenuPriceAuditSource =
+  | "apply_price"
+  | "manual_recipe_edit"
+  | "import"
+  | "system"
+  | "other";
+
+export interface MenuPriceAuditLogRow {
+  id: string;
+  restaurant_id: string;
+  recipe_id: string | null;
+  recipe_name_at_time: string;
+  recipe_kind_at_time: string;
+  category_name_at_time: string | null;
+  old_menu_price: number | null;
+  new_menu_price: number;
+  delta_amount: number | null;
+  delta_percent: number | null;
+  source: MenuPriceAuditSource;
+  context: unknown;
+  note: string | null;
+  changed_by: string | null;
+  changed_at: string;
+  created_at: string;
+}
+
+export interface MenuPriceAuditInput {
+  restaurant_id: string;
+  recipe_id: string | null;
+  recipe_name_at_time: string;
+  category_name_at_time?: string | null;
+  old_menu_price: number | null;
+  new_menu_price: number;
+  source: MenuPriceAuditSource;
+  context?: Record<string, unknown> | null;
+  note?: string | null;
+}
+
+export interface MenuPriceAuditSummary {
+  total_entries: number;
+  last_change_at: string | null;
+  last_source: MenuPriceAuditSource | null;
+  last_old_price: number | null;
+  last_new_price: number | null;
+  last_delta_amount: number | null;
+  last_delta_percent: number | null;
+}

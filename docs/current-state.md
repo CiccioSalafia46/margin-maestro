@@ -1,8 +1,8 @@
 # Current State
 
 **Date:** 2026-05-10
-**Build:** 2.8A — Google OAuth + Live Accepted
-**Branch:** `main` (last accepted commit on `build-2.8-google-oauth` merged)
+**Build:** 2.9 — Menu Price Audit Trail
+**Branch:** `build-2.9-menu-price-audit`
 **Backend:** Self-owned Supabase project `margin-maestro-dev` (`atdvrdhzcbtxvzgvoxhb`) — currently reused as live backend by explicit user choice.
 **Frontend hosting:** Vercel project `margin-maestro` — https://margin-maestro.vercel.app
 
@@ -10,28 +10,41 @@
 
 ## Actual State
 
-**Beta live on Vercel.** Email/password + Google OAuth sign-in, both verified on the live URL. All 22 expected public tables present, RLS enforced. Operational chain Supabase-backed end-to-end (Ingredients → Recipes → Menu Analytics → Price Log → Snapshot → Price Trend → Dish Analysis → Impact Cascade → Alerts → Dashboard). Team management, Apply Price, CSV import/export, monitoring foundation, billing foundation all in place.
+**Beta live on Vercel.** Email/password + Google OAuth sign-in, both verified on the live URL. All 22 expected public tables present (23 once Build 2.9 migration is applied), RLS enforced. Operational chain Supabase-backed end-to-end. Apply Price and manual dish recipe edits now write to an append-only `menu_price_audit_log`.
+
+## Build 2.9 highlights
+
+- New table `menu_price_audit_log` (migration `20260510170000_build_2_9_menu_price_audit_trail.sql`) — **migration not auto-applied; run `supabase db push` to deploy**.
+- New API: `src/data/api/menuPriceAuditApi.ts` (5 functions).
+- Apply Price (`applyDishMenuPrice`) now records `source='apply_price'` audit entries, returns `ApplyPriceResult { audit_recorded, audit_error, old_menu_price, new_menu_price }`.
+- Manual dish recipe edits (`updateRecipe` with `menu_price` patch) now record `source='manual_recipe_edit'` audit entries when the price actually changes.
+- New read-only audit history panel on `/dish-analysis/$id`.
+- New automated QA route `/qa-menu-price-audit` (checks A–U).
+- `/qa-mvp-readiness` and `/qa-beta-launch` updated with the new expected table and Build 2.9 status checks.
+- Settings → Developer QA includes link to `/qa-menu-price-audit`.
+- E2E `qa-routes.spec.ts` includes the new QA route.
 
 ## Live deployment summary
 
-- **Live URL:** https://margin-maestro.vercel.app
-- **Vercel project:** `margin-maestro`
-- **Vercel function wrapper:** `api/server.mjs` (Node.js Function wrapping the TanStack Start SSR fetch handler)
-- **Build adapter:** Cloudflare plugin disabled (`vite.config.ts: cloudflare: false`); SSR output bundled into the Vercel function via `vercel.json:functions.api/server.mjs.includeFiles`.
-- **Supabase Auth Site URL + Redirect URLs:** configured for prod, Vercel preview, and local dev (see `supabase/config.toml` `[auth]`).
-- **Vercel env vars (names only — values not shown):** `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`. None of these is a service role / Stripe / Google secret.
+- Live URL: https://margin-maestro.vercel.app
+- Vercel project `margin-maestro` (auto-deploy on push to `main`)
+- SSR via `api/server.mjs` (TanStack Start fetch handler wrapper)
+- Supabase Auth Site URL + Redirect URLs configured (`supabase/config.toml [auth]`)
+- Vercel env vars: `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID`, plus non-prefixed fallbacks. No service role / Stripe / Google secret in browser env.
 
 ## Known live limitations / risks
 
-- Live backend reuses the dev Supabase project. Test/demo/beta data may coexist with real beta data. Migration to a separate `margin-maestro-prod` project is recommended before wider production rollout.
-- Stripe verification is deferred. Billing UI is present but test-mode flow is not yet exercised end-to-end.
-- Sentry DSN is optional and not configured.
-- Google OAuth provider production hardening (consent screen, authorized domains review) recommended before wider rollout.
+- Live backend reuses dev Supabase project (OI-16, → Build 3.2).
+- Stripe verification deferred (OI-17, → Build 2.2B).
+- Sentry DSN optional / unset (OI-19, → Build 3.3).
+- Transactional invite emails deferred (OI-20, → Build 3.1).
+- Google OAuth production hardening pending (OI-21).
+- Audit insert is client-orchestrated, not atomic with the price update — the UI surfaces a warning when the audit row fails; price update remains.
 
 ## Next Steps
 
-1. Beta tester onboarding on the live URL.
-2. Build 2.9 — Menu Price Audit Trail.
+1. Run `supabase db push` to deploy Build 2.9 migration to the live backend.
+2. Build 2.9A — Menu Price Audit Acceptance (QA on live).
 3. Build 2.2B — Stripe Test Verification.
 4. Build 3.0 — Recipe CSV Import.
 5. Build 3.1 — Transactional Invite Emails.

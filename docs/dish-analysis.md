@@ -1,4 +1,6 @@
-# Dish Analysis — Build 1.6
+# Dish Analysis — Build 1.6 (audit panel: Build 2.9)
+
+> **Build 2.9 update.** `/dish-analysis/$id` now includes a read-only "Menu price audit history" panel with the most recent 25 entries from `menu_price_audit_log` for the active dish (changed at, source label, old price, new price, Δ, Δ%). Panel reloads after Apply Price. Empty state explains that Apply Price + manual recipe edits will populate it.
 
 ## Overview
 

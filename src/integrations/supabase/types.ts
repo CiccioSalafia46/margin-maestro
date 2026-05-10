@@ -341,6 +341,63 @@ export type Database = {
         Update: { id?: string; restaurant_id?: string; batch_id?: string; baseline_version?: number; status?: string; generated_by?: string | null; generated_at?: string; changed_ingredients_count?: number; affected_dish_count?: number; impact_item_count?: number; newly_below_target_count?: number; total_cogs_delta_per_serving?: number | null; total_margin_delta_per_serving?: number | null; note?: string | null; error_message?: string | null; created_at?: string; updated_at?: string }
         Relationships: [{ foreignKeyName: "impact_cascade_runs_restaurant_id_fkey"; columns: ["restaurant_id"]; isOneToOne: false; referencedRelation: "restaurants"; referencedColumns: ["id"] }, { foreignKeyName: "impact_cascade_runs_batch_id_fkey"; columns: ["batch_id"]; isOneToOne: false; referencedRelation: "price_update_batches"; referencedColumns: ["id"] }]
       }
+      menu_price_audit_log: {
+        Row: {
+          id: string
+          restaurant_id: string
+          recipe_id: string | null
+          recipe_name_at_time: string
+          recipe_kind_at_time: string
+          category_name_at_time: string | null
+          old_menu_price: number | null
+          new_menu_price: number
+          delta_amount: number | null
+          delta_percent: number | null
+          source: string
+          context: Json | null
+          note: string | null
+          changed_by: string | null
+          changed_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          restaurant_id: string
+          recipe_id?: string | null
+          recipe_name_at_time: string
+          recipe_kind_at_time?: string
+          category_name_at_time?: string | null
+          old_menu_price?: number | null
+          new_menu_price: number
+          delta_amount?: number | null
+          delta_percent?: number | null
+          source: string
+          context?: Json | null
+          note?: string | null
+          changed_by?: string | null
+          changed_at?: string
+          created_at?: string
+        }
+        Update: {
+          [_ in never]: never
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_price_audit_log_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "menu_price_audit_log_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ingredient_price_log: {
         Row: {
           id: string

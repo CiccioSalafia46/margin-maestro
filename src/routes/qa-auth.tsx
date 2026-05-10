@@ -443,8 +443,8 @@ function QaAuthPage() {
 
         <p className="text-[11px] text-muted-foreground">
           No access tokens, refresh tokens, service-role keys, or raw session JSON are displayed.
-          Build 2.8A — Google OAuth + Live Accepted. Live URL: https://margin-maestro.vercel.app
-          (Google sign-in manually verified on live).
+          Build 2.9 — Menu Price Audit Trail. Live URL: https://margin-maestro.vercel.app.
+          Google sign-in manually verified on live; menu price changes (Apply Price + manual recipe edit) write append-only audit rows.
         </p>
       </div>
     </AppShell>

@@ -1234,6 +1234,7 @@ function DeveloperQa() {
         <QaLink to="/qa-monitoring" label="Monitoring QA" />
         <QaLink to="/qa-google-oauth" label="Google OAuth QA" />
         <QaLink to="/qa-live-deployment" label="Live Deployment QA" />
+        <QaLink to="/qa-menu-price-audit" label="Menu Price Audit QA" />
       </CardContent>
     </Card>
   );

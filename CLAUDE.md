@@ -44,6 +44,7 @@ menu analytics → price log → snapshot → impact cascade → alerts
 | Impact cascade persistence (`impact_cascade_runs`, `impact_cascade_items`) | Build 1.7 |
 | Alerts persistence (`alerts`, `audit_events`) | Build 1.8 |
 | Billing / subscriptions | Build 2.0 |
+| `menu_price_audit_log` | Build 2.9 |
 
 ### Auth & Security
 

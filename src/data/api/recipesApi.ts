@@ -142,6 +142,25 @@ export async function updateRecipe(
     if (!t) throw { code: "validation", message: "Recipe name is required." } as ApiError;
     patch = { ...patch, name: t };
   }
+
+  // Build 2.9: capture previous menu_price + kind so we can record an audit
+  // entry when a dish recipe's menu_price actually changes.
+  let priorMenuPrice: number | null = null;
+  let priorKind: string | null = null;
+  let priorCategoryId: string | null = null;
+  if (patch.menu_price !== undefined) {
+    const { data: prior, error: priorError } = await supabase
+      .from("recipes")
+      .select("menu_price, kind, menu_category_id")
+      .eq("id", recipeId)
+      .eq("restaurant_id", restaurantId)
+      .maybeSingle();
+    if (priorError) throw toApiError(priorError);
+    priorMenuPrice = (prior as { menu_price: number | null } | null)?.menu_price ?? null;
+    priorKind = (prior as { kind: string } | null)?.kind ?? null;
+    priorCategoryId = (prior as { menu_category_id: string | null } | null)?.menu_category_id ?? null;
+  }
+
   const { data, error } = await supabase
     .from("recipes")
     .update(patch)
@@ -150,7 +169,45 @@ export async function updateRecipe(
     .select("*")
     .single();
   if (error) throw toApiError(error);
-  return data as unknown as RecipeRow;
+  const updated = data as unknown as RecipeRow;
+
+  // Build 2.9: audit only when this is a dish recipe and menu_price actually changed.
+  if (
+    patch.menu_price !== undefined &&
+    priorKind === "dish" &&
+    updated.menu_price !== priorMenuPrice &&
+    updated.menu_price != null &&
+    updated.menu_price > 0
+  ) {
+    try {
+      let categoryName: string | null = null;
+      const catId = updated.menu_category_id ?? priorCategoryId;
+      if (catId) {
+        const { data: cat } = await supabase
+          .from("menu_categories")
+          .select("name")
+          .eq("id", catId)
+          .eq("restaurant_id", restaurantId)
+          .maybeSingle();
+        categoryName = (cat as { name: string | null } | null)?.name ?? null;
+      }
+      const { createMenuPriceAuditEntry } = await import("./menuPriceAuditApi");
+      await createMenuPriceAuditEntry({
+        restaurant_id: restaurantId,
+        recipe_id: recipeId,
+        recipe_name_at_time: updated.name,
+        category_name_at_time: categoryName,
+        old_menu_price: priorMenuPrice,
+        new_menu_price: updated.menu_price,
+        source: "manual_recipe_edit",
+        context: { origin: "recipe-edit" },
+      });
+    } catch {
+      // Best-effort audit. Recipe save already committed; surface no raw DB error.
+    }
+  }
+
+  return updated;
 }
 
 export async function deactivateRecipe(

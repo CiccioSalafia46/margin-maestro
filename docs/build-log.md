@@ -691,6 +691,35 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 
 ---
 
+## Build 2.9 — Menu Price Audit Trail
+
+**Status:** Implemented (acceptance pending — Build 2.9A).
+
+- **Migration:** `supabase/migrations/20260510170000_build_2_9_menu_price_audit_trail.sql` (not auto-applied; deploy with `supabase db push`).
+- **New table:** `menu_price_audit_log` (id, restaurant_id, recipe_id, recipe_name_at_time, recipe_kind_at_time, category_name_at_time, old_menu_price, new_menu_price, delta_amount, delta_percent, source, context, note, changed_by, changed_at, created_at). CHECK `new_menu_price > 0` and `recipe_kind_at_time = 'dish'`. CHECK source in (`apply_price`, `manual_recipe_edit`, `import`, `system`, `other`).
+- **Indexes:** `restaurant_id`, `recipe_id`, `changed_at desc`, `source`, `changed_by`.
+- **RLS:** SELECT for restaurant members; INSERT for owner/manager only; no UPDATE; no DELETE (append-only).
+- **API:** `src/data/api/menuPriceAuditApi.ts` — `getMenuPriceAuditLog`, `getMenuPriceAuditForRecipe`, `createMenuPriceAuditEntry`, `deriveMenuPriceAuditSummary`, `validateMenuPriceAuditInput`. Browser client + RLS only. Errors sanitized via `toApiError`.
+- **Apply Price integration:** `applyDishMenuPrice` reads current recipe (name, kind, is_active, menu_price, category), updates `recipes.menu_price`, then best-effort inserts an audit row with `source='apply_price'` and a `context` object (`origin`, `target_gpm`, `cost_per_serving`, `suggested_price`, `reason`). Returns `ApplyPriceResult { audit_recorded, audit_error, old_menu_price, new_menu_price }`. UI shows different toast copy based on result. **Does not write `ingredient_price_log`, `price_update_batches`, or billing rows. No POS publishing.**
+- **Manual recipe edit integration:** `updateRecipe` reads prior `menu_price` and `kind` when the patch includes `menu_price`, then — after a successful update — best-effort inserts an audit row with `source='manual_recipe_edit'` if the recipe is a dish and the price actually changed. Intermediate recipes are skipped.
+- **UI — Dish Analysis:** read-only "Menu price audit history" panel on `/dish-analysis/$id` listing up to 25 most recent entries (changed_at, source label, old price, new price, Δ, Δ%). Empty state explains Apply Price + manual edits will populate it. Audit reloads after Apply Price.
+- **UI — Menu Analytics:** Apply Price success toast distinguishes between full success and audit-failed degraded path.
+- **QA — `/qa-menu-price-audit`:** new automated QA route with checks A–U (auth, RLS scope, append-only design, dish-only, finite deltas, Apply-Price side-effect absence, secret exposure, localStorage). Linked from Settings → Developer QA.
+- **QA — `/qa-mvp-readiness`:** `EXPECTED_TABLES` extended to include `menu_price_audit_log`; new check Y.
+- **QA — `/qa-beta-launch`:** `EXPECTED_TABLES` extended; new check AH.
+- **QA — `/qa-auth`:** footer references Build 2.9.
+- **E2E:** `tests/e2e/qa-routes.spec.ts` includes `/qa-menu-price-audit`. Apply Price mutation tests stay opt-in (no default mutation).
+- **Docs:** `docs/menu-price-audit-trail.md` created. `docs/current-state.md`, `docs/roadmap.md`, `docs/open-issues.md`, `docs/apply-price.md`, `docs/dish-analysis.md`, `docs/menu-analytics.md`, `docs/qa-checklists.md`, `docs/beta-checklist.md`, `docs/live-deployment.md` updated. CLAUDE.md table-build mapping updated.
+- Build label: "Build 2.9 — Menu Price Audit Trail".
+
+**Known limitations:**
+- Client-orchestrated price-update + audit insert (not atomic). When audit insert fails, the price update remains; UI surfaces a clear warning. A server-side SQL wrapper could make this atomic in a future build.
+- No menu price approval workflow.
+- No POS / external menu publishing (intentional, per CLAUDE.md guardrails).
+- `source='import'` is reserved but not exercised in this build.
+
+---
+
 ## Build 2.7A — Monitoring Acceptance
 
 **Status:** Accepted

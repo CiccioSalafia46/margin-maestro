@@ -1,6 +1,8 @@
-# Beta Checklist — Build 2.0
+# Beta Checklist — Build 2.9
 
 Manual acceptance flows for beta readiness.
+
+> **Build 2.9 add-on.** When verifying Apply Price or manual recipe `menu_price` edits, also confirm a row appears in `menu_price_audit_log` for the affected dish (visible in the read-only panel on `/dish-analysis/$id`).
 
 ## A. Auth and Onboarding
 - [ ] Signup with email/password

@@ -10,6 +10,22 @@ Forward implementation plan for Margin IQ — Restaurant Margin Intelligence Saa
 
 ---
 
+## Build 2.9 — Menu Price Audit Trail
+
+**Status:** Implemented (acceptance pending — Build 2.9A).
+
+**Goal:** Append-only audit log for dish recipe `menu_price` changes, integrated with Apply Price and manual recipe edits.
+
+**Highlights:**
+- New table `menu_price_audit_log` with append-only RLS (no UPDATE / no DELETE policy).
+- `applyDishMenuPrice` writes `source='apply_price'` rows; `updateRecipe` writes `source='manual_recipe_edit'` rows when a dish menu price changes.
+- UI: read-only audit history on `/dish-analysis/$id`; new automated QA `/qa-menu-price-audit`.
+- `EXPECTED_TABLES` in `/qa-mvp-readiness` and `/qa-beta-launch` extended.
+
+**Out of scope:** POS publishing, external menu sync, ingredient price log writes from Apply Price, billing rows from Apply Price, atomic server-side wrapper, approval workflow.
+
+---
+
 ## Build 2.8A — Google OAuth + Live Accepted
 
 **Status:** Accepted.

@@ -101,8 +101,13 @@ Known issues and limitations for Margin IQ. Updated for Build 2.8A.
 **Description:** Restaurant switcher works across owned/joined restaurants, but advanced cross-location operations (consolidated dashboard, shared reference data, location-aware reporting) are not implemented.
 
 ### OI-27 — Menu price audit trail not implemented
-**Severity:** Low · **Status:** Open · **Planned build:** 2.9.
-**Description:** Apply Price (Build 2.4) updates `recipes.menu_price` directly with no append-only history. A dedicated audit trail (who/when/old/new/scenario context) is needed before regulated rollout.
+**Severity:** Low · **Status:** Resolved — Build 2.9.
+**Resolution:** `menu_price_audit_log` introduced with append-only RLS (no UPDATE / no DELETE policy). Apply Price (Build 2.4) and manual dish recipe `menu_price` edits both write audit rows. Read-only history panel on `/dish-analysis/$id`. New `/qa-menu-price-audit` route. See `docs/menu-price-audit-trail.md`.
+
+### OI-28 — Menu price audit insert is not atomic with price update
+**Severity:** Low · **Status:** Open · **Planned build:** TBD.
+**Description:** Build 2.9 wires the audit insert client-side after the `recipes.menu_price` update. If the audit insert fails after the price update succeeds, the price change persists without an audit entry. The UI surfaces a clear warning (`Price updated, but audit entry could not be recorded.`), but historical traceability is best-effort.
+**Acceptance criteria:** A server-side SQL function (e.g. `apply_dish_menu_price_with_audit(restaurant_id, recipe_id, new_price, source, context)`) wraps both writes in a single transaction. Apply Price + manual recipe edit call this function instead of two separate statements.
 
 ### OI-08 — Team management placeholder
 **Severity:** Low · **Status:** Resolved — Build 2.1A. (Kept here for traceability.)

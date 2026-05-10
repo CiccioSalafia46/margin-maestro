@@ -19,6 +19,7 @@ import { Route as QaPriceTrendRouteImport } from './routes/qa-price-trend'
 import { Route as QaPriceLogSnapshotRouteImport } from './routes/qa-price-log-snapshot'
 import { Route as QaMvpReadinessRouteImport } from './routes/qa-mvp-readiness'
 import { Route as QaMonitoringRouteImport } from './routes/qa-monitoring'
+import { Route as QaMenuPriceAuditRouteImport } from './routes/qa-menu-price-audit'
 import { Route as QaMenuAnalyticsRouteImport } from './routes/qa-menu-analytics'
 import { Route as QaLiveDeploymentRouteImport } from './routes/qa-live-deployment'
 import { Route as QaIngredientsRouteImport } from './routes/qa-ingredients'
@@ -102,6 +103,11 @@ const QaMvpReadinessRoute = QaMvpReadinessRouteImport.update({
 const QaMonitoringRoute = QaMonitoringRouteImport.update({
   id: '/qa-monitoring',
   path: '/qa-monitoring',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QaMenuPriceAuditRoute = QaMenuPriceAuditRouteImport.update({
+  id: '/qa-menu-price-audit',
+  path: '/qa-menu-price-audit',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QaMenuAnalyticsRoute = QaMenuAnalyticsRouteImport.update({
@@ -303,6 +309,7 @@ export interface FileRoutesByFullPath {
   '/qa-ingredients': typeof QaIngredientsRoute
   '/qa-live-deployment': typeof QaLiveDeploymentRoute
   '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
+  '/qa-menu-price-audit': typeof QaMenuPriceAuditRoute
   '/qa-monitoring': typeof QaMonitoringRoute
   '/qa-mvp-readiness': typeof QaMvpReadinessRoute
   '/qa-price-log-snapshot': typeof QaPriceLogSnapshotRoute
@@ -348,6 +355,7 @@ export interface FileRoutesByTo {
   '/qa-ingredients': typeof QaIngredientsRoute
   '/qa-live-deployment': typeof QaLiveDeploymentRoute
   '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
+  '/qa-menu-price-audit': typeof QaMenuPriceAuditRoute
   '/qa-monitoring': typeof QaMonitoringRoute
   '/qa-mvp-readiness': typeof QaMvpReadinessRoute
   '/qa-price-log-snapshot': typeof QaPriceLogSnapshotRoute
@@ -394,6 +402,7 @@ export interface FileRoutesById {
   '/qa-ingredients': typeof QaIngredientsRoute
   '/qa-live-deployment': typeof QaLiveDeploymentRoute
   '/qa-menu-analytics': typeof QaMenuAnalyticsRoute
+  '/qa-menu-price-audit': typeof QaMenuPriceAuditRoute
   '/qa-monitoring': typeof QaMonitoringRoute
   '/qa-mvp-readiness': typeof QaMvpReadinessRoute
   '/qa-price-log-snapshot': typeof QaPriceLogSnapshotRoute
@@ -442,6 +451,7 @@ export interface FileRouteTypes {
     | '/qa-ingredients'
     | '/qa-live-deployment'
     | '/qa-menu-analytics'
+    | '/qa-menu-price-audit'
     | '/qa-monitoring'
     | '/qa-mvp-readiness'
     | '/qa-price-log-snapshot'
@@ -487,6 +497,7 @@ export interface FileRouteTypes {
     | '/qa-ingredients'
     | '/qa-live-deployment'
     | '/qa-menu-analytics'
+    | '/qa-menu-price-audit'
     | '/qa-monitoring'
     | '/qa-mvp-readiness'
     | '/qa-price-log-snapshot'
@@ -532,6 +543,7 @@ export interface FileRouteTypes {
     | '/qa-ingredients'
     | '/qa-live-deployment'
     | '/qa-menu-analytics'
+    | '/qa-menu-price-audit'
     | '/qa-monitoring'
     | '/qa-mvp-readiness'
     | '/qa-price-log-snapshot'
@@ -579,6 +591,7 @@ export interface RootRouteChildren {
   QaIngredientsRoute: typeof QaIngredientsRoute
   QaLiveDeploymentRoute: typeof QaLiveDeploymentRoute
   QaMenuAnalyticsRoute: typeof QaMenuAnalyticsRoute
+  QaMenuPriceAuditRoute: typeof QaMenuPriceAuditRoute
   QaMonitoringRoute: typeof QaMonitoringRoute
   QaMvpReadinessRoute: typeof QaMvpReadinessRoute
   QaPriceLogSnapshotRoute: typeof QaPriceLogSnapshotRoute
@@ -663,6 +676,13 @@ declare module '@tanstack/react-router' {
       path: '/qa-monitoring'
       fullPath: '/qa-monitoring'
       preLoaderRoute: typeof QaMonitoringRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qa-menu-price-audit': {
+      id: '/qa-menu-price-audit'
+      path: '/qa-menu-price-audit'
+      fullPath: '/qa-menu-price-audit'
+      preLoaderRoute: typeof QaMenuPriceAuditRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/qa-menu-analytics': {
@@ -984,6 +1004,7 @@ const rootRouteChildren: RootRouteChildren = {
   QaIngredientsRoute: QaIngredientsRoute,
   QaLiveDeploymentRoute: QaLiveDeploymentRoute,
   QaMenuAnalyticsRoute: QaMenuAnalyticsRoute,
+  QaMenuPriceAuditRoute: QaMenuPriceAuditRoute,
   QaMonitoringRoute: QaMonitoringRoute,
   QaMvpReadinessRoute: QaMvpReadinessRoute,
   QaPriceLogSnapshotRoute: QaPriceLogSnapshotRoute,

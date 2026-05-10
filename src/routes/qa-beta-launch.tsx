@@ -23,6 +23,7 @@ const EXPECTED_TABLES = [
   "price_update_batches", "ingredient_price_log", "ingredient_snapshots",
   "impact_cascade_runs", "impact_cascade_items", "alerts",
   "billing_customers", "billing_subscriptions", "billing_events",
+  "menu_price_audit_log",
 ];
 
 function QaBetaLaunchPage() {
@@ -88,6 +89,9 @@ function QaBetaLaunchPage() {
       next.push({ label: "AF. Google OAuth manually verified on live", status: "pass", detail: "Confirmed by user on https://margin-maestro.vercel.app" });
       next.push({ label: "AG. Live backend reuses dev project", status: "warn", detail: "margin-maestro-dev used as live by explicit user choice — separate prod project recommended" });
 
+      // AH: Menu Price Audit Trail (Build 2.9)
+      next.push({ label: "AH. Menu price audit trail implemented", status: "pass", detail: "menu_price_audit_log + Apply Price + manual recipe edit (Build 2.9)" });
+
       if (!cancelled) { setChecks(next); setDone(true); }
     })();
     return () => { cancelled = true; };
@@ -103,7 +107,7 @@ function QaBetaLaunchPage() {
 
   return (
     <AppShell>
-      <PageHeader title="QA — Beta Launch" description="Build 2.8A: beta readiness, documentation, route health, security, live deployment." />
+      <PageHeader title="QA — Beta Launch" description="Build 2.9: beta readiness, route health, security, live deployment, menu price audit trail." />
       <div className="space-y-6 p-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between"><CardTitle className="text-base">Overall status</CardTitle><OverallBadge status={summary.overall} /></CardHeader>
@@ -118,7 +122,7 @@ function QaBetaLaunchPage() {
             {checks.map((c) => (<div key={c.label} className="flex items-start justify-between gap-3 border-b py-2 last:border-b-0"><div className="min-w-0"><p className="text-sm font-medium">{c.label}</p>{c.detail && <p className="text-xs text-muted-foreground">{c.detail}</p>}</div><StatusBadge status={c.status} /></div>))}
           </CardContent>
         </Card>
-        <p className="text-[11px] text-muted-foreground">Build 2.8A — Beta Launch + Live Accepted.</p>
+        <p className="text-[11px] text-muted-foreground">Build 2.9 — Menu Price Audit Trail.</p>
       </div>
     </AppShell>
   );

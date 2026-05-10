@@ -29,6 +29,7 @@ const EXPECTED_TABLES = [
   "ingredients", "ingredient_cost_state", "recipes", "recipe_lines",
   "price_update_batches", "ingredient_price_log", "ingredient_snapshots",
   "impact_cascade_runs", "impact_cascade_items", "alerts",
+  "menu_price_audit_log",
 ];
 
 function QaMvpReadinessPage() {
@@ -110,6 +111,9 @@ function QaMvpReadinessPage() {
       next.push({ label: "W. Live deployment active", status: "pass", detail: "https://margin-maestro.vercel.app — Vercel project margin-maestro" });
       next.push({ label: "X. Separate production Supabase recommended", status: "warn", detail: "margin-maestro-dev currently reused as live backend by explicit user choice" });
 
+      // Y: Menu Price Audit Trail (Build 2.9)
+      next.push({ label: "Y. Menu price audit trail implemented", status: "pass", detail: "menu_price_audit_log + Apply Price + manual recipe edit integrations (Build 2.9)" });
+
       if (!cancelled) { setChecks(next); setDone(true); }
     })();
     return () => { cancelled = true; };
@@ -125,7 +129,7 @@ function QaMvpReadinessPage() {
 
   return (
     <AppShell>
-      <PageHeader title="QA — MVP Readiness" description="Build 2.8A: all modules Supabase-backed, security reviewed, beta checklist + live deployment documented." />
+      <PageHeader title="QA — MVP Readiness" description="Build 2.9: all modules Supabase-backed, security reviewed, beta checklist + live deployment + menu price audit." />
       <div className="space-y-6 p-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between"><CardTitle className="text-base">Overall status</CardTitle><OverallBadge status={summary.overall} /></CardHeader>
@@ -145,7 +149,7 @@ function QaMvpReadinessPage() {
             ))}
           </CardContent>
         </Card>
-        <p className="text-[11px] text-muted-foreground">No tokens or secrets displayed. Build 2.8A — Beta Readiness + Live Accepted.</p>
+        <p className="text-[11px] text-muted-foreground">No tokens or secrets displayed. Build 2.9 — Menu Price Audit Trail.</p>
       </div>
     </AppShell>
   );
