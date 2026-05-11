@@ -95,8 +95,8 @@ function QaBetaLaunchPage() {
       // AI: Recipe CSV Import (Build 3.0A — Accepted)
       next.push({ label: "AI. Recipe CSV Import accepted", status: "pass", detail: "Build 3.0A: live-verified — recipes + recipe-lines CSV, preview/apply, audit dish menu prices (source=import); no ingredient creation, no batches, no billing, no POS." });
 
-      // AJ: Atomic RPC Hardening (Build 3.4)
-      next.push({ label: "AJ. Apply Price + audit atomic via RPC", status: "pass", detail: "Build 3.4 — apply_dish_menu_price_with_audit RPC. Recipe import update path also uses RPC for menu_price changes. See /qa-atomic-rpc." });
+      // AJ: Atomic RPC Hardening (Build 3.4A — Accepted)
+      next.push({ label: "AJ. Apply Price + audit atomic via RPC (accepted)", status: "pass", detail: "Build 3.4A — RPC deployed live and verified. Recipe import update path also uses RPC for menu_price changes. See /qa-atomic-rpc." });
 
       if (!cancelled) { setChecks(next); setDone(true); }
     })();
@@ -113,7 +113,7 @@ function QaBetaLaunchPage() {
 
   return (
     <AppShell>
-      <PageHeader title="QA — Beta Launch" description="Build 3.4: beta readiness + atomic Apply Price/audit via SQL RPC." />
+      <PageHeader title="QA — Beta Launch" description="Build 3.4A — Accepted. Beta readiness + atomic Apply Price/audit via SQL RPC (live-verified)." />
       <div className="space-y-6 p-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between"><CardTitle className="text-base">Overall status</CardTitle><OverallBadge status={summary.overall} /></CardHeader>
@@ -128,7 +128,7 @@ function QaBetaLaunchPage() {
             {checks.map((c) => (<div key={c.label} className="flex items-start justify-between gap-3 border-b py-2 last:border-b-0"><div className="min-w-0"><p className="text-sm font-medium">{c.label}</p>{c.detail && <p className="text-xs text-muted-foreground">{c.detail}</p>}</div><StatusBadge status={c.status} /></div>))}
           </CardContent>
         </Card>
-        <p className="text-[11px] text-muted-foreground">Build 3.4 — Atomic RPC Hardening.</p>
+        <p className="text-[11px] text-muted-foreground">Build 3.4A — Atomic RPC Accepted.</p>
       </div>
     </AppShell>
   );

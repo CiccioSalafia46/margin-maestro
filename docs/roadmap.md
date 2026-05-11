@@ -12,7 +12,15 @@ Forward implementation plan for Margin IQ — Restaurant Margin Intelligence Saa
 
 ## Build 3.4 — Atomic RPC Hardening
 
-**Status:** Implemented (acceptance pending — Build 3.4A).
+**Status:** Accepted (Build 3.4A — live verification).
+
+---
+
+## Build 3.4A — Atomic RPC Accepted
+
+**Status:** Accepted.
+
+**Goal:** Live verification + acceptance polish for Build 3.4. RPC migration applied to live Supabase, `pg_proc` and ACL confirmed, function reachable, defensive auth gate proven to fire. QA copy refreshed across all touched routes.
 
 **Goal:** Move Apply Price + audit into a single SQL function so the price update and the audit row commit or roll back together. Same RPC is also used by Recipe CSV Import's update path for dish `menu_price` changes (source = 'import'). Manual recipe edit audit and recipe-import create path remain best-effort by design.
 
@@ -64,9 +72,14 @@ Forward implementation plan for Margin IQ — Restaurant Margin Intelligence Saa
 
 ---
 
-## Recommended next builds (post 3.4)
+## Recommended next builds (post 3.4A)
 
-- **Build 3.4A — Atomic RPC Acceptance (recommended next).** Deploy the RPC migration to live (`supabase db push`), live-verify `/qa-atomic-rpc`, run real Apply Price + Recipe Import update path, sign off as accepted.
+- **Build 3.1 — Transactional Invite Emails (recommended next).** Email delivery for `restaurant_invitations` (Supabase email / Resend / Postmark). Closes OI-20.
+- **Build 2.2B — Stripe Test Verification.** Exercise checkout + portal + webhook end-to-end on the live Vercel URL with Stripe test keys.
+- **Build 3.3 — Production Monitoring Provider Setup.** Configure Sentry DSN.
+- **Build 3.5 — XLS/XLSM Analysis / Formula Gap Review.** Scope only.
+- **Build 3.6 — Manual Recipe Edit Atomic Audit RPC.** Closes OI-30.
+- **Build 3.7 — Recipe Import Atomic Server Workflow.** Closes the remaining client-orchestrated portions of OI-29 (create path + non-price update fields + lines).
 - **Build 3.1 — Transactional Invite Emails.** Email delivery for `restaurant_invitations`.
 - **Build 2.2B — Stripe Test Verification.** Exercise checkout + portal + webhook end-to-end on the live Vercel URL with Stripe test keys.
 - **Build 3.3 — Production Monitoring Provider Setup.** Configure Sentry DSN.

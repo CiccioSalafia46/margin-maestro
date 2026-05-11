@@ -143,7 +143,7 @@ function QaMenuPriceAuditPage() {
     <AppShell>
       <PageHeader
         title="QA — Menu Price Audit"
-        description="Build 3.4: append-only audit of dish menu_price changes; Apply Price + audit atomic via SQL RPC."
+        description="Build 3.4A — Accepted. Append-only audit; Apply Price writes audit through atomic SQL RPC. Recipe import update path also uses the RPC."
       />
       <div className="space-y-6 p-6">
         <Card>
@@ -179,9 +179,10 @@ function QaMenuPriceAuditPage() {
         </Card>
 
         <p className="text-[11px] text-muted-foreground">
-          Build 3.4 — Apply Price + audit now atomic via SQL RPC. Audit table remains append-only
-          (RLS enabled, SELECT for members, INSERT for owner/manager, no UPDATE/DELETE).
-          This QA page does not mutate data.
+          Build 3.4A — Atomic RPC Accepted. Audit table remains append-only (RLS enabled, SELECT
+          for members, INSERT for owner/manager, no UPDATE/DELETE). Apply Price and Recipe Import
+          update path both write audit through the atomic RPC. Manual recipe edit audit and recipe
+          import create path remain best-effort by design.
         </p>
       </div>
     </AppShell>

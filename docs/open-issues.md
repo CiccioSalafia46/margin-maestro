@@ -115,7 +115,7 @@ Known issues and limitations for Margin IQ. Updated for Build 2.8A.
 **Resolution:** `menu_price_audit_log` introduced with append-only RLS (no UPDATE / no DELETE policy). Apply Price (Build 2.4) and manual dish recipe `menu_price` edits both write audit rows. Read-only history panel on `/dish-analysis/$id`. New `/qa-menu-price-audit` route. Live verified at Build 2.9A: `pg_policies` confirms only SELECT (members) and INSERT (owner/manager) policies; no UPDATE / no DELETE; Apply Price does not write ingredient_price_log / batches / billing rows. See `docs/menu-price-audit-trail.md`.
 
 ### OI-28 — Menu price audit insert is not atomic with price update
-**Severity:** Low · **Status:** Resolved for Apply Price — Build 3.4 (pending acceptance Build 3.4A). Partially resolved for Recipe CSV Import update path.
+**Severity:** Low · **Status:** Resolved for Apply Price — Build 3.4 / accepted Build 3.4A. Partially resolved for Recipe CSV Import update path.
 **Resolution:** SQL function `public.apply_dish_menu_price_with_audit(...)` writes both `recipes.menu_price` and `menu_price_audit_log` in a single transaction. `applyDishMenuPrice` (Menu Analytics + Dish Analysis) calls this RPC exclusively. Recipe CSV Import update path also calls it for dish `menu_price` changes (source = 'import'). See `docs/atomic-rpc-hardening.md`.
 **Remaining gap → OI-30 below:** `updateRecipe` (manual recipe edit) still writes a best-effort `manual_recipe_edit` audit row after a multi-field recipe update — not atomic. Deferred to keep the recipe save flow stable.
 

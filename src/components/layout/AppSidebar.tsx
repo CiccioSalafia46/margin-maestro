@@ -138,7 +138,7 @@ export function AppSidebar() {
       <SidebarFooter className="border-t">
         {!collapsed && (
           <p className="px-2 py-1 text-[10px] text-muted-foreground">
-            Build 3.4 — Atomic RPC Hardening
+            Build 3.4A — Atomic RPC Accepted
           </p>
         )}
       </SidebarFooter>

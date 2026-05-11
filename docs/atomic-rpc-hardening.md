@@ -1,4 +1,6 @@
-# Atomic RPC Hardening — Build 3.4
+# Atomic RPC Hardening — Build 3.4A (accepted)
+
+> **Build 3.4A — Accepted (2026-05-10).** Migration applied to live Supabase (`atdvrdhzcbtxvzgvoxhb`) via MCP `apply_migration`. `pg_proc` confirms `security = INVOKER`, correct argument signature, and `authenticated`-only `EXECUTE` grant. Defensive auth check verified via probe (function reachable, raises `42501` when called outside an authenticated session). Live `/qa-atomic-rpc` returns 200.
 
 ## Purpose
 
@@ -102,10 +104,12 @@ The migration is **not auto-applied**. Run `supabase db push --project-ref atdvr
 
 ## Recommended next builds
 
-- Build 3.4A — Atomic RPC Acceptance (live verification: deploy migration, run Apply Price, confirm via `/qa-atomic-rpc` that the function is reachable and `audit_log_id` is returned).
-- Build 3.1 — Transactional Invite Emails.
+- ✅ Build 3.4A — Atomic RPC Acceptance (done).
+- **Build 3.1 — Transactional Invite Emails (recommended next).**
 - Build 2.2B — Stripe Test Verification.
 - Build 3.3 — Production Monitoring Provider Setup.
 - Build 3.5 — XLS/XLSM Analysis / Formula Gap Review.
+- Build 3.6 — Manual Recipe Edit Atomic Audit RPC (closes OI-30).
+- Build 3.7 — Recipe Import Atomic Server Workflow (closes remaining OI-29 parts).
 
 Note: **Build 3.2 (separate production Supabase project)** remains future optional hardening, not a recommended next step (per intentional cost decision documented at Build 3.0A).

@@ -81,7 +81,7 @@ function QaApplyPricePage() {
 
   return (
     <AppShell>
-      <PageHeader title="QA — Apply Price" description="Build 3.4: Apply suggested menu price to dish recipes — atomic via SQL RPC." />
+      <PageHeader title="QA — Apply Price" description="Build 3.4A — Accepted. Apply suggested menu price to dish recipes — atomic via SQL RPC." />
       <div className="space-y-6 p-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between"><CardTitle className="text-base">Overall status</CardTitle><OverallBadge status={summary.overall} /></CardHeader>
@@ -96,7 +96,7 @@ function QaApplyPricePage() {
             {checks.map((c) => (<div key={c.label} className="flex items-start justify-between gap-3 border-b py-2 last:border-b-0"><div className="min-w-0"><p className="text-sm font-medium">{c.label}</p>{c.detail && <p className="text-xs text-muted-foreground">{c.detail}</p>}</div><StatusBadge status={c.status} /></div>))}
           </CardContent>
         </Card>
-        <p className="text-[11px] text-muted-foreground">Build 3.4 — Apply Price + audit atomic via SQL RPC.</p>
+        <p className="text-[11px] text-muted-foreground">Build 3.4A — Apply Price + audit atomic via SQL RPC (accepted). No client fallback path; viewer remains read-only; Stripe/billing unrelated and deferred.</p>
       </div>
     </AppShell>
   );

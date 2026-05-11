@@ -1,6 +1,6 @@
-# Security Review — Build 3.4 (atomic RPC hardening)
+# Security Review — Build 3.4A (atomic RPC accepted)
 
-> **Build 3.4 update.** Added one SQL function `public.apply_dish_menu_price_with_audit(...)`. `SECURITY INVOKER`. `SET search_path = public`. No dynamic SQL. Defensive `auth.uid()` + `has_restaurant_role(..., array['owner','manager'])` check inside function body. `REVOKE ALL` from `public`/`anon`; `GRANT EXECUTE` to `authenticated`. No service-role usage; no client-exposed secrets. No new tables. No RLS changes. See `docs/atomic-rpc-hardening.md`.
+> **Build 3.4A update.** SQL function `public.apply_dish_menu_price_with_audit(...)` live-verified. `pg_proc` confirms `security = INVOKER`, correct argument signature, and ACL `postgres=X, authenticated=X, service_role=X` (no `public` or `anon` grant). Probe call rejects unauthenticated callers with `42501` from the defensive auth check inside the function body. No service-role usage; no client-exposed secrets. No new tables. No RLS changes. See `docs/atomic-rpc-hardening.md`.
 
 ---
 

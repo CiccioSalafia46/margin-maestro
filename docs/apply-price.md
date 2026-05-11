@@ -1,6 +1,6 @@
-# Apply Price — Build 2.4 (audit integration: 2.9 / 2.9A · atomic RPC: Build 3.4)
+# Apply Price — Build 2.4 (audit: 2.9 / 2.9A · atomic RPC: 3.4 / accepted: 3.4A)
 
-> **Build 3.4 update.** Apply Price now performs a **single atomic SQL RPC call** (`public.apply_dish_menu_price_with_audit`) that updates `recipes.menu_price` and inserts the `menu_price_audit_log` row in one transaction. Both writes succeed or fail together — no more partial-success path. The success toast reads "Menu price updated to $X and audit entry recorded." On RPC failure, no client-side fallback writes the price. **Apply Price still does not write `ingredient_price_log`, create `price_update_batches`, create billing rows, or publish to a POS.** See `docs/atomic-rpc-hardening.md`.
+> **Build 3.4A update.** RPC live-verified. Apply Price now performs a **single atomic SQL RPC call** (`public.apply_dish_menu_price_with_audit`) that updates `recipes.menu_price` and inserts the `menu_price_audit_log` row in one transaction. Both writes succeed or fail together — no more partial-success path. The success toast reads "Menu price updated to $X and audit entry recorded." On RPC failure, no client-side fallback writes the price. **Apply Price still does not write `ingredient_price_log`, create `price_update_batches`, create billing rows, or publish to a POS.** See `docs/atomic-rpc-hardening.md`.
 
 ## Overview
 

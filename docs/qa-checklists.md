@@ -12,6 +12,8 @@ Manual and automated QA checklists for Margin IQ.
 
 > **Build 3.4 update.** New automated route `/qa-atomic-rpc` (22 checks A–V) probes the new `apply_dish_menu_price_with_audit` SQL RPC, documents grant model, covers defensive role/kind/price/source validation, atomicity guarantee, API integration, recipe-import audit atomicity, manual recipe edit limitation, side-effect absence. `/qa-apply-price` adds T+U; `/qa-menu-price-audit` and `/qa-recipe-import` rephrased; `/qa-mvp-readiness` adds AA; `/qa-beta-launch` adds AJ. See `docs/atomic-rpc-hardening.md`.
 
+> **Build 3.4A update.** RPC accepted live. `/qa-atomic-rpc` description + footer bumped to "Accepted"; same for `/qa-apply-price`, `/qa-menu-price-audit`, `/qa-recipe-import`. `/qa-mvp-readiness` check AA and `/qa-beta-launch` check AJ report "accepted". `pg_proc` confirms `security = INVOKER`, ACL `authenticated`-only.
+
 ---
 
 ## Auth QA

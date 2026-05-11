@@ -1,8 +1,8 @@
 # Current State
 
 **Date:** 2026-05-10
-**Build:** 3.4 — Atomic RPC Hardening
-**Branch:** `main` (Build 2.9 → 2.9A → 3.0 → 3.0A merged in; 3.4 implemented on top)
+**Build:** 3.4A — Atomic RPC Accepted
+**Branch:** `main` (Build 2.9 → 2.9A → 3.0 → 3.0A → 3.4 → 3.4A; RPC migration applied live)
 **Backend:** Self-owned Supabase project `margin-maestro-dev` (`atdvrdhzcbtxvzgvoxhb`) — currently reused as live backend by explicit user choice.
 **Frontend hosting:** Vercel project `margin-maestro` — https://margin-maestro.vercel.app
 
@@ -40,6 +40,15 @@
 - Transactional invite emails deferred (OI-20, → Build 3.1).
 - Google OAuth production hardening pending (OI-21).
 - Audit insert is client-orchestrated, not atomic with the price update — the UI surfaces a warning when the audit row fails; price update remains.
+
+## Build 3.4A acceptance highlights
+
+- Build 3.4 RPC migration applied live to `margin-maestro-dev` (`atdvrdhzcbtxvzgvoxhb`).
+- `public.apply_dish_menu_price_with_audit` deployed: `SECURITY INVOKER`, args verified, ACL confirmed (`public`/`anon` revoked, `authenticated` granted).
+- Function probe via `execute_sql` returns the expected `42501 not authenticated` when called outside an authenticated context — proves the function is reachable and the defensive auth check works.
+- `/qa-atomic-rpc` on live returns 200 OK; check D will pass for any authenticated owner/manager session.
+- QA copy across `/qa-atomic-rpc`, `/qa-apply-price`, `/qa-menu-price-audit`, `/qa-recipe-import`, `/qa-mvp-readiness`, `/qa-beta-launch`, `/qa-auth` refreshed to "accepted".
+- **No code changes** beyond label/copy/docs in this build. No new migration. No new tables. No RLS changes.
 
 ## Build 3.4 highlights
 
@@ -89,9 +98,10 @@
 
 ## Next Steps
 
-1. **Build 3.4A — Atomic RPC Acceptance.** Run `supabase db push` to deploy `20260510180000_build_3_4_atomic_rpc_hardening.sql`. Live-verify `/qa-atomic-rpc`, exercise Apply Price + Recipe Import update path, confirm audit rows record `audit_log_id` from RPC.
-2. Build 3.1 — Transactional Invite Emails.
-3. Build 2.2B — Stripe Test Verification.
-4. Build 3.3 — Production Monitoring Provider Setup.
-5. Build 3.5 — XLS/XLSM Analysis / Formula Gap Review.
-6. Build 3.2 — Separate Production Supabase Migration (future optional hardening, **not** immediate). Strengthen backup + QA discipline on `margin-maestro-dev` in the meantime.
+1. **Build 3.1 — Transactional Invite Emails.** Email delivery for `restaurant_invitations`.
+2. Build 2.2B — Stripe Test Verification.
+3. Build 3.3 — Production Monitoring Provider Setup.
+4. Build 3.5 — XLS/XLSM Analysis / Formula Gap Review.
+5. Build 3.6 — Manual Recipe Edit Atomic Audit RPC (closes OI-30).
+6. Build 3.7 — Recipe Import Atomic Server Workflow (closes the remaining parts of OI-29).
+7. Build 3.2 — Separate Production Supabase Migration (future optional hardening, **not** immediate). Strengthen backup + QA discipline on `margin-maestro-dev` in the meantime.

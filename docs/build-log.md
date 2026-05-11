@@ -861,6 +861,34 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 
 ---
 
+## Build 3.4A — Atomic RPC Accepted
+
+**Status:** Accepted.
+
+- Build 3.4 RPC migration applied to live Supabase (`atdvrdhzcbtxvzgvoxhb`) via MCP `apply_migration` — `{"success": true}`.
+- Live verification:
+  - `pg_proc` shows the function with `security = INVOKER`, correct argument signature, and ACL `postgres=X, authenticated=X, service_role=X` (no `public` or `anon` grant) → grant model confirmed.
+  - Probe call `select * from public.apply_dish_menu_price_with_audit('00000000-...', '00000000-...', 10.0, 'apply_price')` (outside authenticated session) returns `42501 not authenticated` from the defensive auth check inside the function. Function is reachable and the auth gate works.
+  - Migration history shows `build_3_4_atomic_rpc_hardening` (version `20260510212325`).
+- Live Vercel routes — all 200 OK: `/qa-atomic-rpc`, `/qa-apply-price`, `/qa-menu-price-audit`, `/qa-recipe-import`.
+- **No code changes** beyond label/copy/docs in this build.
+- Build label: "Build 3.4A — Atomic RPC Accepted".
+- `/qa-atomic-rpc` description + footer bumped to 3.4A.
+- `/qa-apply-price`, `/qa-menu-price-audit`, `/qa-recipe-import`, `/qa-mvp-readiness` (check AA), `/qa-beta-launch` (check AJ), `/qa-auth` footer all bumped to 3.4A.
+- Docs updated: `current-state`, `build-log` (this entry), `roadmap` (Build 3.4 accepted; next list reordered with Build 3.1 first), `open-issues` (OI-28 fully resolved for Apply Price; OI-30 carried as recipe-edit follow-up), `atomic-rpc-hardening`, `apply-price`, `menu-price-audit-trail`, `recipe-csv-import`, `qa-checklists`, `beta-checklist`, `live-deployment`, `security-review`.
+
+**Known remaining limitations (carried forward):**
+- OI-30 — Manual recipe edit audit not atomic.
+- OI-29 (reduced) — Recipe import create path + non-price update fields not atomic.
+- OI-16 — Single Supabase backend reused for live beta (intentional cost decision).
+- OI-17/18 — Stripe verification + billing rollout deferred.
+- OI-19 — Sentry DSN optional / unset.
+- OI-20 — Transactional invite emails not implemented.
+- OI-21 — Google OAuth production hardening pending.
+- No XLS/XLSM. No POS/marketplace publishing.
+
+---
+
 ## Build 2.7A — Monitoring Acceptance
 
 **Status:** Accepted

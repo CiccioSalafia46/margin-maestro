@@ -200,7 +200,7 @@ function QaRecipeImportPage() {
     <AppShell>
       <PageHeader
         title="QA — Recipe Import"
-        description="Build 3.4: Recipe CSV Import — update path uses atomic RPC for dish menu_price changes."
+        description="Build 3.4A — Accepted. Recipe CSV Import — update path uses atomic RPC for dish menu_price changes; create path remains best-effort by design."
       />
       <div className="space-y-6 p-6">
         <Card>
@@ -236,10 +236,10 @@ function QaRecipeImportPage() {
         </Card>
 
         <p className="text-[11px] text-muted-foreground">
-          Build 3.4 — Atomic RPC integration. This QA page does not import recipes or mutate data.
-          Recipe import is owner/manager only, requires existing ingredients, does NOT create ingredients/suppliers/batches/billing rows,
-          does NOT publish to POS. Update path's dish menu_price uses atomic RPC (source=import);
-          create path is still best-effort, manual recipe edit audit remains best-effort.
+          Build 3.4A — Atomic RPC Accepted. This QA page does not import recipes or mutate data.
+          Recipe import is owner/manager only, requires existing ingredients, does NOT create
+          ingredients/suppliers/batches/billing rows, does NOT publish to POS. Update path's dish
+          menu_price uses atomic RPC (source=import); create path remains best-effort by design.
         </p>
       </div>
     </AppShell>

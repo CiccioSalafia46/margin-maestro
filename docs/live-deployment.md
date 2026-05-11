@@ -105,9 +105,9 @@ Authorization continues to come exclusively from Supabase Auth + RLS + `restaura
 
 ---
 
-## SQL functions added at Build 3.4
+## SQL functions added at Build 3.4 (accepted at Build 3.4A)
 
-`public.apply_dish_menu_price_with_audit(uuid, uuid, numeric, text, text, jsonb)` — atomic dish menu_price update + menu_price_audit_log insert. `SECURITY INVOKER`. Owner/manager only via defensive `has_restaurant_role` check + RLS. `REVOKE`d from `public`/`anon`, `GRANT EXECUTE` to `authenticated`. **Migration not auto-applied; run `supabase db push` after taking a PITR checkpoint** (single-Supabase-backend live decision means a shared backend with dev).
+`public.apply_dish_menu_price_with_audit(uuid, uuid, numeric, text, text, jsonb)` — atomic dish menu_price update + menu_price_audit_log insert. `SECURITY INVOKER`. Owner/manager only via defensive `has_restaurant_role` check + RLS. `REVOKE`d from `public`/`anon`, `GRANT EXECUTE` to `authenticated`. **Migration applied live** at Build 3.4A — `pg_proc` confirms function signature, security mode, and ACL.
 
 ## Expected public tables (23 — unchanged at Build 3.4)
 

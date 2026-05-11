@@ -117,8 +117,8 @@ function QaMvpReadinessPage() {
       // Z: Recipe CSV Import (Build 3.0A — Accepted; update path atomic since 3.4)
       next.push({ label: "Z. Recipe CSV Import accepted (update path atomic via RPC since 3.4)", status: "pass", detail: "Two-file CSV; preview/apply with duplicate + line modes; source=import audit. Update path's menu_price uses atomic RPC; create path remains best-effort." });
 
-      // AA: Atomic RPC Hardening (Build 3.4)
-      next.push({ label: "AA. Apply Price + audit atomic via RPC", status: "pass", detail: "Build 3.4 — apply_dish_menu_price_with_audit RPC writes menu_price + menu_price_audit_log in one transaction. See /qa-atomic-rpc." });
+      // AA: Atomic RPC Hardening (Build 3.4A — Accepted)
+      next.push({ label: "AA. Apply Price + audit atomic via RPC (accepted)", status: "pass", detail: "Build 3.4A — RPC deployed live and verified. apply_dish_menu_price_with_audit writes menu_price + menu_price_audit_log in one transaction. Manual recipe edit and recipe import create path remain best-effort (OI-29/OI-30)." });
 
       if (!cancelled) { setChecks(next); setDone(true); }
     })();
@@ -135,7 +135,7 @@ function QaMvpReadinessPage() {
 
   return (
     <AppShell>
-      <PageHeader title="QA — MVP Readiness" description="Build 3.4: atomic RPC hardening of Apply Price + audit; recipe CSV import update path atomic on menu_price." />
+      <PageHeader title="QA — MVP Readiness" description="Build 3.4A — Accepted. Atomic RPC for Apply Price + audit live-verified." />
       <div className="space-y-6 p-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between"><CardTitle className="text-base">Overall status</CardTitle><OverallBadge status={summary.overall} /></CardHeader>
@@ -155,7 +155,7 @@ function QaMvpReadinessPage() {
             ))}
           </CardContent>
         </Card>
-        <p className="text-[11px] text-muted-foreground">No tokens or secrets displayed. Build 3.4 — Atomic RPC Hardening.</p>
+        <p className="text-[11px] text-muted-foreground">No tokens or secrets displayed. Build 3.4A — Atomic RPC Accepted.</p>
       </div>
     </AppShell>
   );

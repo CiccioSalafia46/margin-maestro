@@ -201,7 +201,7 @@ function QaAtomicRpcPage() {
     <AppShell>
       <PageHeader
         title="QA — Atomic RPC"
-        description="Build 3.4: dish menu_price update + menu_price_audit_log insert atomic via SQL RPC."
+        description="Build 3.4A — Accepted. Dish menu_price update + menu_price_audit_log insert atomic via SQL RPC. RPC deployed live and verified."
       />
       <div className="space-y-6 p-6">
         <Card>
@@ -237,9 +237,10 @@ function QaAtomicRpcPage() {
         </Card>
 
         <p className="text-[11px] text-muted-foreground">
-          Build 3.4 — Atomic RPC Hardening. This QA page does not apply prices or mutate data.
-          Apply Price + audit is now atomic through the SQL RPC; Recipe CSV Import is atomic on the
-          update path's menu_price column only; manual recipe edit audit remains best-effort.
+          Build 3.4A — Atomic RPC Accepted. RPC deployed live and verified. This QA page does not
+          apply prices or mutate data. Apply Price + audit is atomic through the SQL RPC; Recipe
+          CSV Import is atomic on the update path's menu_price column only; manual recipe edit
+          audit remains best-effort by design (OI-30).
         </p>
       </div>
     </AppShell>

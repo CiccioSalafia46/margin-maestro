@@ -62,7 +62,7 @@ No service-role usage in the browser. No cross-tenant reads. No broad `authentic
 
 ## Where audit rows come from
 
-> **Build 3.4 update.** Apply Price and Recipe CSV Import's update path now write the dish `menu_price` change and the audit row in a single SQL RPC call (`public.apply_dish_menu_price_with_audit`), so the two writes are atomic. See `docs/atomic-rpc-hardening.md`. Manual recipe edits and recipe-import create paths remain best-effort by design.
+> **Build 3.4A update.** Atomic RPC live-verified. Apply Price and Recipe CSV Import's update path write the dish `menu_price` change and the audit row in a single SQL RPC call (`public.apply_dish_menu_price_with_audit`), so the two writes are atomic. See `docs/atomic-rpc-hardening.md`. Manual recipe edits and recipe-import create paths remain best-effort by design.
 
 ### 1. Apply Price (`source = 'apply_price'`) — atomic since Build 3.4
 

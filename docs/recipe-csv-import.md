@@ -2,7 +2,7 @@
 
 > **Build 3.0A — Accepted (2026-05-10).** Functionally verified on https://margin-maestro.vercel.app. Two-file import (Recipes CSV + Recipe Lines CSV) is live for owner/manager users. Recipe import does not create ingredients/suppliers/categories/batches/billing rows and does not publish to a POS. Imported dish menu prices write `source = 'import'` rows to `menu_price_audit_log`.
 >
-> **Build 3.4 update.** The UPDATE path's dish `menu_price` change now goes through the atomic RPC `apply_dish_menu_price_with_audit` (source = 'import') — menu_price column + audit row commit/rollback together. Create path and non-price update fields remain client-orchestrated by design (OI-29).
+> **Build 3.4A update.** Atomic RPC live-verified. The UPDATE path's dish `menu_price` change goes through the atomic RPC `apply_dish_menu_price_with_audit` (source = 'import') — menu_price column + audit row commit/rollback together. Create path and non-price update fields remain client-orchestrated by design (OI-29).
 
 ## Purpose
 
