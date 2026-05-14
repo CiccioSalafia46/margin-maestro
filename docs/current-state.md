@@ -1,8 +1,8 @@
 # Current State
 
-**Date:** 2026-05-10
-**Build:** 3.4A — Atomic RPC Accepted
-**Branch:** `main` (Build 2.9 → 2.9A → 3.0 → 3.0A → 3.4 → 3.4A; RPC migration applied live)
+**Date:** 2026-05-11
+**Build:** 3.1 — Transactional Invite Emails
+**Branch:** `main` (Build 2.9 → 2.9A → 3.0 → 3.0A → 3.4 → 3.4A → 3.1)
 **Backend:** Self-owned Supabase project `margin-maestro-dev` (`atdvrdhzcbtxvzgvoxhb`) — currently reused as live backend by explicit user choice.
 **Frontend hosting:** Vercel project `margin-maestro` — https://margin-maestro.vercel.app
 
@@ -40,6 +40,17 @@
 - Transactional invite emails deferred (OI-20, → Build 3.1).
 - Google OAuth production hardening pending (OI-21).
 - Audit insert is client-orchestrated, not atomic with the price update — the UI surfaces a warning when the audit row fails; price update remains.
+
+## Build 3.1 highlights
+
+- New Supabase Edge Function `send-team-invitation` (Deno) — owner-only, fetches the invitation via service-role admin client, builds the accept-invite URL from `SITE_URL`, sends via Resend HTTPS API (`POST https://api.resend.com/emails`). No SDK dependency.
+- New frontend helper `sendTeamInvitationEmail(restaurantId, invitationId)` in `src/data/api/teamApi.ts`. Returns `{ sent, provider_configured, message }` and sanitizes raw errors.
+- Settings → Team `onInvite` now best-effort calls the email after creating the invitation. Clipboard copy happens first so the manual-share fallback is never blocked. Pending invitations table gains a **Resend email** button.
+- **No new tables.** **No new migration.** Provider secrets stay server-side (`RESEND_API_KEY`, `FROM_EMAIL`, `SITE_URL` via `supabase secrets set`).
+- New automated QA `/qa-transactional-invites` (20 checks A–T). Probes Edge Function deployment without sending real emails.
+- `/qa-team-management` adds check R; `/qa-mvp-readiness` adds BB; `/qa-beta-launch` adds AK; `/qa-auth` footer refreshed.
+- Settings → Developer QA adds `/qa-transactional-invites`. E2E `qa-routes.spec.ts` includes the new route.
+- `.env.example` documents `RESEND_API_KEY` + `FROM_EMAIL` as server-side-only secrets.
 
 ## Build 3.4A acceptance highlights
 
@@ -98,10 +109,10 @@
 
 ## Next Steps
 
-1. **Build 3.1 — Transactional Invite Emails.** Email delivery for `restaurant_invitations`.
+1. **Build 3.1A — Transactional Invite Email Acceptance.** Deploy the Edge Function (`supabase functions deploy send-team-invitation --project-ref atdvrdhzcbtxvzgvoxhb`), set provider secrets (`supabase secrets set RESEND_API_KEY=... FROM_EMAIL=... SITE_URL=...`), live-verify `/qa-transactional-invites`, run an end-to-end invitation send to a real address.
 2. Build 2.2B — Stripe Test Verification.
 3. Build 3.3 — Production Monitoring Provider Setup.
 4. Build 3.5 — XLS/XLSM Analysis / Formula Gap Review.
 5. Build 3.6 — Manual Recipe Edit Atomic Audit RPC (closes OI-30).
-6. Build 3.7 — Recipe Import Atomic Server Workflow (closes the remaining parts of OI-29).
-7. Build 3.2 — Separate Production Supabase Migration (future optional hardening, **not** immediate). Strengthen backup + QA discipline on `margin-maestro-dev` in the meantime.
+6. Build 3.7 — Recipe Import Atomic Server Workflow (closes remaining OI-29 parts).
+7. Build 3.2 — Separate Production Supabase Migration (future optional hardening, **not** immediate).

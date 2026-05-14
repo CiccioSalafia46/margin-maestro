@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RecipesRouteImport } from './routes/recipes'
+import { Route as QaTransactionalInvitesRouteImport } from './routes/qa-transactional-invites'
 import { Route as QaTeamManagementRouteImport } from './routes/qa-team-management'
 import { Route as QaSettingsAdminRouteImport } from './routes/qa-settings-admin'
 import { Route as QaRecipesRouteImport } from './routes/qa-recipes'
@@ -70,6 +71,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const RecipesRoute = RecipesRouteImport.update({
   id: '/recipes',
   path: '/recipes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QaTransactionalInvitesRoute = QaTransactionalInvitesRouteImport.update({
+  id: '/qa-transactional-invites',
+  path: '/qa-transactional-invites',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QaTeamManagementRoute = QaTeamManagementRouteImport.update({
@@ -331,6 +337,7 @@ export interface FileRoutesByFullPath {
   '/qa-recipes': typeof QaRecipesRoute
   '/qa-settings-admin': typeof QaSettingsAdminRoute
   '/qa-team-management': typeof QaTeamManagementRoute
+  '/qa-transactional-invites': typeof QaTransactionalInvitesRoute
   '/recipes': typeof RecipesRouteWithChildren
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
@@ -379,6 +386,7 @@ export interface FileRoutesByTo {
   '/qa-recipes': typeof QaRecipesRoute
   '/qa-settings-admin': typeof QaSettingsAdminRoute
   '/qa-team-management': typeof QaTeamManagementRoute
+  '/qa-transactional-invites': typeof QaTransactionalInvitesRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -428,6 +436,7 @@ export interface FileRoutesById {
   '/qa-recipes': typeof QaRecipesRoute
   '/qa-settings-admin': typeof QaSettingsAdminRoute
   '/qa-team-management': typeof QaTeamManagementRoute
+  '/qa-transactional-invites': typeof QaTransactionalInvitesRoute
   '/recipes': typeof RecipesRouteWithChildren
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
@@ -479,6 +488,7 @@ export interface FileRouteTypes {
     | '/qa-recipes'
     | '/qa-settings-admin'
     | '/qa-team-management'
+    | '/qa-transactional-invites'
     | '/recipes'
     | '/settings'
     | '/signup'
@@ -527,6 +537,7 @@ export interface FileRouteTypes {
     | '/qa-recipes'
     | '/qa-settings-admin'
     | '/qa-team-management'
+    | '/qa-transactional-invites'
     | '/settings'
     | '/signup'
     | '/auth/callback'
@@ -575,6 +586,7 @@ export interface FileRouteTypes {
     | '/qa-recipes'
     | '/qa-settings-admin'
     | '/qa-team-management'
+    | '/qa-transactional-invites'
     | '/recipes'
     | '/settings'
     | '/signup'
@@ -625,6 +637,7 @@ export interface RootRouteChildren {
   QaRecipesRoute: typeof QaRecipesRoute
   QaSettingsAdminRoute: typeof QaSettingsAdminRoute
   QaTeamManagementRoute: typeof QaTeamManagementRoute
+  QaTransactionalInvitesRoute: typeof QaTransactionalInvitesRoute
   RecipesRoute: typeof RecipesRouteWithChildren
   SettingsRoute: typeof SettingsRoute
   SignupRoute: typeof SignupRoute
@@ -653,6 +666,13 @@ declare module '@tanstack/react-router' {
       path: '/recipes'
       fullPath: '/recipes'
       preLoaderRoute: typeof RecipesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qa-transactional-invites': {
+      id: '/qa-transactional-invites'
+      path: '/qa-transactional-invites'
+      fullPath: '/qa-transactional-invites'
+      preLoaderRoute: typeof QaTransactionalInvitesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/qa-team-management': {
@@ -1054,6 +1074,7 @@ const rootRouteChildren: RootRouteChildren = {
   QaRecipesRoute: QaRecipesRoute,
   QaSettingsAdminRoute: QaSettingsAdminRoute,
   QaTeamManagementRoute: QaTeamManagementRoute,
+  QaTransactionalInvitesRoute: QaTransactionalInvitesRoute,
   RecipesRoute: RecipesRouteWithChildren,
   SettingsRoute: SettingsRoute,
   SignupRoute: SignupRoute,

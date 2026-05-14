@@ -1,4 +1,6 @@
-# Team Management — Build 2.1
+# Team Management — Build 2.1 (transactional emails: Build 3.1)
+
+> **Build 3.1 update.** Owner-created invitations now trigger a best-effort transactional email via the `send-team-invitation` Supabase Edge Function (Resend). The clipboard copy fallback remains the source of truth; email outcome is surfaced as toast warnings, never blocks invitation creation. Pending invitations table gains a **Resend email** button. See `docs/transactional-invite-emails.md`.
 
 ## Table: `restaurant_invitations`
 

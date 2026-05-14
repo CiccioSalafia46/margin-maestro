@@ -63,9 +63,9 @@ Known issues and limitations for Margin IQ. Updated for Build 2.8A.
 **Acceptance criteria:** Sentry DSN configured in Vercel Production env; one verified test event captured; alerting wired.
 
 ### OI-20 — Transactional invite email delivery not implemented
-**Severity:** Medium · **Status:** Open · **Planned build:** 3.1.
-**Description:** Team invitations create rows in `restaurant_invitations` and the inviter copies the link manually. No email is sent.
-**Acceptance criteria:** New invitations trigger an email containing the accept-invite link, via Supabase email or an external provider (Resend/Postmark).
+**Severity:** Medium · **Status:** Implemented — Build 3.1 (acceptance pending Build 3.1A).
+**Resolution:** New `send-team-invitation` Supabase Edge Function (Deno + Resend HTTPS API, no SDK). Frontend helper `sendTeamInvitationEmail` invokes it after `createRestaurantInvitation`; UI surfaces three toast outcomes (sent / provider unconfigured / provider failure). Owner-only enforced server-side. Manual link copy remains the source of truth. Provider secrets (`RESEND_API_KEY`, `FROM_EMAIL`, `SITE_URL`) live in Supabase Edge Function env. See `docs/transactional-invite-emails.md`.
+**Outstanding for Build 3.1A:** deploy the Edge Function to live (`supabase functions deploy send-team-invitation`), set provider secrets via `supabase secrets set`, verify a real email is delivered.
 
 ### OI-21 — Google OAuth production hardening pending
 **Severity:** Medium · **Status:** Open.

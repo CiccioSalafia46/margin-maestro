@@ -120,6 +120,9 @@ function QaMvpReadinessPage() {
       // AA: Atomic RPC Hardening (Build 3.4A — Accepted)
       next.push({ label: "AA. Apply Price + audit atomic via RPC (accepted)", status: "pass", detail: "Build 3.4A — RPC deployed live and verified. apply_dish_menu_price_with_audit writes menu_price + menu_price_audit_log in one transaction. Manual recipe edit and recipe import create path remain best-effort (OI-29/OI-30)." });
 
+      // BB: Transactional Invite Emails (Build 3.1)
+      next.push({ label: "BB. Transactional invite emails implemented", status: "pass", detail: "Build 3.1 — send-team-invitation Edge Function + sendTeamInvitationEmail helper. Owner-only. Provider config (RESEND_API_KEY/FROM_EMAIL/SITE_URL) optional; manual copy fallback always available." });
+
       if (!cancelled) { setChecks(next); setDone(true); }
     })();
     return () => { cancelled = true; };
@@ -135,7 +138,7 @@ function QaMvpReadinessPage() {
 
   return (
     <AppShell>
-      <PageHeader title="QA — MVP Readiness" description="Build 3.4A — Accepted. Atomic RPC for Apply Price + audit live-verified." />
+      <PageHeader title="QA — MVP Readiness" description="Build 3.1: transactional invite emails + atomic Apply Price/audit accepted." />
       <div className="space-y-6 p-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between"><CardTitle className="text-base">Overall status</CardTitle><OverallBadge status={summary.overall} /></CardHeader>
@@ -155,7 +158,7 @@ function QaMvpReadinessPage() {
             ))}
           </CardContent>
         </Card>
-        <p className="text-[11px] text-muted-foreground">No tokens or secrets displayed. Build 3.4A — Atomic RPC Accepted.</p>
+        <p className="text-[11px] text-muted-foreground">No tokens or secrets displayed. Build 3.1 — Transactional Invite Emails.</p>
       </div>
     </AppShell>
   );

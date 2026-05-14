@@ -1,4 +1,14 @@
-# Deployment Guide — Build 2.8A (live)
+# Deployment Guide — Build 3.1 (transactional invite emails)
+
+> **Build 3.1 deployment note.** Build 3.1 introduces a new Supabase Edge Function `send-team-invitation`. Deploy it with:
+> ```bash
+> supabase functions deploy send-team-invitation --project-ref atdvrdhzcbtxvzgvoxhb
+> supabase secrets set --project-ref atdvrdhzcbtxvzgvoxhb \
+>   SITE_URL=https://margin-maestro.vercel.app \
+>   RESEND_API_KEY=re_... \
+>   FROM_EMAIL="Margin Maestro <onboarding@resend.dev>"
+> ```
+> Provider secrets are optional — when unset the Edge Function returns `{ sent: false, provider_configured: false }` and the UI falls back to the manual copy-link flow. **Never** copy `RESEND_API_KEY` into Vercel frontend env or prefix it with `VITE_`.
 
 > **Live since Build 2.8A.** The app is deployed at https://margin-maestro.vercel.app via the Vercel project `margin-maestro`. For the operational runbook (Vercel adapter, Supabase Auth URL push, env rotation, rollback, log inspection), see `docs/live-deployment.md`.
 

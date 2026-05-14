@@ -1,3 +1,9 @@
+# Security Review — Build 3.1 (transactional invite emails)
+
+> **Build 3.1 update.** New Supabase Edge Function `send-team-invitation`. Auth: requires authenticated JWT; defensive `verifyRestaurantOwner` server-side. Reads invitation server-side via service-role admin client; validates `status='pending'` + not expired. Returns sanitized `{ sent, provider_configured, message }`; never returns raw provider response; never logs invite tokens or provider secrets. Provider secrets (`RESEND_API_KEY`, `FROM_EMAIL`, `SITE_URL`) live exclusively in Edge Function env — never `VITE_`-prefixed, never in Vercel frontend env. Manual clipboard copy is the source of truth; email failure does not block invitation creation. See `docs/transactional-invite-emails.md`.
+
+---
+
 # Security Review — Build 3.4A (atomic RPC accepted)
 
 > **Build 3.4A update.** SQL function `public.apply_dish_menu_price_with_audit(...)` live-verified. `pg_proc` confirms `security = INVOKER`, correct argument signature, and ACL `postgres=X, authenticated=X, service_role=X` (no `public` or `anon` grant). Probe call rejects unauthenticated callers with `42501` from the defensive auth check inside the function body. No service-role usage; no client-exposed secrets. No new tables. No RLS changes. See `docs/atomic-rpc-hardening.md`.

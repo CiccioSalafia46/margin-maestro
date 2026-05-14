@@ -105,6 +105,17 @@ Authorization continues to come exclusively from Supabase Auth + RLS + `restaura
 
 ---
 
+## Edge Functions
+
+| Function | Build | Purpose | Required secrets |
+|---|---|---|---|
+| `create-checkout-session` | 2.2A | Stripe checkout (deferred test verification) | `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID`, `SITE_URL` |
+| `create-customer-portal-session` | 2.2A | Stripe customer portal | `STRIPE_SECRET_KEY`, `SITE_URL` |
+| `stripe-webhook` | 2.2A | Stripe webhook handler | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` |
+| `send-team-invitation` | **3.1** | Transactional team invitation emails (Resend) | `RESEND_API_KEY` (optional), `FROM_EMAIL` (optional), `SITE_URL` |
+
+All secrets are managed via `supabase secrets set --project-ref atdvrdhzcbtxvzgvoxhb ...`. None of them belong in Vercel frontend env.
+
 ## SQL functions added at Build 3.4 (accepted at Build 3.4A)
 
 `public.apply_dish_menu_price_with_audit(uuid, uuid, numeric, text, text, jsonb)` — atomic dish menu_price update + menu_price_audit_log insert. `SECURITY INVOKER`. Owner/manager only via defensive `has_restaurant_role` check + RLS. `REVOKE`d from `public`/`anon`, `GRANT EXECUTE` to `authenticated`. **Migration applied live** at Build 3.4A — `pg_proc` confirms function signature, security mode, and ACL.

@@ -10,6 +10,16 @@ Forward implementation plan for Margin IQ — Restaurant Margin Intelligence Saa
 
 ---
 
+## Build 3.1 — Transactional Invite Emails
+
+**Status:** Implemented (acceptance pending — Build 3.1A).
+
+**Goal:** Add a transactional email layer for team invitations. Owner-triggered, single email per invitation, Resend via Edge Function. Manual link copy remains the source of truth.
+
+**Highlights:** New Edge Function, owner-only role gate, optional provider config, graceful manual-copy fallback, new `/qa-transactional-invites` route. No migrations, no new tables, no schema changes.
+
+---
+
 ## Build 3.4 — Atomic RPC Hardening
 
 **Status:** Accepted (Build 3.4A — live verification).
@@ -72,9 +82,9 @@ Forward implementation plan for Margin IQ — Restaurant Margin Intelligence Saa
 
 ---
 
-## Recommended next builds (post 3.4A)
+## Recommended next builds (post 3.1)
 
-- **Build 3.1 — Transactional Invite Emails (recommended next).** Email delivery for `restaurant_invitations` (Supabase email / Resend / Postmark). Closes OI-20.
+- **Build 3.1A — Transactional Invite Email Acceptance (recommended next).** Deploy Edge Function, set provider secrets, live-verify `/qa-transactional-invites`, send a real invitation end-to-end.
 - **Build 2.2B — Stripe Test Verification.** Exercise checkout + portal + webhook end-to-end on the live Vercel URL with Stripe test keys.
 - **Build 3.3 — Production Monitoring Provider Setup.** Configure Sentry DSN.
 - **Build 3.5 — XLS/XLSM Analysis / Formula Gap Review.** Scope only.

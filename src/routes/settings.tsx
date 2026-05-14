@@ -881,14 +881,50 @@ function TeamTab({ restaurantId, canManage }: { restaurantId: string; canManage:
     if (!userId) return;
     setSubmitting(true);
     try {
-      const { createRestaurantInvitation } = await import("@/data/api/teamApi");
+      const { createRestaurantInvitation, sendTeamInvitationEmail } = await import("@/data/api/teamApi");
       const inv = await createRestaurantInvitation(restaurantId, invEmail, invRole as "owner" | "manager" | "viewer", userId);
       const link = `${window.location.origin}/accept-invite?token=${inv.token}`;
       await navigator.clipboard.writeText(link).catch(() => {});
-      toast.success("Invite link copied to clipboard! Send it to the invited user manually.", { duration: 8000 });
+      // Build 3.1: best-effort transactional email. The manual copy path
+      // above is the source of truth — never blocked on email delivery.
+      try {
+        const result = await sendTeamInvitationEmail(restaurantId, inv.id);
+        if (result.sent) {
+          toast.success("Invite link copied. Invitation email also sent.", { duration: 8000 });
+        } else if (!result.provider_configured) {
+          toast.warning(
+            "Invite link copied. Email delivery is not configured yet, so share the link manually.",
+            { duration: 9000 },
+          );
+        } else {
+          toast.warning(
+            "Invite link copied, but the invitation email could not be sent. Share the link manually.",
+            { duration: 9000 },
+          );
+        }
+      } catch {
+        toast.warning(
+          "Invite link copied. Email delivery failed silently; share the link manually.",
+          { duration: 9000 },
+        );
+      }
       setInvEmail("");
       await load();
     } catch (e) { toast.error(errMsg(e)); } finally { setSubmitting(false); }
+  };
+
+  const onResendEmail = async (invId: string) => {
+    try {
+      const { sendTeamInvitationEmail } = await import("@/data/api/teamApi");
+      const result = await sendTeamInvitationEmail(restaurantId, invId);
+      if (result.sent) {
+        toast.success("Invitation email sent.");
+      } else if (!result.provider_configured) {
+        toast.warning("Email delivery is not configured. Use the copy-link option to share manually.");
+      } else {
+        toast.warning("Invitation email could not be sent. Use the copy-link option to share manually.");
+      }
+    } catch (e) { toast.error(errMsg(e)); }
   };
 
   const onCancel = async (invId: string) => {
@@ -969,7 +1005,12 @@ function TeamTab({ restaurantId, canManage }: { restaurantId: string; canManage:
               </div>
               <Button type="submit" disabled={submitting}>{submitting ? "Creating…" : "Create invite"}</Button>
             </form>
-            <p className="mt-2 text-[11px] text-muted-foreground">Email delivery is not enabled yet. After creating an invite, copy the link and send it to the user manually. The user must sign up or log in with the invited email.</p>
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              Build 3.1: the app attempts to send a transactional invitation email after creating an invite.
+              The invite link is always copied to your clipboard as a manual fallback — if email delivery is
+              not configured or fails, share the link directly. Invitees must accept while signed in with the
+              invited email address.
+            </p>
           </CardContent>
         </Card>
       )}
@@ -988,6 +1029,7 @@ function TeamTab({ restaurantId, canManage }: { restaurantId: string; canManage:
                     <TableCell className="text-xs text-muted-foreground">{new Date(inv.created_at).toLocaleDateString()}</TableCell>
                     {canManage && <TableCell className="text-right space-x-1">
                       <Button size="sm" variant="outline" onClick={() => { const link = `${window.location.origin}/accept-invite?token=${inv.token}`; navigator.clipboard.writeText(link).then(() => toast.success("Invite link copied.")); }}>Copy link</Button>
+                      <Button size="sm" variant="outline" onClick={() => onResendEmail(inv.id)}>Resend email</Button>
                       <Button size="sm" variant="ghost" onClick={() => onCancel(inv.id)}>Cancel</Button>
                     </TableCell>}
                   </TableRow>
@@ -1411,6 +1453,7 @@ function DeveloperQa() {
         <QaLink to="/qa-menu-price-audit" label="Menu Price Audit QA" />
         <QaLink to="/qa-recipe-import" label="Recipe Import QA" />
         <QaLink to="/qa-atomic-rpc" label="Atomic RPC QA" />
+        <QaLink to="/qa-transactional-invites" label="Transactional Invites QA" />
       </CardContent>
     </Card>
   );

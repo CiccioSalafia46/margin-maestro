@@ -98,6 +98,9 @@ function QaBetaLaunchPage() {
       // AJ: Atomic RPC Hardening (Build 3.4A — Accepted)
       next.push({ label: "AJ. Apply Price + audit atomic via RPC (accepted)", status: "pass", detail: "Build 3.4A — RPC deployed live and verified. Recipe import update path also uses RPC for menu_price changes. See /qa-atomic-rpc." });
 
+      // AK: Transactional Invite Emails (Build 3.1)
+      next.push({ label: "AK. Transactional invite emails implemented", status: "pass", detail: "Build 3.1 — send-team-invitation Edge Function. Owner only. Provider optional; manual link copy fallback always available. See /qa-transactional-invites." });
+
       if (!cancelled) { setChecks(next); setDone(true); }
     })();
     return () => { cancelled = true; };
@@ -113,7 +116,7 @@ function QaBetaLaunchPage() {
 
   return (
     <AppShell>
-      <PageHeader title="QA — Beta Launch" description="Build 3.4A — Accepted. Beta readiness + atomic Apply Price/audit via SQL RPC (live-verified)." />
+      <PageHeader title="QA — Beta Launch" description="Build 3.1: beta readiness + transactional invite emails + atomic Apply Price/audit accepted." />
       <div className="space-y-6 p-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between"><CardTitle className="text-base">Overall status</CardTitle><OverallBadge status={summary.overall} /></CardHeader>
@@ -128,7 +131,7 @@ function QaBetaLaunchPage() {
             {checks.map((c) => (<div key={c.label} className="flex items-start justify-between gap-3 border-b py-2 last:border-b-0"><div className="min-w-0"><p className="text-sm font-medium">{c.label}</p>{c.detail && <p className="text-xs text-muted-foreground">{c.detail}</p>}</div><StatusBadge status={c.status} /></div>))}
           </CardContent>
         </Card>
-        <p className="text-[11px] text-muted-foreground">Build 3.4A — Atomic RPC Accepted.</p>
+        <p className="text-[11px] text-muted-foreground">Build 3.1 — Transactional Invite Emails.</p>
       </div>
     </AppShell>
   );

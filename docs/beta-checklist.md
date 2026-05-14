@@ -8,6 +8,8 @@ Manual acceptance flows for beta readiness.
 
 > **Build 3.4 / 3.4A add-on (accepted).** Atomic RPC deployed live and verified. Acceptance flow remains the practical test: exercise Apply Price on a live dish from `/menu-analytics` and `/dish-analysis/$id` — confirm success toast says "Menu price updated to $X and audit entry recorded.", verify the audit row appears with `audit_log_id` populated. Then run an UPDATE-mode Recipe CSV Import on an existing dish to confirm the import path also writes an atomic audit row with `source = 'import'`.
 
+> **Build 3.1 add-on.** After deploying `send-team-invitation` and setting provider secrets, exercise the invite flow from Settings → Team: create an invitation for an email you control, confirm the success toast reports both clipboard copy and email send, verify the email arrives with the correct accept link, click the link and complete the accept flow. Then exercise the **Resend email** button on a pending invitation. Verify viewer role cannot see invite-creation UI.
+
 ## A. Auth and Onboarding
 - [ ] Signup with email/password
 - [ ] Login

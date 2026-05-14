@@ -116,6 +116,52 @@ export async function cancelRestaurantInvitation(restaurantId: string, invitatio
   if (error) throw toApiError(error);
 }
 
+// ── Transactional Invitation Email — Build 3.1 ─────────────────────
+
+export interface SendInvitationEmailResult {
+  /** True when the provider reports successful delivery. */
+  sent: boolean;
+  /** False when no email provider is configured server-side (graceful fallback). */
+  provider_configured: boolean;
+  /** Friendly message safe to surface to the operator. */
+  message: string;
+}
+
+export function canSendTeamInvitationEmail(role: RestaurantRole | null): boolean {
+  // Mirrors existing invitation creation rule: owner only.
+  return role === "owner";
+}
+
+export async function sendTeamInvitationEmail(
+  restaurantId: string,
+  invitationId: string,
+): Promise<SendInvitationEmailResult> {
+  const { data, error } = await supabase.functions.invoke<SendInvitationEmailResult>(
+    "send-team-invitation",
+    { body: { restaurant_id: restaurantId, invitation_id: invitationId } },
+  );
+  if (error) {
+    // Sanitize: never surface raw provider/edge error to UI.
+    const msg = error.message ?? "Edge Function call failed.";
+    if (/missing auth|not authenticated/i.test(msg)) {
+      throw { code: "auth", message: "Please sign in again." } as ApiError;
+    }
+    if (/owners can send/i.test(msg) || /permission/i.test(msg)) {
+      throw { code: "permission", message: "Only restaurant owners can send invitation emails." } as ApiError;
+    }
+    throw { code: "unknown", message: "Invitation email could not be sent." } as ApiError;
+  }
+  // Normalize a missing/empty response into a safe default.
+  if (!data) {
+    return {
+      sent: false,
+      provider_configured: false,
+      message: "Email provider is not configured yet. Copy and share the invite link manually.",
+    };
+  }
+  return data;
+}
+
 // ── Accept Invite ────────────────────────────────────────────────────
 
 export async function acceptRestaurantInvitation(token: string): Promise<{ restaurant_id: string; role: string; already_member: boolean }> {

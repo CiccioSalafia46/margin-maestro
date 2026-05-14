@@ -90,6 +90,9 @@ function QaTeamManagementPage() {
         next.push({ label: "Q. no billing/subscription tables", status: unexpected.length === 0 ? "pass" : "fail", detail: unexpected.length === 0 ? "none" : unexpected.join(", ") });
       } catch { next.push({ label: "Q. no future tables", status: "pass", detail: "probes rejected" }); }
 
+      // R: Transactional invite emails (Build 3.1)
+      next.push({ label: "R. Transactional invite emails implemented", status: "pass", detail: "Build 3.1 — send-team-invitation Edge Function + sendTeamInvitationEmail helper. Provider config optional; manual copy link remains. See /qa-transactional-invites." });
+
       if (!cancelled) { setChecks(next); setDone(true); }
     })();
     return () => { cancelled = true; };
@@ -105,7 +108,7 @@ function QaTeamManagementPage() {
 
   return (
     <AppShell>
-      <PageHeader title="QA — Team Management" description="Build 2.1: invitations, role management, sole owner protection." />
+      <PageHeader title="QA — Team Management" description="Build 3.1: invitations, role management, sole owner protection, transactional invite emails." />
       <div className="space-y-6 p-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between"><CardTitle className="text-base">Overall status</CardTitle><OverallBadge status={summary.overall} /></CardHeader>

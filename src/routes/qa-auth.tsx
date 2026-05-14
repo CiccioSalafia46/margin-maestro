@@ -443,9 +443,9 @@ function QaAuthPage() {
 
         <p className="text-[11px] text-muted-foreground">
           No access tokens, refresh tokens, service-role keys, or raw session JSON are displayed.
-          Build 3.4A — Atomic RPC Accepted. Live URL: https://margin-maestro.vercel.app.
-          Apply Price + menu_price_audit_log insert are atomic via SQL RPC (single transaction) — live-verified.
-          Recipe CSV Import update path uses the same RPC; create path and manual recipe edit audit remain best-effort by design.
+          Build 3.1 — Transactional Invite Emails. Live URL: https://margin-maestro.vercel.app.
+          Apply Price + audit atomic via SQL RPC (live-verified). Team invitations now attempt
+          transactional email delivery via Supabase Edge Function (provider optional; manual copy fallback).
           No ingredient_price_log writes, no batches, no billing rows, no POS publishing.
           Single Supabase backend reused for live beta by intentional cost decision.
         </p>

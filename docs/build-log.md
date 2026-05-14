@@ -889,6 +889,44 @@ Historical record of builds for Margin IQ — Restaurant Margin Intelligence Saa
 
 ---
 
+## Build 3.1 — Transactional Invite Emails
+
+**Status:** Implemented (acceptance pending — Build 3.1A).
+
+- **No migration. No new tables.**
+- **New Edge Function** `supabase/functions/send-team-invitation/index.ts`. Deno runtime. Provider: Resend via HTTPS API (`POST https://api.resend.com/emails`) — no SDK dependency. Behavior:
+  - Requires authenticated JWT.
+  - `verifyRestaurantOwner` on the supplied `restaurant_id` (owner-only, matches Build 2.1 invitation rule).
+  - Reads invitation server-side via service-role admin client; validates ownership + `status='pending'` + not expired.
+  - Builds `inviteUrl = SITE_URL + /accept-invite?token=<token>` (SITE_URL defaults to `https://margin-maestro.vercel.app`).
+  - When `RESEND_API_KEY` is unset → returns `{ sent: false, provider_configured: false, message }` (graceful fallback).
+  - When `RESEND_API_KEY` is set → sends with `from = FROM_EMAIL ?? "Margin Maestro <onboarding@resend.dev>"`, returns `{ sent: true, provider_configured: true, message }`.
+  - Sanitizes provider responses; never returns raw API output; never logs tokens or provider secrets.
+- **`src/data/api/teamApi.ts`** — added `canSendTeamInvitationEmail(role)` (owner-only) and `sendTeamInvitationEmail(restaurantId, invitationId)` (sanitized errors). Existing CRUD untouched.
+- **Settings → Team UI** — `onInvite` now best-effort calls the email helper after `createRestaurantInvitation`. The clipboard copy fires first so the manual-share fallback is unaffected by email outcome. Three toast outcomes:
+  - sent → "Invite link copied. Invitation email also sent."
+  - provider unconfigured → "Invite link copied. Email delivery is not configured yet…"
+  - provider failure → "Invite link copied, but the invitation email could not be sent…"
+- Pending invitations table gains a **Resend email** action (owner-only). Cancel + Copy link unchanged.
+- **New automated QA** `/qa-transactional-invites` (20 checks A–T). Probes Edge Function deployment by invoking with `body: {}` and inspecting whether the response looks like "function not deployed" (WARN) or "deployed but rejected" (PASS). Covers role gate, provider config optionality, manual fallback, accept-invite route, secret exposure, localStorage persistence, and absence of new tables.
+- **`/qa-team-management`** check R added (Build 3.1 implementation note); description bumped.
+- **`/qa-auth`** footer bumped to 3.1.
+- **`/qa-mvp-readiness`** new check BB; description + footer bumped.
+- **`/qa-beta-launch`** new check AK; description + footer bumped.
+- **Settings → Developer QA** adds link to `/qa-transactional-invites`. E2E spec includes the route. No mutating tests added by default.
+- **`.env.example`** — added documented `RESEND_API_KEY` and `FROM_EMAIL` placeholders, both commented; explicit reminder that they belong only in Supabase Edge Function secrets, never in Vercel frontend env or prefixed with `VITE_`.
+- **Docs** created `docs/transactional-invite-emails.md`. Updated `current-state`, `build-log` (this entry), `roadmap`, `open-issues` (OI-20 marked implemented pending acceptance), `team-management`, `deployment-guide`, `security-review`, `qa-checklists`, `beta-checklist`, `live-deployment`.
+- Build label: "Build 3.1 — Transactional Invite Emails".
+
+**Known limitations:**
+- Email send is **not atomic** with invitation creation by design. Manual copy fallback is the source of truth.
+- No retry / queue / bounce handling.
+- No `last_email_sent_at` field on `restaurant_invitations` (would require a schema change; deferred).
+- Domain verification (Resend) is a manual one-time setup by the operator outside this build.
+- Function ships in code but provider secrets must be set on the live backend (`supabase secrets set ...`) before real emails leave the system.
+
+---
+
 ## Build 2.7A — Monitoring Acceptance
 
 **Status:** Accepted

@@ -5,6 +5,7 @@ const QA_ROUTES = [
   "/qa-mvp-readiness",
   "/qa-auth",
   "/qa-team-management",
+  "/qa-transactional-invites",
   "/qa-dashboard",
   "/qa-alerts",
   "/qa-impact-cascade",

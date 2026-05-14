@@ -14,6 +14,8 @@ Manual and automated QA checklists for Margin IQ.
 
 > **Build 3.4A update.** RPC accepted live. `/qa-atomic-rpc` description + footer bumped to "Accepted"; same for `/qa-apply-price`, `/qa-menu-price-audit`, `/qa-recipe-import`. `/qa-mvp-readiness` check AA and `/qa-beta-launch` check AJ report "accepted". `pg_proc` confirms `security = INVOKER`, ACL `authenticated`-only.
 
+> **Build 3.1 update.** New automated route `/qa-transactional-invites` (20 checks A–T) probes the new `send-team-invitation` Edge Function via a malformed invocation, covers role enforcement, provider-config optionality (WARN, not FAIL), manual fallback, accept-invite preservation, no-new-tables guarantee, secret exposure (no `VITE_*_API_KEY` for email providers), localStorage persistence. `/qa-team-management` adds check R; `/qa-mvp-readiness` adds BB; `/qa-beta-launch` adds AK. See `docs/transactional-invite-emails.md`.
+
 ---
 
 ## Auth QA
