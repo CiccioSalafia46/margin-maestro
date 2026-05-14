@@ -1,0 +1,1617 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Margin Maestro Beta Admin Guide</title>
+<style>
+  /* ---------- Reset & base ---------- */
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+    font-size: 16px;
+    line-height: 1.55;
+    color: #1f2933;
+    background: #f7f8fa;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: #1a73c2; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code, kbd, pre {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size: 0.92em;
+  }
+  code {
+    background: #eef1f5;
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: #2d3748;
+  }
+  pre {
+    background: #0f1623;
+    color: #e6edf3;
+    padding: 14px 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+  }
+  pre code { background: transparent; padding: 0; color: inherit; }
+  hr { border: 0; border-top: 1px solid #e3e6eb; margin: 28px 0; }
+
+  /* ---------- Layout ---------- */
+  .page {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+  header.cover {
+    background: linear-gradient(135deg, #143a5a 0%, #0d6b8a 60%, #119080 100%);
+    color: #fff;
+    border-radius: 14px;
+    padding: 36px 32px;
+    box-shadow: 0 6px 24px rgba(15, 30, 60, 0.18);
+    margin-bottom: 28px;
+  }
+  header.cover h1 {
+    margin: 0 0 6px;
+    font-size: 30px;
+    letter-spacing: -0.01em;
+  }
+  header.cover .subtitle {
+    margin: 0 0 18px;
+    opacity: 0.9;
+    font-size: 17px;
+  }
+  header.cover .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    font-size: 14px;
+    margin-top: 14px;
+  }
+  header.cover .meta span {
+    background: rgba(255,255,255,0.14);
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  header.cover a { color: #d9f1ff; }
+  header.cover a:hover { color: #fff; }
+
+  h2 {
+    font-size: 22px;
+    margin: 40px 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #e3e6eb;
+    color: #0f2540;
+    scroll-margin-top: 16px;
+  }
+  h3 {
+    font-size: 17px;
+    margin: 22px 0 8px;
+    color: #163a59;
+    scroll-margin-top: 16px;
+  }
+  h4 {
+    font-size: 15px;
+    margin: 14px 0 6px;
+    color: #1f2933;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  p { margin: 8px 0; }
+  ul, ol { padding-left: 22px; margin: 8px 0; }
+  li { margin: 3px 0; }
+
+  /* ---------- TOC ---------- */
+  nav.toc {
+    background: #fff;
+    border: 1px solid #e3e6eb;
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin-bottom: 24px;
+    column-count: 2;
+    column-gap: 30px;
+  }
+  nav.toc h2 {
+    column-span: all;
+    margin: 0 0 10px;
+    border-bottom: none;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #506070;
+  }
+  nav.toc ol {
+    list-style: decimal;
+    margin: 0;
+    padding-left: 22px;
+  }
+  nav.toc li { break-inside: avoid; margin: 2px 0; font-size: 14.5px; }
+
+  /* ---------- Cards & sections ---------- */
+  section.card {
+    background: #fff;
+    border: 1px solid #e3e6eb;
+    border-radius: 12px;
+    padding: 22px 26px;
+    margin: 18px 0 28px;
+    box-shadow: 0 1px 3px rgba(15, 30, 60, 0.04);
+  }
+  section.card > h2:first-child { margin-top: 0; }
+
+  /* ---------- Badges ---------- */
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 999px;
+    vertical-align: middle;
+    margin-left: 6px;
+    line-height: 1.4;
+    border: 1px solid transparent;
+    white-space: nowrap;
+  }
+  .badge.impl    { background: #e7f6ee; color: #137247; border-color: #b8e2ce; }
+  .badge.deferred{ background: #fff4e0; color: #8b5a00; border-color: #f4d8a4; }
+  .badge.admin   { background: #ecefff; color: #2841b3; border-color: #c6cffb; }
+  .badge.warn    { background: #fff0f0; color: #a72a2a; border-color: #f3c0c0; }
+  .badge.beta    { background: #eef6ff; color: #1a4f95; border-color: #c4dcf6; }
+  .badge.atomic  { background: #ecf6f0; color: #1a5b3a; border-color: #b8d8c4; }
+
+  /* ---------- Callouts ---------- */
+  .callout {
+    border-left: 4px solid;
+    padding: 12px 14px;
+    margin: 14px 0;
+    border-radius: 0 8px 8px 0;
+    background: #f3f5f9;
+  }
+  .callout .label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-right: 6px;
+  }
+  .callout p:first-of-type { margin-top: 4px; }
+  .callout p:last-of-type { margin-bottom: 0; }
+  .callout.important  { border-color: #1a73c2; background: #eaf3fc; }
+  .callout.important .label { color: #145a99; }
+  .callout.warning    { border-color: #c47b00; background: #fdf3e0; }
+  .callout.warning .label { color: #8b5a00; }
+  .callout.adminonly  { border-color: #4658bf; background: #ecefff; }
+  .callout.adminonly .label { color: #2841b3; }
+  .callout.betalimit  { border-color: #a72a2a; background: #fff0f0; }
+  .callout.betalimit .label { color: #a72a2a; }
+  .callout.testthis   { border-color: #1a5b3a; background: #ecf6f0; }
+  .callout.testthis .label { color: #1a5b3a; }
+
+  /* ---------- Tables ---------- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 16px;
+    font-size: 14.5px;
+  }
+  th, td {
+    border-bottom: 1px solid #e3e6eb;
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: #f1f4f8;
+    color: #1f2933;
+    font-weight: 600;
+  }
+  tbody tr:hover { background: #fafbfc; }
+  table.compact th, table.compact td { padding: 6px 8px; font-size: 13.5px; }
+
+  /* ---------- Checklists ---------- */
+  ul.check {
+    list-style: none;
+    padding-left: 0;
+  }
+  ul.check li {
+    position: relative;
+    padding: 4px 6px 4px 28px;
+    border-bottom: 1px dashed #eceff3;
+    line-height: 1.45;
+  }
+  ul.check li::before {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 9px;
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid #8b97a7;
+    border-radius: 3px;
+    background: #fff;
+  }
+  ul.check li:last-child { border-bottom: 0; }
+
+  /* ---------- Scenario cards ---------- */
+  .scenario {
+    border: 1px solid #e3e6eb;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 12px 0;
+    background: #fff;
+  }
+  .scenario .stitle {
+    font-weight: 700;
+    color: #0f2540;
+    margin-bottom: 6px;
+  }
+  .scenario .row {
+    margin: 4px 0;
+    font-size: 14.5px;
+  }
+  .scenario .row b { color: #1f2933; }
+
+  /* ---------- QA list ---------- */
+  .qa-route {
+    border-top: 1px solid #eceff3;
+    padding: 10px 0 8px;
+  }
+  .qa-route:first-of-type { border-top: 0; }
+  .qa-route .route {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: 600;
+    color: #1a73c2;
+  }
+  .qa-route .desc { font-size: 14.5px; color: #3a4754; margin-top: 2px; }
+  .qa-route .status-line { font-size: 13px; color: #4d5b6a; margin-top: 4px; }
+  .qa-route .status-line span { margin-right: 8px; }
+  .qa-route .pass { color: #137247; font-weight: 600; }
+  .qa-route .warn { color: #8b5a00; font-weight: 600; }
+  .qa-route .fail { color: #a72a2a; font-weight: 600; }
+
+  /* ---------- Glossary ---------- */
+  dl.glossary { margin: 0; }
+  dl.glossary dt {
+    font-weight: 700;
+    color: #0f2540;
+    margin-top: 12px;
+  }
+  dl.glossary dd {
+    margin: 2px 0 0 0;
+    color: #2d3748;
+    font-size: 14.7px;
+  }
+
+  /* ---------- Back to top ---------- */
+  .back-top {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #5a6b80;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 720px) {
+    .page { padding: 18px 14px 60px; }
+    header.cover { padding: 24px 20px; }
+    header.cover h1 { font-size: 24px; }
+    nav.toc { column-count: 1; padding: 14px 18px; }
+    section.card { padding: 18px 16px; }
+    h2 { font-size: 20px; }
+    table, thead, tbody, th, td, tr { font-size: 13.5px; }
+  }
+
+  /* ---------- Print ---------- */
+  @media print {
+    body { background: #fff; color: #000; }
+    header.cover { background: #fff; color: #000; box-shadow: none; border: 1px solid #ccc; }
+    header.cover a { color: #000; }
+    section.card { border: 1px solid #d0d0d0; box-shadow: none; break-inside: avoid; }
+    nav.toc { border: 1px solid #d0d0d0; }
+    .callout { background: #f8f8f8 !important; color: #000 !important; }
+    pre { background: #f4f4f4; color: #000; }
+    a { color: #000; text-decoration: none; }
+    a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.85em; color: #555; }
+    .back-top { display: none; }
+    h2 { break-after: avoid; }
+    .scenario, .qa-route { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="cover" id="top">
+  <h1>Margin Maestro Beta Admin Guide</h1>
+  <p class="subtitle">Complete guide for owner/admin beta testers</p>
+  <p>
+    <strong>Live URL:</strong>
+    <a href="https://margin-maestro.vercel.app">https://margin-maestro.vercel.app</a>
+  </p>
+  <div class="meta">
+    <span>Build 3.4A — Atomic RPC Accepted</span>
+    <span>Beta phase</span>
+    <span>Single Supabase backend (intentional)</span>
+    <span>Email + Google OAuth</span>
+  </div>
+</header>
+
+<!-- ===================== TOC ===================== -->
+<nav class="toc" aria-label="Table of contents">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#intro">Title and introduction</a></li>
+    <li><a href="#quickstart">Quick start checklist</a></li>
+    <li><a href="#account">Account and login</a></li>
+    <li><a href="#roles">Roles and permissions</a></li>
+    <li><a href="#settings">Settings and Admin</a></li>
+    <li><a href="#ingredients">Ingredients</a></li>
+    <li><a href="#recipes">Recipes</a></li>
+    <li><a href="#csv">CSV Import / Export</a></li>
+    <li><a href="#menu-analytics">Menu Analytics</a></li>
+    <li><a href="#apply-price">Apply Price &amp; Menu Price Audit Trail</a></li>
+    <li><a href="#dish-analysis">Dish Analysis</a></li>
+    <li><a href="#price-log">Price Log &amp; Snapshot</a></li>
+    <li><a href="#price-trend">Price Trend</a></li>
+    <li><a href="#impact">Impact Cascade</a></li>
+    <li><a href="#alerts">Alerts</a></li>
+    <li><a href="#dashboard">Dashboard</a></li>
+    <li><a href="#team">Team Management</a></li>
+    <li><a href="#billing">Billing</a></li>
+    <li><a href="#monitoring">Monitoring &amp; support</a></li>
+    <li><a href="#qa-pages">Developer QA pages</a></li>
+    <li><a href="#scenarios">Suggested beta test scenarios</a></li>
+    <li><a href="#limits">Known limitations</a></li>
+    <li><a href="#glossary">Glossary</a></li>
+  </ol>
+</nav>
+
+<!-- ===================== 1. INTRO ===================== -->
+<section class="card" id="intro">
+  <h2>1. Title and introduction</h2>
+  <p><strong>Margin Maestro</strong> is a <em>Restaurant Margin Intelligence</em> platform for independent restaurant operators. It connects ingredient cost changes to dish profitability, recommended actions, and margin-aware pricing decisions — and answers a single operator question:</p>
+  <p style="font-size:18px; font-weight:600; color:#0f2540; margin: 12px 0;">"What should I change right now to improve my margins?"</p>
+
+  <h3>Who this guide is for</h3>
+  <p>You are an <strong>owner/admin beta tester</strong> with full access to one restaurant. This guide is written so you can use the platform end-to-end without a separate walkthrough: setup, daily workflows, edge cases, and QA verification.</p>
+
+  <h3>What Margin Maestro is — and is not</h3>
+  <table>
+    <thead><tr><th>It is</th><th>It is not</th></tr></thead>
+    <tbody>
+      <tr><td>A decision layer over your menu, recipes and ingredient costs</td><td>Not a POS</td></tr>
+      <tr><td>A margin intelligence and recipe costing tool</td><td>Not accounting software</td></tr>
+      <tr><td>An impact analyzer when supplier prices move</td><td>Not inventory management</td></tr>
+      <tr><td>A recommended-actions engine for pricing</td><td>Not a supplier marketplace</td></tr>
+      <tr><td>A menu pricing audit trail</td><td>Not an external menu publisher / no POS push</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Beta status</h3>
+  <div class="callout important">
+    <span class="label">Important</span>
+    <p>This is a working beta. Real beta data and test/demo data coexist on a <strong>single shared Supabase backend</strong> (intentional cost decision for the beta phase). Please treat the data as durable but expect that other beta accounts share the same database. Backups and append-only audit logs are in place.</p>
+  </div>
+  <p><strong>Current accepted build:</strong> 3.4A — Atomic RPC Accepted. Apply Price and Recipe CSV Import's update path now write the dish menu price and the audit row in a single atomic SQL function call.</p>
+  <p><strong>Next planned build:</strong> 3.1 — Transactional Invite Emails (deferred until acceptance pass).</p>
+  <p class="back-top"><a href="#top">↑ Back to top</a></p>
+</section>
+
+<!-- ===================== 2. QUICK START ===================== -->
+<section class="card" id="quickstart">
+  <h2>2. Quick start checklist</h2>
+  <p>Use this on your very first beta session. It walks you across the whole product in about 30–45 minutes. Tick items as you go.</p>
+  <ul class="check">
+    <li>Log in at <a href="https://margin-maestro.vercel.app">https://margin-maestro.vercel.app</a> with email/password or Google.</li>
+    <li>Create your restaurant (or select your active restaurant if you already have one).</li>
+    <li>Open <strong>Settings → General</strong>: restaurant name, currency, locale, target GPM, tax mode.</li>
+    <li>Review <strong>Settings → Units &amp; Conversions</strong>: 8 units (Ct, Gr, Kg, Lb, Oz, Ml, Lt, Gl) present and read-only.</li>
+    <li>Review <strong>Settings → Menu Categories</strong>: default categories seeded; add/rename/deactivate as needed.</li>
+    <li>Review <strong>Settings → Suppliers</strong>: default suppliers seeded; add your real ones.</li>
+    <li>Create or import a handful of <strong>ingredients</strong> (Primary, Fixed, Intermediate).</li>
+    <li>Create or import a few <strong>recipes</strong> (1–2 intermediate, several dishes).</li>
+    <li>Go to <strong>Price Log</strong> and <strong>Initialize Baseline</strong>.</li>
+    <li>Run a <strong>Price Update Batch</strong> on one ingredient to test the cost-change flow.</li>
+    <li>Open <strong>Menu Analytics</strong>, verify COGS / GP / GPM / target status / suggested price.</li>
+    <li>Open <strong>Dish Analysis</strong> for a below-target dish; review breakdown and Margin Manager.</li>
+    <li>Click <strong>Apply Price</strong> on a below-target dish; confirm the success toast.</li>
+    <li>Open <strong>Dish Analysis → Menu price audit history</strong> panel; verify the new entry.</li>
+    <li>Generate an <strong>Impact Cascade</strong> from the latest price-update batch.</li>
+    <li>Generate <strong>Alerts</strong> from the Alerts page.</li>
+    <li>Review the <strong>Dashboard</strong>: alerts, KPIs, recommended actions.</li>
+    <li>Export CSVs from <strong>Settings → Import / Export</strong>.</li>
+    <li>Open the <strong>QA pages</strong> linked at the bottom of Settings → Developer QA, especially <code>/qa-beta-launch</code> and <code>/qa-mvp-readiness</code>.</li>
+  </ul>
+  <p class="back-top"><a href="#top">↑ Back to top</a></p>
+</section>
+
+<!-- ===================== 3. ACCOUNT & LOGIN ===================== -->
+<section class="card" id="account">
+  <h2>3. Account and login</h2>
+  <p>Margin Maestro supports two ways to sign in. Both work on the live URL.</p>
+  <h3>Email / password <span class="badge impl">Implemented</span></h3>
+  <ul>
+    <li>Visit <code>/login</code>, enter the email and password used at signup.</li>
+    <li>If the account doesn't exist yet, click "Sign up" and create one at <code>/signup</code>.</li>
+    <li>You may need to confirm your email if email confirmations are enabled by Supabase.</li>
+  </ul>
+
+  <h3>Google OAuth <span class="badge impl">Implemented</span></h3>
+  <ul>
+    <li>Both <code>/login</code> and <code>/signup</code> show a "Continue with Google" button.</li>
+    <li>Google redirects you back to <code>/auth/callback</code>, then to the dashboard.</li>
+    <li>The OAuth consent screen is still pending production hardening (verified domains, logo/policy URLs). It works for beta.</li>
+  </ul>
+
+  <h3>Session restore</h3>
+  <p>After login, your session must survive a full page refresh and direct navigation (typing a route in the URL bar). If it doesn't, please report it.</p>
+
+  <h3>Logout</h3>
+  <p>Use the sidebar's logout control. Logging out clears the Supabase session from local storage.</p>
+
+  <div class="callout testthis">
+    <span class="label">Test this</span>
+    <ul class="check" style="margin-top:6px;">
+      <li>Sign up with email/password.</li>
+      <li>Sign in with email/password.</li>
+      <li>Refresh — still signed in.</li>
+      <li>Type a deep URL directly (e.g., <code>/menu-analytics</code>) — still signed in.</li>
+      <li>Sign out, sign in with Google.</li>
+      <li>Run <code>/qa-auth</code> — should be PASS or PASS with minor WARN footer notes.</li>
+    </ul>
+  </div>
+
+  <div class="callout important">
+    <span class="label">If something looks wrong</span>
+    <p>Report: which path you took (email or Google), the page URL, what you expected, what happened, and any error toast text. See <a href="#monitoring">Monitoring &amp; support</a> for the bug template.</p>
+  </div>
+  <p class="back-top"><a href="#top">↑ Back to top</a></p>
+</section>
+
+<!-- ===================== 4. ROLES & PERMISSIONS ===================== -->
+<section class="card" id="roles">
+  <h2>4. Roles and permissions</h2>
+  <p>Margin Maestro has three roles per restaurant.</p>
+  <table>
+    <thead><tr><th>Role</th><th>Reference data</th><th>Operational data</th><th>Pricing actions</th><th>Team</th><th>Billing</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Owner</strong> <span class="badge admin">Admin</span></td>
+        <td>Edit</td><td>Edit</td><td>Apply Price, save audit</td><td>Invite, change roles, cancel invites</td><td>Manage</td>
+      </tr>
+      <tr>
+        <td><strong>Manager</strong></td>
+        <td>Edit (categories, suppliers, settings on some sections)</td><td>Edit</td><td>Apply Price, save audit</td><td>Read-only</td><td>Read-only</td>
+      </tr>
+      <tr>
+        <td><strong>Viewer</strong></td>
+        <td>Read-only</td><td>Read-only</td><td>None</td><td>Read-only</td><td>None</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Invite flow</h3>
+  <ol>
+    <li>Owner opens <strong>Settings → Team</strong>.</li>
+    <li>Owner enters the invitee's email and selects a role (manager or viewer).</li>
+    <li>System creates a pending invitation with a unique token.</li>
+    <li>Owner sees a toast confirming the invitation was created and the accept-invite link was copied to the clipboard.</li>
+    <li>The accept link looks like <code>https://margin-maestro.vercel.app/accept-invite?token=…</code>.</li>
+    <li>Owner shares the link with the invitee (chat, SMS, paste into email).</li>
+    <li>Invitee signs in or signs up with the <em>same email address</em> that was invited.</li>
+    <li>Invitee opens the link → membership is created.</li>
+  </ol>
+
+  <h3>Transactional invite emails <span class="badge deferred">Deferred (Build 3.1 acceptance pending)</span></h3>
+  <div class="callout warning">
+    <span class="label">Beta limitation</span>
+    <p>Code for transactional invite emails exists (Supabase Edge Function <code>send-team-invitation</code>, Resend provider). The function is <strong>not yet deployed live</strong> and provider secrets are not yet set. Until Build 3.1A is accepted, the <strong>clipboard copy is the source of truth</strong> — share the link manually. The UI already shows "Resend email" buttons; they will work after deployment.</p>
+  </div>
+  <p class="back-top"><a href="#top">↑ Back to top</a></p>
+</section>
+
+<!-- ===================== 5. SETTINGS & ADMIN ===================== -->
+<section class="card" id="settings">
+  <h2>5. Settings and Admin</h2>
+  <p>The Settings page is your reference configuration layer. Everything in the operational pages (ingredients, recipes, analytics) reads against this.</p>
+
+  <h3>5.1 General</h3>
+  <ul>
+    <li><strong>Restaurant name</strong> — display only; renames do not break references.</li>
+    <li><strong>Currency, locale, timezone</strong> — affect display formatting.</li>
+    <li><strong>Tax mode</strong> — display-only setting (no live tax engine yet).</li>
+    <li><strong>Target GPM</strong> — your restaurant's target gross profit margin (0–1). Used everywhere a "below target" comparison is made.</li>
+  </ul>
+
+  <h3>5.2 Units &amp; Conversions <span class="badge impl">Implemented</span></h3>
+  <ul>
+    <li>Read-only catalog of <strong>8 units</strong>: Ct, Gr, Kg, Lb, Oz, Ml, Lt, Gl.</li>
+    <li>Conversions across <em>mass</em> (Gr ↔ Kg ↔ Lb ↔ Oz) and <em>volume</em> (Ml ↔ Lt ↔ Gl) are preseeded.</li>
+    <li><strong>Ct</strong> converts only to Ct.</li>
+    <li><strong>Mass ↔ volume</strong> requires ingredient density and is not silently seeded.</li>
+  </ul>
+
+  <h3>5.3 Menu Categories</h3>
+  <ul>
+    <li>Default seed: Appetizers &amp; Salads, The Classics, Signature Dishes, Specials, Desserts, Pizzeria, Wine, Beer, Non-alcoholic beverages, Intermediate.</li>
+    <li>Owner / manager can add, rename, deactivate. <strong>Soft delete only</strong> — there is no hard delete.</li>
+  </ul>
+
+  <h3>5.4 Suppliers</h3>
+  <ul>
+    <li>Default demo suppliers (Mediterraneo Imports, Local Greens Co., Dairy &amp; Oil Co., House Prep) seed on restaurant creation — rename or deactivate them to model your real supply chain.</li>
+    <li>Suppliers are linked to ingredients (Build 1.2).</li>
+  </ul>
+
+  <h3>5.5 Alert thresholds</h3>
+  <ul>
+    <li>Ingredient cost spike % (above this, an alert is generated).</li>
+    <li>GPM drop % (against baseline).</li>
+    <li>GP floor (per-serving floor).</li>
+  </ul>
+
+  <h3>5.6 Team</h3>
+  <p>See <a href="#team">Team Management</a>.</p>
+
+  <h3>5.7 Billing</h3>
+  <p>See <a href="#billing">Billing</a>. <span class="badge deferred">Stripe verification deferred</span></p>
+
+  <h3>5.8 Import / Export</h3>
+  <p>See <a href="#csv">CSV Import / Export</a>.</p>
+
+  <h3>5.9 Developer QA</h3>
+  <p>A list of every QA route used to verify the platform. Linked from the bottom of Settings. See <a href="#qa-pages">Developer QA pages</a>.</p>
+
+  <div class="callout testthis">
+    <span class="label">Admin testing checklist</span>
+    <ul class="check" style="margin-top:6px;">
+      <li>Update restaurant name and target GPM; refresh and confirm.</li>
+      <li>Verify 8 units appear and are read-only.</li>
+      <li>Add a new menu category; rename one; deactivate one.</li>
+      <li>Add a new supplier; rename one; deactivate one.</li>
+      <li>Update alert thresholds; revisit /alerts later to see effect.</li>
+      <li>Sign in as a manager — confirm reference-data write access matches the table above.</li>
+      <li>Sign in as a viewer — confirm fields are disabled / read-only.</li>
+      <li>Run <code>/qa-settings-admin</code> — all checks should be PASS.</li>
+    </ul>
+  </div>
+  <p class="back-top"><a href="#top">↑ Back to top</a></p>
+</section>
+
+<!-- ===================== 6. INGREDIENTS ===================== -->
+<section class="card" id="ingredients">
+  <h2>6. Ingredients</h2>
+  <p>Your ingredients are the master cost database that everything else costs against. The Excel-derived logic is preserved.</p>
+
+  <h3>Ingredient types</h3>
+  <table>
+    <thead><tr><th>Type</th><th>Meaning</th><th>Cost source</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Primary</strong></td><td>Purchased from a supplier (e.g., olive oil, flour).</td><td>Calculated from purchase price + quantity + adjustment.</td></tr>
+      <tr><td><strong>Fixed</strong></td><td>Items you simply enter a fixed cost-per-unit for (e.g., spice blend, condiment).</td><td>Manually entered cost per recipe unit.</td></tr>
+      <tr><td><strong>Intermediate</strong></td><td>Produced in-house by an intermediate recipe (e.g., sauce, dough).</td><td>Computed from a linked Intermediate Recipe's cost per serving.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Key fields</h3>
+  <ul>
+    <li><strong>Total cost</strong> — what you paid for the purchased quantity (Primary only).</li>
+    <li><strong>Original quantity + Original UoM</strong> — how much you bought, in the supplier's unit.</li>
+    <li><strong>Recipe UoM</strong> — the unit your recipes use this ingredient in.</li>
+    <li><strong>Adjustment / waste</strong> — yield adjustment, typically between &minus;0.99 and a positive number. Cannot equal &minus;1 (would divide by zero).</li>
+    <li><strong>Density (g/ml)</strong> — required for any mass ↔ volume conversion (e.g., grams of olive oil from a milliliter recipe quantity).</li>
+    <li><strong>Recipe unit cost</strong> — final cost per recipe UoM, derived from the above.</li>
+    <li><strong>Calculation status</strong> — <code>valid</code> / <code>warning</code> / <code>error</code> / <code>pending</code>.</li>
+  </ul>
+
+  <h3>Validation rules</h3>
+  <ul>
+    <li>Name required, unique per restaurant.</li>
+    <li>Primary: <code>total_cost &ge; 0</code>, <code>original_quantity &gt; 0</code>, UoM codes valid.</li>
+    <li>Fixed: <code>manual_recipe_unit_cost</code> required.</li>
+    <li>Adjustment cannot equal &minus;1.</li>
+    <li><code>Ct</code> can only convert to <code>Ct</code>.</li>
+    <li>Mass ↔ volume requires density.</li>
+  </ul>
+
+  <div class="callout testthis">
+    <span class="label">Ingredients testing checklist</span>
+    <ul class="check" style="margin-top:6px;">
+      <li>Create a primary ingredient (e.g., Olive Oil, 5 Lt, $50, recipe UoM Ml, density 0.91). Confirm recipe_unit_cost is calculated.</li>
+      <li>Create a fixed ingredient (e.g., House spice blend, Ct, $0.10/unit).</li>
+      <li>Create an intermediate ingredient stub (status should be <em>pending</em> until a recipe links to it).</li>
+      <li>Edit a primary ingredient: change adjustment, confirm cost updates.</li>
+      <li>Try an invalid conversion (e.g., Ct → Kg). Should show a clear error.</li>
+      <li>Deactivate an ingredient — confirm it disappears from active lists but historical references remain.</li>
+      <li>Run <code>/qa-ingredients</code> and review PASS/WARN/FAIL.</li>
+    </ul>
+  </div>
+  <p class="back-top"><a href="#top">↑ Back to top</a></p>
+</section>
+
+<!-- ===================== 7. RECIPES ===================== -->
+<section class="card" id="recipes">
+  <h2>7. Recipes</h2>
+  <p>Recipes come in two kinds:</p>
+  <ul>
+    <li><strong>Dish recipes</strong> — what you sell. Have a menu price and feed Menu Analytics.</li>
+    <li><strong>Intermediate recipes</strong> — internal preparations that produce an Intermediate ingredient (e.g., tomato sauce, pizza dough). The recipe's <em>cost per serving</em> becomes the linked Intermediate ingredient's recipe unit cost.</li>
+  </ul>
+
+  <h3>Recipe header</h3>
+  <ul>
+    <li><strong>Name</strong> — unique per restaurant.</li>
+    <li><strong>Kind</strong> — dish or intermediate.</li>
+    <li><strong>Menu category</strong> — optional, picked from your category list.</li>
+    <li><strong>Serving quantity + Serving UoM</strong> — defines what one "serving" is for cost-per-serving math. Must be &gt; 0.</li>
+    <li><strong>Menu price</strong> — dish only, &ge; 0. Apply Price and manual edits both write to an audit log.</li>
+    <li><strong>Linked intermediate ingredient</strong> — intermediate only; tells the system which ingredient receives the computed cost.</li>
+    <li><strong>Notes</strong> — free form.</li>
+  </ul>
+
+  <h3>Recipe lines</h3>
+  <ul>
+    <li>Each line = ingredient + quantity + UoM + (sort order).</li>
+    <li><strong>Line cost</strong> = converted_quantity × ingredient.recipe_unit_cost.</li>
+    <li><strong>Recipe COGS</strong> = sum of line costs.</li>
+    <li><strong>Cost per serving</strong> = COGS / serving_quantity.</li>
+    <li>For dishes: <strong>GP</strong> = menu_price − cost_per_serving; <strong>GPM</strong> = GP / menu_price.</li>
+  </ul>
+
+  <h3>Intermediates flow into dishes</h3>
+  <p>When you save an intermediate recipe, the linked Intermediate ingredient's cost state is recalculated (cost_source = <em>calculated</em>, status = <em>valid</em> if everything is fine). Any dish recipe that uses that intermediate ingredient will pick up the new cost on its next read.</p>
+
+  <h3>Cycle detection</h3>
+  <p>You cannot create a circular intermediate dependency (Recipe A's intermediate ingredient is consumed by Recipe B whose intermediate ingredient is consumed by Recipe A). The system blocks the save with a friendly error. Self-reference is also blocked.</p>
+
+  <h3>Edit behavior</h3>
+  <ul>
+    <li>Editing a dish recipe's <strong>menu_price</strong> writes a <code>menu_price_audit_log</code> row with source <code>manual_recipe_edit</code> (best-effort; the audit row is not yet atomic with the rest of the recipe save — see <a href="#limits">Known limitations</a>).</li>
+    <li>Editing a recipe's lines triggers cost recalculation on save.</li>
+    <li>Recipes are soft-deletable (no hard delete from the UI).</li>
+  </ul>
+
+  <div class="callout testthis">
+    <span class="label">Recipes testing checklist</span>
+    <ul class="check" style="margin-top:6px;">
+      <li>Create an intermediate recipe (e.g., Tomato Sauce). Add 3 lines. Link it to an intermediate ingredient. Confirm the ingredient cost updates.</li>
+      <li>Create a dish recipe that consumes that intermediate ingredient. Confirm COGS reflects both direct and indirect costs.</li>
+      <li>Edit a recipe line quantity; save; confirm new COGS.</li>
+      <li>Try to create a cycle — should fail with a clear error.</li>
+      <li>Edit a dish recipe's menu price; confirm a new entry shows up in the Dish Analysis audit panel.</li>
+      <li>Run <code>/qa-recipes</code>.</li>
+    </ul>
+  </div>
+  <p class="back-top"><a href="#top">↑ Back to top</a></p>
+</section>
+
+<!-- ===================== 8. CSV ===================== -->
+<section class="card" id="csv">
+  <h2>8. CSV Import / Export</h2>
+  <p>Located under <strong>Settings → Import / Export</strong>. Owner/manager only.</p>
+
+  <h3>8.1 Ingredient CSV Import <span class="badge impl">Implemented</span></h3>
+  <ul>
+    <li>Required columns: <code>name</code>, <code>type</code>.</li>
+    <li>Optional: <code>supplier_name</code>, <code>total_cost</code>, <code>original_quantity</code>, <code>original_uom_code</code>, <code>recipe_uom_code</code>, <code>adjustment</code>, <code>density_g_per_ml</code>, <code>manual_recipe_unit_cost</code>, <code>notes</code>.</li>
+    <li>Validation: name + type required; Primary requires cost + quantity + UoMs; Fixed requires manual cost; adjustment ≠ &minus;1; invalid UoMs rejected.</li>
+    <li>Duplicate handling: <em>skip</em> (default) or <em>update existing</em>.</li>
+  </ul>
+
+  <h3>8.2 Recipe CSV Import (two files) <span class="badge impl">Implemented</span> <span class="badge atomic">Update path atomic for menu_price</span></h3>
+  <p>Recipe import takes two CSVs:</p>
+  <ol>
+    <li><strong>Recipes</strong> — headers: <code>name</code>, <code>kind</code> (+ optional category_name, serving_quantity, serving_uom_code, menu_price, target_gpm (informational only), linked_intermediate_ingredient_name, notes, is_active).</li>
+    <li><strong>Recipe lines</strong> — required: <code>recipe_name</code>, <code>ingredient_name</code>, <code>quantity</code>, <code>uom_code</code> (+ optional notes, line_order).</li>
+  </ol>
+
+  <h4>Duplicate handling modes</h4>
+  <ul>
+    <li><strong>Skip existing</strong> (default) — skip recipes whose names already exist.</li>
+    <li><strong>Update existing</strong> — patch the existing recipe. Kind transitions blocked.</li>
+    <li><strong>Block duplicates</strong> — fail the preview if any name already exists.</li>
+  </ul>
+
+  <h4>Line handling modes</h4>
+  <ul>
+    <li><strong>Append lines</strong> (default) — keep existing lines, append new ones.</li>
+    <li><strong>Replace lines</strong> — hard-delete existing lines and replace with imported set (UI confirms before applying).</li>
+  </ul>
+
+  <h3>8.3 Templates &amp; preview</h3>
+  <ul>
+    <li>Both ingredient and recipe imports offer downloadable templates.</li>
+    <li>Every import runs a <strong>preview</strong> first — no DB write happens until you press <em>Apply</em>.</li>
+    <li>Preview rows have a status: <em>valid</em>, <em>warning</em>, <em>error</em>, or <em>skipped</em>.</li>
+    <li>Apply is disabled if any row is in <em>error</em>.</li>
+  </ul>
+
+  <h3>8.4 Errors vs warnings</h3>
+  <table class="compact">
+    <thead><tr><th>Class</th><th>Examples</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td>Error</td><td>Empty name/kind, invalid UoM, line ingredient does not exist, line quantity ≤ 0</td><td>Blocks the row from being applied; preview total includes errors and disables Apply.</td></tr>
+      <tr><td>Warning</td><td>Unknown category (resolves to null), <code>target_gpm</code> column (informational), menu_price on an intermediate (ignored), unknown linked intermediate ingredient name</td><td>Row still applies (no DB write blocked), but operator should review.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>8.5 Existing ingredient requirement</h3>
+  <div class="callout important">
+    <span class="label">Important</span>
+    <p>Recipe import <strong>does not create ingredients</strong>. If your recipe lines reference an ingredient name that doesn't exist (or isn't active), the row errors out. Import (or create manually) all ingredients first, then run the recipe import.</p>
+  </div>
+
+  <h3>8.6 Exports</h3>
+  <table class="compact">
+    <thead><tr><th>Dataset</th><th>File</th></tr></thead>
+    <tbody>
+      <tr><td>Ingredients</td><td><code>ingredients.csv</code></td></tr>
+      <tr><td>Recipes</td><td><code>recipes.csv</code></td></tr>
+      <tr><td>Recipe Lines</td><td><code>recipe-lines.csv</code></td></tr>
+      <tr><td>Menu Analytics</td><td><code>menu-analytics.csv</code></td></tr>
+      <tr><td>Price Log</td><td><code>price-log.csv</code></td></tr>
+      <tr><td>Alerts</td><td><code>alerts.csv</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>8.7 Formula injection protection</h3>
+  <p>Every exported cell that begins with <code>=</code>, <code>+</code>, <code>-</code>, <code>@</code> (formula-risky) is prefixed with a single quote so spreadsheet apps treat it as text — defends against CSV injection.</p>
+
+  <h3>8.8 Limitations</h3>
+  <ul>
+    <li>Imports are <strong>client-orchestrated</strong> — multiple Supabase calls in a row. They are <strong>not</strong> a single atomic transaction. The recipe-import <em>update path</em>'s dish menu_price change uses an atomic RPC; everything else is best-effort with clear partial-success reporting.</li>
+    <li>No XLS/XLSX/XLSM import.</li>
+    <li>No POS export.</li>
+    <li>Recipe import does NOT: create ingredients, create suppliers, create categories, write to <code>ingredient_price_log</code>, create <code>price_update_batches</code>, write billing rows, or publish to a POS.</li>
+  </ul>
+
+  <div class="callout testthis">
+    <span class="label">CSV testing checklist</span>
+    <ul class="check" style="margin-top:6px;">
+      <li>Download the Ingredient template, fill 3 rows, upload, preview, apply.</li>
+      <li>Re-import same file with mode <em>skip</em> — rows skipped, no changes.</li>
+      <li>Re-import with mode <em>update existing</em> — fields updated.</li>
+      <li>Submit a malformed CSV (missing required column); preview shows errors; Apply is disabled.</li>
+      <li>Download Recipe + Recipe Lines templates, fill in 1–2 dishes using existing ingredients, apply with <em>append</em>.</li>
+      <li>Re-run recipe import with <em>replace lines</em>; confirm the confirmation prompt.</li>
+      <li>Try importing a recipe line whose ingredient doesn't exist — error.</li>
+      <li>Export every CSV; open in a spreadsheet; confirm formula-risky cells are escaped (leading apostrophe).</li>
+      <li>Run <code>/qa-import-export</code> and <code>/qa-recipe-import</code>.</li>
+    </ul>
+  </div>
+  <p class="back-top"><a href="#top">↑ Back to top</a></p>
+</section>
+
+<!-- ===================== 9. MENU ANALYTICS ===================== -->
+<section class="card" id="menu-analytics">
+  <h2>9. Menu Analytics</h2>
+  <p>Menu Analytics is the per-dish profitability table — your daily working surface for pricing decisions.</p>
+
+  <h3>Columns</h3>
+  <table class="compact">
+    <thead><tr><th>Column</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><strong>COGS</strong></td><td>Sum of line costs for the dish.</td></tr>
+      <tr><td><strong>Cost per serving</strong></td><td>COGS / serving_quantity.</td></tr>
+      <tr><td><strong>Menu price</strong></td><td>What you currently sell the dish for.</td></tr>
+      <tr><td><strong>GP</strong></td><td>menu_price − cost_per_serving.</td></tr>
+      <tr><td><strong>GPM</strong></td><td>GP / menu_price (as a percentage).</td></tr>
+      <tr><td><strong>Target GPM</strong></td><td>Your restaurant's setting (Settings → General).</td></tr>
+      <tr><td><strong>Status</strong></td><td>On target / Below target / Missing price / Incomplete costing.</td></tr>
+      <tr><td><strong>Suggested price</strong></td><td>cost_per_serving / (1 − target_gpm). Informational.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Statuses</h3>
+  <ul>
+    <li><strong>On target</strong>: GPM ≥ target.</li>
+    <li><strong>Below target</strong>: GPM &lt; target.</li>
+    <li><strong>Missing price</strong>: dish has no <code>menu_price</code>.</li>
+    <li><strong>Incomplete costing</strong>: missing ingredient data — COGS cannot be computed.</li>
+  </ul>
+
+  <h3>Filters</h3>
+  <ul>
+    <li>Below target.</li>
+    <li>Missing menu price.</li>
+    <li>Incomplete costing.</li>
+    <li>By category (using your menu categories).</li>
+  </ul>
+
+  <h3>Apply Price</h3>
+  <p>Each below-target row has an <strong>Apply</strong> action that opens a confirmation dialog with the suggested price. On confirm, the dish's <code>menu_price</code> is updated and an audit entry is recorded. See <a href="#apply-price">Apply Price &amp; Menu Price Audit Trail</a>.</p>
+
+  <div class="callout testthis">
+    <span class="label">Menu Analytics testing checklist</span>
+    <ul class="check" style="margin-top:6px;">
+      <li>Confirm COGS / GP / GPM render for all priced dishes with complete ingredient data.</li>
+      <li>Create a dish with no <code>menu_price</code> — should appear with status "Missing price".</li>
+      <li>Create a dish using an ingredient whose cost_state is in error — should appear as "Incomplete costing".</li>
+      <li>Filter by Below target; verify the rows look correct.</li>
+      <li>Use the Apply action on one below-target dish; review the audit panel on Dish Analysis.</li>
+      <li>Run <code>/qa-menu-analytics</code>.</li>
+    </ul>
+  </div>
+  <p class="back-top"><a href="#top">↑ Back to top</a></p>
+</section>
+
+<!-- ===================== 10. APPLY PRICE + AUDIT ===================== -->
+<section class="card" id="apply-price">
+  <h2>10. Apply Price and Menu Price Audit Trail</h2>
+
+  <h3>Where Apply Price appears</h3>
+  <ul>
+    <li><strong>Menu Analytics</strong> — <em>Apply</em> link next to suggested price on below-target rows.</li>
+    <li><strong>Dish Analysis → Margin Manager</strong> — <em>Apply this price</em> under the primary target GPM suggestion.</li>
+  </ul>
+
+  <h3>What Apply Price does <span class="badge atomic">Atomic (Build 3.4A)</span></h3>
+  <ol>
+    <li>Owner/manager triggers Apply with a positive, finite price.</li>
+    <li>A confirmation dialog shows old price → new price.</li>
+    <li>The browser calls a single Supabase SQL RPC: <code>apply_dish_menu_price_with_audit</code>.</li>
+    <li>Inside one database transaction the function:
+      <ul>
+        <li>Locks the recipe row, validates kind = <em>dish</em>, is_active = true, role is owner/manager.</li>
+        <li>Updates <code>recipes.menu_price</code>.</li>
+        <li>Inserts an audit row into <code>menu_price_audit_log</code> with <code>source = 'apply_price'</code>, old/new price, delta amount, delta percent, context (origin, target GPM, suggested price, reason), and <code>changed_by = auth.uid()</code>.</li>
+      </ul>
+    </li>
+    <li>Either both writes succeed or both roll back — no partial success.</li>
+    <li>UI shows: <em>"Menu price updated to $X and audit entry recorded."</em></li>
+  </ol>
+
+  <h3>What Apply Price does NOT do <span class="badge warn">Out of scope</span></h3>
+  <ul>
+    <li>Does <strong>not</strong> publish to a POS, online menu, ordering platform, or marketplace.</li>
+    <li>Does <strong>not</strong> update ingredients.</li>
+    <li>Does <strong>not</strong> write to <code>ingredient_price_log</code>.</li>
+    <li>Does <strong>not</strong> create <code>price_update_batches</code>.</li>
+    <li>Does <strong>not</strong> create billing records.</li>
+    <li>Does <strong>not</strong> apply across multiple dishes in one click (one dish at a time).</li>
+  </ul>
+
+  <h3>Audit sources</h3>
+  <table class="compact">
+    <thead><tr><th>Source</th><th>Trigger</th><th>Atomic with the price update?</th></tr></thead>
+    <tbody>
+      <tr><td><code>apply_price</code></td><td>Apply Price action (Menu Analytics or Dish Analysis)</td><td>Yes (Build 3.4A)</td></tr>
+      <tr><td><code>manual_recipe_edit</code></td><td>Saving a dish recipe with a changed menu price</td><td>No — best-effort (OI-30)</td></tr>
+      <tr><td><code>import</code></td><td>Recipe CSV Import, update path on dishes</td><td>Yes for menu_price (Build 3.4A); non-price fields still client-orchestrated</td></tr>
+      <tr><td><code>system</code> / <code>other</code></td><td>Reserved for future automated processes</td><td>n/a</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Audit history panel</h3>
+  <p>Opening <strong>Dish Analysis → /dish-analysis/$id</strong> shows a read-only "Menu price audit history" panel with up to 25 most-recent entries: <em>changed at</em>, <em>source</em>, <em>old price</em>, <em>new price</em>, <em>delta</em>, <em>delta %</em>. The panel refreshes after Apply Price.</p>
+
+  <h3>Append-only design</h3>
+  <ul>
+    <li><code>menu_price_audit_log</code> has no UPDATE policy and no DELETE policy.</li>
+    <li>The DB enforces <code>new_menu_price &gt; 0</code> and <code>recipe_kind_at_time = 'dish'</code>.</li>
+    <li>Corrections come from new audit rows, never edits.</li>
+  </ul>
+
+  <div class="callout testthis">
+    <span class="label">Apply Price testing checklist</span>
+    <ul class="check" style="margin-top:6px;">
+      <li>Apply a price from Menu Analytics — verify success toast and audit row in Dish Analysis.</li>
+      <li>Apply a price from Dish Analysis → Margin Manager — verify identical behavior.</li>
+      <li>Manually edit a dish recipe's menu price; confirm a <code>manual_recipe_edit</code> audit row appears.</li>
+      <li>Run a Recipe CSV Import with mode <em>update existing</em> where a dish's menu price changes; confirm a <code>import</code> audit row appears.</li>
+      <li>Try Apply Price as a viewer — should fail with a friendly permission error.</li>
+      <li>Run <code>/qa-apply-price</code>, <code>/qa-menu-price-audit</code>, and <code>/qa-atomic-rpc</code> — all PASS.</li>
+    </ul>
+  </div>
+  <p class="back-top"><a href="#top">↑ Back to top</a></p>
+</section>
+
+<!-- ===================== 11. DISH ANALYSIS ===================== -->
+<section class="card" id="dish-analysis">
+  <h2>11. Dish Analysis</h2>
+  <p>The per-dish workspace. Open from Menu Analytics or by going directly to <code>/dish-analysis/$id</code>.</p>
+
+  <h3>Sections</h3>
+  <ul>
+    <li><strong>Dish header</strong> — name, category, serving info, current menu price.</li>
+    <li><strong>Ingredient breakdown</strong> — line-by-line cost contribution sorted by share. See which 2–3 lines dominate the COGS.</li>
+    <li><strong>Profitability summary</strong> — COGS, cost per serving, GP, GPM, target GPM, status.</li>
+    <li><strong>Scenario modelling</strong> — local sliders to adjust ingredient costs (&minus;30% to +50%) and menu price (&minus;20% to +50%). Shows scenario COGS / GP / GPM and the delta from current. <strong>Local only — does not write to the database.</strong></li>
+    <li><strong>Margin Manager</strong> — suggested prices at multiple target GPMs (e.g., 60%, 65%, 70%, 75%). The primary suggestion (your restaurant's target) has an <em>Apply this price</em> action.</li>
+    <li><strong>Menu price audit history</strong> — read-only panel; last 25 entries for this dish.</li>
+  </ul>
+
+  <h3>Scenario modelling rules</h3>
+  <ul>
+    <li>Sliders are <strong>React state only</strong>. Refreshing the page discards the scenario.</li>
+    <li>No alerts or audit rows generated by scenarios.</li>
+    <li>Margin Manager <em>Apply</em> uses the same atomic Apply Price flow as Menu Analytics.</li>
+  </ul>
+
+  <div class="callout testthis">
+    <span class="label">Dish Analysis testing checklist</span>
+    <ul class="check" style="margin-top:6px;">
+      <li>Open the deepest below-target dish. Confirm ingredient breakdown shows expected top contributors.</li>
+      <li>Move the cost slider to +20%. Verify scenario GPM changes. Refresh page — slider resets.</li>
+      <li>Move the price slider; verify GPM changes accordingly.</li>
+      <li>Use Margin Manager <em>Apply</em>; verify audit history updates.</li>
+      <li>Run <code>/qa-dish-analysis</code>.</li>
+    </ul>
+  </div>
+  <p class="back-top"><a href="#top">↑ Back to top</a></p>
+</section>
+
+<!-- ===================== 12. PRICE LOG / SNAPSHOT ===================== -->
+<section class="card" id="price-log">
+  <h2>12. Price Log and Snapshot</h2>
+  <p>The Price Log is your <strong>append-only</strong> ingredient cost history. The Snapshot is the last-known baseline state.</p>
+
+  <h3>12.1 Baseline initialization</h3>
+  <p>First-time setup captures the current state of all active ingredients:</p>
+  <ol>
+    <li>System creates a <code>price_update_batches</code> row with <code>source = baseline_initialization</code>, <code>status = applied</code>.</li>
+    <li>For each active ingredient, inserts an <code>ingredient_price_log</code> row with <code>event_type = baseline</code> (old = new, delta = 0).</li>
+    <li>Inserts <code>ingredient_snapshots</code> rows that capture the current cost state.</li>
+  </ol>
+  <p>Run this once per restaurant before doing your first price update batch.</p>
+
+  <h3>12.2 Price Update Batch flow</h3>
+  <ol>
+    <li>Create a new draft batch (<code>price_update_batches.status = draft</code>).</li>
+    <li>Add rows: pick ingredients, enter new total cost or new recipe unit cost.</li>
+    <li>Preview the batch: status moves to <em>previewed</em>.</li>
+    <li>Apply: status moves to <em>applied</em>. Each row inserts an <code>ingredient_price_log</code> entry with <code>event_type = change</code>, snapshot of name + supplier at time of change, and old/new costs.</li>
+    <li>Or cancel: status moves to <em>cancelled</em>; nothing is written to the log.</li>
+  </ol>
+
+  <h3>12.3 Append-only rules</h3>
+  <ul>
+    <li><code>ingredient_price_log</code> has <strong>no UPDATE policy and no DELETE policy</strong>.</li>
+    <li>Corrections are new rows with <code>event_type = 'correction'</code>.</li>
+    <li>Editing an ingredient directly does <strong>not</strong> write to the price log. Use batches.</li>
+  </ul>
+
+  <h3>12.4 Non-destructive baseline reset</h3>
+  <p>If you need to reset the baseline (e.g., switching cost model), the system bumps <code>baseline_version</code> and writes new rows. Old history is never deleted.</p>
+
+  <h3>Price Log vs Menu Price Audit</h3>
+  <table class="compact">
+    <thead><tr><th>Surface</th><th>Tracks</th></tr></thead>
+    <tbody>
+      <tr><td><code>ingredient_price_log</code></td><td>Supplier / ingredient cost changes.</td></tr>
+      <tr><td><code>ingredient_snapshots</code></td><td>Ingredient cost baseline state.</td></tr>
+      <tr><td><code>price_update_batches</code></td><td>Grouping of supplier-price updates.</td></tr>
+      <tr><td><code>menu_price_audit_log</code></td><td><strong>Dish menu price</strong> changes (Apply Price, manual edit, import).</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout testthis">
+    <span class="label">Price Log testing checklist</span>
+    <ul class="check" style="margin-top:6px;">
+      <li>Initialize baseline; verify one row per active ingredient in the log with <code>event_type = baseline</code>.</li>
+      <li>Run a Price Update Batch on 2–3 ingredients; verify status transitions draft → previewed → applied.</li>
+      <li>Verify that an applied batch wrote one <code>change</code> row per ingredient.</li>
+      <li>Confirm there is no edit/delete UI on log rows.</li>
+      <li>Cancel a draft; verify nothing is written.</li>
+      <li>Run <code>/qa-price-log-snapshot</code>.</li>
+    </ul>
+  </div>
+  <p class="back-top"><a href="#top">↑ Back to top</a></p>
+</section>
+
+<!-- ===================== 13. PRICE TREND ===================== -->
+<section class="card" id="price-trend">
+  <h2>13. Price Trend</h2>
+  <p>Single-ingredient cost history view. Use when reviewing a supplier or planning a renegotiation.</p>
+  <ul>
+    <li>Pick an active, non-intermediate ingredient.</li>
+    <li>Chart plots <code>new_recipe_unit_cost</code> over time, including baseline and change points (toggleable).</li>
+    <li>KPIs: first recorded cost, current cost, absolute change, percent change, number of changes, largest single increase.</li>
+    <li>Null / NaN / Infinity values are skipped.</li>
+  </ul>
+
+  <div class="callout testthis">
+    <span class="label">Price Trend testing checklist</span>
+    <ul class="check" style="margin-top:6px;">
+      <li>Pick an ingredient that has at least one batch entry; chart should render two points minimum.</li>
+      <li>Toggle baseline on/off; verify chart updates.</li>
+      <li>Pick an ingredient with no history; UI should show an empty state, not an error.</li>
+      <li>Run <code>/qa-price-trend</code>.</li>
+    </ul>
+  </div>
+  <p class="back-top"><a href="#top">↑ Back to top</a></p>
+</section>
+
+<!-- ===================== 14. IMPACT CASCADE ===================== -->
+<section class="card" id="impact">
+  <h2>14. Impact Cascade</h2>
+  <p>Answers: "We just changed these supplier prices — which dishes are now in trouble?"</p>
+
+  <h3>How it works</h3>
+  <ol>
+    <li>Run a Price Update Batch first.</li>
+    <li>Open <strong>Impact Cascade</strong> and generate a new run against the latest batch.</li>
+    <li>The engine:
+      <ul>
+        <li>Finds the changed ingredients from <code>ingredient_price_log</code>.</li>
+        <li>Builds old / new cost maps.</li>
+        <li>Finds dish recipes consuming changed ingredients <em>directly</em> (line uses the ingredient) or <em>indirectly</em> (line uses an intermediate ingredient whose recipe consumes the changed ingredient).</li>
+        <li>Recomputes each affected dish's COGS, GP, GPM at old and new costs.</li>
+        <li>Stores results in <code>impact_cascade_runs</code> + <code>impact_cascade_items</code>.</li>
+      </ul>
+    </li>
+  </ol>
+
+  <h3>Direct vs indirect paths</h3>
+  <ul>
+    <li><strong>Direct</strong>: Ingredient → Dish (e.g., Mozzarella → Margherita Pizza).</li>
+    <li><strong>Indirect</strong>: Ingredient → Intermediate Recipe → Intermediate Ingredient → Dish (e.g., Tomatoes → Tomato Sauce intermediate → Pasta dish).</li>
+  </ul>
+  <p>Only dish recipes appear as final impact items. Intermediate recipes are traversed but not stored as separate impact rows.</p>
+
+  <h3>What each row shows</h3>
+  <ul>
+    <li>Dish name + path (direct/indirect).</li>
+    <li>Affected ingredients (names at time of change).</li>
+    <li>Old COGS → New COGS, COGS delta.</li>
+    <li>Old GPM → New GPM, GPM delta, target status.</li>
+    <li>Suggested price.</li>
+  </ul>
+
+  <h3>Why it matters</h3>
+  <p>This is the core promise of Margin Maestro: a supplier price moves, you see <em>exactly</em> which dishes need pricing attention — including dishes that don't even reference the ingredient directly because they consume an intermediate that does.</p>
+
+  <div class="callout testthis">
+    <span class="label">Impact Cascade testing checklist</span>
+    <ul class="check" style="margin-top:6px;">
+      <li>Have at least one dish that uses an intermediate ingredient.</li>
+      <li>Bump the supplier cost on a primary ingredient used by that intermediate.</li>
+      <li>Apply the batch.</li>
+      <li>Generate Impact Cascade; confirm both the directly-affected dish(es) and the indirectly-affected dish appear.</li>
+      <li>Verify newly-below-target count makes sense.</li>
+      <li>Run <code>/qa-impact-cascade</code>.</li>
+    </ul>
+  </div>
+  <p class="back-top"><a href="#top">↑ Back to top</a></p>
+</section>
+
+<!-- ===================== 15. ALERTS ===================== -->
+<section class="card" id="alerts">
+  <h2>15. Alerts</h2>
+  <p>Alerts are operator-facing signals — they convert margin and cost issues into recommended actions.</p>
+
+  <h3>Alert types</h3>
+  <table class="compact">
+    <thead><tr><th>Type</th><th>Source</th><th>Severity</th></tr></thead>
+    <tbody>
+      <tr><td><code>dish_below_target</code></td><td>Menu Analytics</td><td>warning / critical</td></tr>
+      <tr><td><code>dish_newly_below_target</code></td><td>Impact Cascade</td><td>critical</td></tr>
+      <tr><td><code>ingredient_cost_spike</code></td><td>Price Log</td><td>warning</td></tr>
+      <tr><td><code>impact_cascade_margin_drop</code></td><td>Impact Cascade</td><td>warning</td></tr>
+      <tr><td><code>missing_menu_price</code></td><td>Menu Analytics</td><td>info</td></tr>
+      <tr><td><code>incomplete_costing</code></td><td>Menu Analytics</td><td>warning</td></tr>
+      <tr><td><code>intermediate_cost_shift</code></td><td>Impact Cascade</td><td>warning</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Generation</h3>
+  <p>Alerts are <strong>not</strong> created automatically on every page load. Click <em>Generate Alerts</em> on the Alerts page after you've done a price update or imported new recipes. Duplicate-prevention skips inserting a new alert when an open alert with the same type and entity already exists.</p>
+
+  <h3>Statuses</h3>
+  <p><code>open</code> → <code>acknowledged</code> → <code>resolved</code> (or <code>dismissed</code> from any state).</p>
+
+  <h3>Recommended actions</h3>
+  <p>Each alert renders a brief recommended next step and a link — usually to <em>Review pricing</em> (Menu Analytics filtered) or <em>Open Dish Analysis</em>. Alerts do not auto-apply prices.</p>
+
+  <div class="callout testthis">
+    <span class="label">Alerts testing checklist</span>
+    <ul class="check" style="margin-top:6px;">
+      <li>Create a deliberately below-target dish.</li>
+      <li>Click <em>Generate Alerts</em>; the new alert should appear.</li>
+      <li>Acknowledge → resolve → confirm history.</li>
+      <li>Dismiss an alert from open state; verify it's hidden from the default view.</li>
+      <li>Run a Price Update Batch with a sharp cost spike; generate alerts; confirm <code>ingredient_cost_spike</code> appears.</li>
+      <li>Run <code>/qa-alerts</code>.</li>
+    </ul>
+  </div>
+  <p class="back-top"><a href="#top">↑ Back to top</a></p>
+</section>
+
+<!-- ===================== 16. DASHBOARD ===================== -->
+<section class="card" id="dashboard">
+  <h2>16. Dashboard</h2>
+  <p>The Dashboard is your <strong>alert-first overview</strong> — the page you should open first thing each day.</p>
+
+  <h3>Sections</h3>
+  <ul>
+    <li><strong>Alert-first header</strong> — critical alerts banner.</li>
+    <li><strong>KPI cards</strong> — average GPM, below-target count, open alerts count, missing-price count, recent price changes, impacted dishes.</li>
+    <li><strong>Active alerts</strong> — latest open alerts with severity and quick actions.</li>
+    <li><strong>Menu health</strong> — priced / below-target / incomplete counts, worst margins list.</li>
+    <li><strong>Price activity</strong> — latest batch, recent changes, cost spikes.</li>
+    <li><strong>Impact cascade</strong> — latest run summary.</li>
+    <li><strong>Recommended actions</strong> — contextual next steps with links.</li>
+  </ul>
+
+  <h3>Daily review workflow</h3>
+  <ol>
+    <li>Open Dashboard.</li>
+    <li>Read critical alerts banner; resolve or act.</li>
+    <li>Scan KPI cards for anomalies (e.g., average GPM dropping).</li>
+    <li>For each recommended action, open the linked review page (Menu Analytics, Dish Analysis, Impact Cascade).</li>
+    <li>Apply prices where appropriate.</li>
+    <li>Generate Alerts again after substantive changes.</li>
+  </ol>
+
+  <h3>Warnings</h3>
+  <ul>
+    <li>Dashboard is per-serving only — there is no monthly impact view because sales volume is not yet tracked.</li>
+    <li>Dashboard does not mutate data. It links to review pages; you apply changes there.</li>
+    <li>Dashboard does not auto-generate alerts.</li>
+  </ul>
+
+  <div class="callout testthis">
+    <span class="label">Dashboard testing checklist</span>
+    <ul class="check" style="margin-top:6px;">
+      <li>Confirm KPIs render numbers consistent with Menu Analytics counts.</li>
+      <li>Confirm critical alerts show in the banner.</li>
+      <li>Confirm price activity card reflects your most recent batch.</li>
+      <li>Confirm Impact Cascade summary matches the latest run.</li>
+      <li>Verify no mock-looking data is visible (numbers should match your actual records).</li>
+      <li>Run <code>/qa-dashboard</code>.</li>
+    </ul>
+  </div>
+  <p class="back-top"><a href="#top">↑ Back to top</a></p>
+</section>
+
+<!-- ===================== 17. TEAM ===================== -->
+<section class="card" id="team">
+  <h2>17. Team Management</h2>
+
+  <h3>Members</h3>
+  <p>Settings → Team shows the list of restaurant members with their roles. Owners can change roles. The <strong>sole-owner protection</strong> rule prevents removing the last owner — there must always be at least one owner per restaurant.</p>
+
+  <h3>Pending invitations</h3>
+  <p>Each invitation row shows email, role, created date, expiration (default 30 days), and status (<em>pending</em>). Actions:</p>
+  <ul>
+    <li><strong>Copy link</strong> — re-copies the accept-invite URL.</li>
+    <li><strong>Resend email</strong> — calls the transactional email Edge Function. <span class="badge deferred">Deferred until 3.1A</span> Today it returns "provider not configured" — share the link manually.</li>
+    <li><strong>Cancel</strong> — invalidates the invitation.</li>
+  </ul>
+
+  <h3>Accept invite flow</h3>
+  <ol>
+    <li>Invitee signs up or logs in with the invited email.</li>
+    <li>Invitee opens <code>https://margin-maestro.vercel.app/accept-invite?token=…</code>.</li>
+    <li>RPC <code>accept_restaurant_invitation</code> validates the JWT email claim against the invitation email and inserts a <code>restaurant_members</code> row.</li>
+    <li>Idempotent — re-running the link if already a member does no harm.</li>
+  </ol>
+
+  <h3>Manual link fallback <span class="badge impl">Always available</span></h3>
+  <div class="callout important">
+    <span class="label">Important</span>
+    <p>The clipboard copy is the source of truth for sharing. Even when transactional emails go live, the manual link fallback remains so that an email-delivery hiccup never blocks an invitation.</p>
+  </div>
+
+  <h3>Future transactional email delivery <span class="badge deferred">Build 3.1 acceptance pending</span></h3>
+  <p>Once Build 3.1A is accepted, the Resend-powered Edge Function will send an email to the invitee automatically when the invitation is created (and on Resend-button clicks). Toast outcomes:</p>
+  <ul>
+    <li><em>"Invite link copied. Invitation email also sent."</em></li>
+    <li><em>"Invite link copied. Email delivery is not configured yet, so share the link manually."</em></li>
+    <li><em>"Invite link copied, but the invitation email could not be sent. Share the link manually."</em></li>
+  </ul>
+
+  <div class="callout testthis">
+    <span class="label">Team testing checklist</span>
+    <ul class="check" style="margin-top:6px;">
+      <li>Invite an email you control as <em>manager</em>; copy the link from the toast.</li>
+      <li>Sign in as that user using the invited email; visit the accept link; verify membership.</li>
+      <li>Confirm the manager can edit operational data but cannot send invitations.</li>
+      <li>Invite another email as <em>viewer</em>; verify they cannot edit anything.</li>
+      <li>Cancel an unaccepted invitation; the row should disappear from pending.</li>
+      <li>Attempt to remove the last owner; should be blocked with a clear error.</li>
+      <li>Run <code>/qa-team-management</code> and (when 3.1A is live) <code>/qa-transactional-invites</code>.</li>
+    </ul>
+  </div>
+  <p class="back-top"><a href="#top">↑ Back to top</a></p>
+</section>
+
+<!-- ===================== 18. BILLING ===================== -->
+<section class="card" id="billing">
+  <h2>18. Billing <span class="badge deferred">Deferred</span></h2>
+  <p>The billing foundation is present in the database and as UI scaffolding, but live Stripe verification is not complete.</p>
+  <ul>
+    <li>Tables exist: <code>billing_customers</code>, <code>billing_subscriptions</code>, <code>billing_events</code>.</li>
+    <li>Three Supabase Edge Functions are stubbed: <code>create-checkout-session</code>, <code>create-customer-portal-session</code>, <code>stripe-webhook</code>.</li>
+    <li>None of the Stripe secrets are set in Supabase Edge Function env on the live project.</li>
+    <li><code>/qa-billing</code> reports WARN by design.</li>
+  </ul>
+
+  <div class="callout warning">
+    <span class="label">Do not test real payments</span>
+    <p>Unless Stripe test mode is explicitly enabled and configured on this project, do not run real (or test) payment flows. The end-to-end Stripe flow has not yet been verified live (tracked as OI-17, Build 2.2B).</p>
+  </div>
+
+  <p>There is <strong>no production billing enforcement yet</strong> — Margin Maestro does not currently paywall any feature based on subscription state.</p>
+  <p class="back-top"><a href="#top">↑ Back to top</a></p>
+</section>
+
+<!-- ===================== 19. MONITORING & SUPPORT ===================== -->
+<section class="card" id="monitoring">
+  <h2>19. Monitoring and support</h2>
+
+  <h3>Error boundary</h3>
+  <p>A top-level React error boundary catches render-time errors and shows a friendly fallback page with <em>Try again</em> and <em>Go to Dashboard</em> buttons. In production, the underlying error message is not shown to the user; in development, it is.</p>
+
+  <h3>Sentry / provider status <span class="badge deferred">Deferred (Build 3.3)</span></h3>
+  <p>Monitoring scaffolding exists (<code>src/lib/monitoring/*</code>). When <code>VITE_SENTRY_DSN</code> is unset, helpers are no-ops. <code>/qa-monitoring</code> reports WARN for the DSN check. This is fine for beta — when Build 3.3 is accepted, real error capture will be enabled.</p>
+
+  <h3>What beta testers should report</h3>
+  <ul>
+    <li>Any error toast that looks unfamiliar.</li>
+    <li>Anything that visibly contradicts what this guide says.</li>
+    <li>Any QA route that fails (FAIL — not WARN).</li>
+    <li>Any data that disappears across refresh, or auth that resets unexpectedly.</li>
+    <li>Any 4xx/5xx network response you happen to notice in DevTools.</li>
+  </ul>
+
+  <h3>Bug report template</h3>
+  <pre><code>User email: you@example.com
+Restaurant name: Bistro Demo
+Page URL: https://margin-maestro.vercel.app/menu-analytics
+Action attempted: Clicked Apply on the suggested price for "Margherita Pizza".
+Expected behavior: Success toast, audit row appears in Dish Analysis.
+Actual behavior: Red error toast "Permission denied", no audit row.
+Screenshot: (attach)
+Approximate time: 2026-05-14 14:32 local
+Browser / device: Chrome 134 / macOS 14 / Desktop
+QA page result: /qa-apply-price → FAIL on check T (atomic RPC)</code></pre>
+  <p class="back-top"><a href="#top">↑ Back to top</a></p>
+</section>
+
+<!-- ===================== 20. QA PAGES ===================== -->
+<section class="card" id="qa-pages">
+  <h2>20. Developer QA pages</h2>
+  <p>QA routes are interactive diagnostic pages that exercise the platform's contracts and report PASS / WARN / FAIL per check. They are linked from the bottom of <strong>Settings → Developer QA</strong>.</p>
+
+  <h3>How to read results</h3>
+  <ul>
+    <li><span class="pass">PASS</span> — the contract is met.</li>
+    <li><span class="warn">WARN</span> — a known-deferred feature or empty-dataset condition. Not a failure.</li>
+    <li><span class="fail">FAIL</span> — a real contract violation. Please report immediately, especially for schema, RLS, or security checks.</li>
+  </ul>
+
+  <div class="qa-route">
+    <div class="route">/qa-beta-launch</div>
+    <div class="desc">Beta-readiness rollup: schema, RLS, auth, audit, atomic RPC, transactional emails, deployment posture.</div>
+    <div class="status-line"><span class="pass">PASS</span> entire chain ready · <span class="warn">WARN</span> deferred feature (Stripe, Sentry, 3.1A) · <span class="fail">FAIL</span> a required acceptance gate fails.</div>
+  </div>
+  <div class="qa-route">
+    <div class="route">/qa-mvp-readiness</div>
+    <div class="desc">MVP-readiness rollup: tenancy, ingredients, recipes, analytics, alerts, import/export, audit.</div>
+    <div class="status-line"><span class="pass">PASS</span> all functional gates met · <span class="warn">WARN</span> empty datasets or deferred work · <span class="fail">FAIL</span> required gate not met.</div>
+  </div>
+  <div class="qa-route">
+    <div class="route">/qa-auth</div>
+    <div class="desc">Auth, tenancy, session persistence, RLS posture, service-role exposure.</div>
+    <div class="status-line"><span class="pass">PASS</span> all checks · <span class="warn">WARN</span> minor footer notes · <span class="fail">FAIL</span> session lost / service role exposed.</div>
+  </div>
+  <div class="qa-route">
+    <div class="route">/qa-dashboard</div>
+    <div class="desc">Dashboard data sources, KPI consistency with derived analytics.</div>
+    <div class="status-line"><span class="pass">PASS</span> Dashboard reads match analytics · <span class="warn">WARN</span> empty data · <span class="fail">FAIL</span> Dashboard renders mock or stale numbers.</div>
+  </div>
+  <div class="qa-route">
+    <div class="route">/qa-monitoring</div>
+    <div class="desc">Logger redaction rules, error boundary presence, Sentry config presence.</div>
+    <div class="status-line"><span class="pass">PASS</span> redaction + error boundary live · <span class="warn">WARN</span> DSN unset (expected in beta) · <span class="fail">FAIL</span> logger leaks tokens.</div>
+  </div>
+  <div class="qa-route">
+    <div class="route">/qa-billing</div>
+    <div class="desc">Billing tables, RLS, Edge Function presence, no client-side secrets.</div>
+    <div class="status-line"><span class="pass">PASS</span> tables + RLS correct · <span class="warn">WARN</span> Edge Functions or Stripe not configured (expected) · <span class="fail">FAIL</span> Stripe secret in client bundle.</div>
+  </div>
+  <div class="qa-route">
+    <div class="route">/qa-google-oauth</div>
+    <div class="desc">Google sign-in flow, callback route, no Google secret in client.</div>
+    <div class="status-line"><span class="pass">PASS</span> flow works, no client secret · <span class="warn">WARN</span> production hardening pending (OI-21) · <span class="fail">FAIL</span> secret exposure.</div>
+  </div>
+  <div class="qa-route">
+    <div class="route">/qa-team-management</div>
+    <div class="desc">Membership, invitations, accept RPC, role-write rules, transactional email scaffold.</div>
+    <div class="status-line"><span class="pass">PASS</span> end-to-end invite works · <span class="warn">WARN</span> transactional email not deployed yet (3.1A) · <span class="fail">FAIL</span> sole-owner protection broken / cross-tenant write.</div>
+  </div>
+  <div class="qa-route">
+    <div class="route">/qa-ingredients</div>
+    <div class="desc">Ingredient schema, cost calculation, RLS, conversion rules.</div>
+    <div class="status-line"><span class="pass">PASS</span> calculations match helper logic · <span class="warn">WARN</span> empty dataset · <span class="fail">FAIL</span> Ct → non-Ct conversion silently allowed, or cross-tenant read.</div>
+  </div>
+  <div class="qa-route">
+    <div class="route">/qa-recipes</div>
+    <div class="desc">Recipe schema, line costing, intermediate propagation, cycle detection.</div>
+    <div class="status-line"><span class="pass">PASS</span> cycle blocked, intermediate cost flows · <span class="warn">WARN</span> empty dataset · <span class="fail">FAIL</span> cycle allowed, COGS miscalc.</div>
+  </div>
+  <div class="qa-route">
+    <div class="route">/qa-import-export</div>
+    <div class="desc">Ingredient CSV import + all exports, formula injection protection.</div>
+    <div class="status-line"><span class="pass">PASS</span> · <span class="warn">WARN</span> empty exports · <span class="fail">FAIL</span> formula injection unsanitized, ingredient created with invalid UoM.</div>
+  </div>
+  <div class="qa-route">
+    <div class="route">/qa-recipe-import</div>
+    <div class="desc">Recipe CSV import: two-file flow, preview, duplicate/line modes, audit integration, atomic-RPC integration for menu_price.</div>
+    <div class="status-line"><span class="pass">PASS</span> · <span class="warn">WARN</span> contextual (e.g., no recipes in DB) · <span class="fail">FAIL</span> ingredient auto-create, missing audit row on update.</div>
+  </div>
+  <div class="qa-route">
+    <div class="route">/qa-menu-analytics</div>
+    <div class="desc">Derived COGS/GP/GPM consistency, status assignment, suggested-price formula.</div>
+    <div class="status-line"><span class="pass">PASS</span> · <span class="warn">WARN</span> empty dataset · <span class="fail">FAIL</span> formula mismatch with helpers.</div>
+  </div>
+  <div class="qa-route">
+    <div class="route">/qa-price-log-snapshot</div>
+    <div class="desc">Baseline initialization, batch lifecycle, append-only enforcement.</div>
+    <div class="status-line"><span class="pass">PASS</span> · <span class="warn">WARN</span> no batches yet · <span class="fail">FAIL</span> UPDATE/DELETE policy exists on log.</div>
+  </div>
+  <div class="qa-route">
+    <div class="route">/qa-impact-cascade</div>
+    <div class="desc">Cascade traversal, indirect intermediate paths, run/items integrity.</div>
+    <div class="status-line"><span class="pass">PASS</span> · <span class="warn">WARN</span> no runs yet · <span class="fail">FAIL</span> intermediate-path dish missed.</div>
+  </div>
+  <div class="qa-route">
+    <div class="route">/qa-alerts</div>
+    <div class="desc">Alert types, generation, duplicate prevention, lifecycle transitions.</div>
+    <div class="status-line"><span class="pass">PASS</span> · <span class="warn">WARN</span> no alerts yet · <span class="fail">FAIL</span> auto-close broken, duplicates allowed.</div>
+  </div>
+  <div class="qa-route">
+    <div class="route">/qa-apply-price</div>
+    <div class="desc">Apply Price flow: confirmation, atomic RPC, audit insert, side-effect absence.</div>
+    <div class="status-line"><span class="pass">PASS</span> · <span class="warn">WARN</span> · <span class="fail">FAIL</span> price write without audit, or RPC missing.</div>
+  </div>
+  <div class="qa-route">
+    <div class="route">/qa-menu-price-audit</div>
+    <div class="desc">Audit table schema, append-only RLS, source distribution, history panel reads.</div>
+    <div class="status-line"><span class="pass">PASS</span> · <span class="warn">WARN</span> sparse data · <span class="fail">FAIL</span> UPDATE/DELETE policy present.</div>
+  </div>
+  <div class="qa-route">
+    <div class="route">/qa-atomic-rpc</div>
+    <div class="desc">Apply Price atomic RPC: existence, grant model, defensive checks (kind, price, role, source), side-effect absence, recipe-import update integration.</div>
+    <div class="status-line"><span class="pass">PASS</span> · <span class="warn">WARN</span> caller is viewer (check D contextual) · <span class="fail">FAIL</span> RPC missing or anon-grantable.</div>
+  </div>
+  <div class="qa-route">
+    <div class="route">/qa-calculations</div>
+    <div class="desc">Pure calculation helpers: cost, GP, GPM, suggested price, conversions.</div>
+    <div class="status-line"><span class="pass">PASS</span> all formulas correct · <span class="warn">WARN</span> n/a · <span class="fail">FAIL</span> any formula drift.</div>
+  </div>
+  <div class="qa-route">
+    <div class="route">/qa-data-integrity</div>
+    <div class="desc">Reference integrity across mock + Supabase datasets used by the operational pages.</div>
+    <div class="status-line"><span class="pass">PASS</span> · <span class="warn">WARN</span> empty · <span class="fail">FAIL</span> dangling FK references in seed/mock.</div>
+  </div>
+  <div class="qa-route">
+    <div class="route">/qa-settings-admin</div>
+    <div class="desc">Settings reference data: units present, conversion factors, tenant scoping, role-gated writes.</div>
+    <div class="status-line"><span class="pass">PASS</span> · <span class="warn">WARN</span> role can't exercise write · <span class="fail">FAIL</span> cross-tenant read, service-role exposed.</div>
+  </div>
+  <p class="back-top"><a href="#top">↑ Back to top</a></p>
+</section>
+
+<!-- ===================== 21. SCENARIOS ===================== -->
+<section class="card" id="scenarios">
+  <h2>21. Suggested beta test scenarios</h2>
+  <p>Each scenario walks one end-to-end thread. Run them in order on a fresh restaurant for the cleanest signal.</p>
+
+  <div class="scenario">
+    <div class="stitle">A. New restaurant setup from scratch <span class="badge admin">Admin</span></div>
+    <div class="row"><b>Objective:</b> Validate first-run flow and default seeds.</div>
+    <div class="row"><b>Steps:</b>
+      <ol>
+        <li>Sign up; create restaurant "Bistro Demo".</li>
+        <li>Open Settings → General; set currency, locale, target GPM (e.g., 0.70).</li>
+        <li>Confirm seeded categories and demo suppliers; rename one of each to your own.</li>
+        <li>Add 3 primary, 1 fixed, 1 intermediate ingredient manually.</li>
+        <li>Add 1 intermediate recipe linked to the intermediate ingredient.</li>
+        <li>Add 2 dish recipes (one consuming the intermediate ingredient).</li>
+        <li>Open Menu Analytics; confirm both dishes show COGS/GP/GPM.</li>
+      </ol>
+    </div>
+    <div class="row"><b>Expected:</b> Restaurant has working analytics with no mock data.</div>
+    <div class="row"><b>If it fails, report:</b> the step number, the specific error toast, and a screenshot.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="stitle">B. Ingredient import → recipe import → analytics</div>
+    <div class="row"><b>Objective:</b> Validate CSV templates end-to-end.</div>
+    <div class="row"><b>Steps:</b>
+      <ol>
+        <li>Download the ingredient CSV template; fill with 10 rows of mixed types.</li>
+        <li>Upload, preview, apply (skip-duplicates mode).</li>
+        <li>Download the recipe + recipe-lines templates; fill 3 dish recipes referencing those ingredients.</li>
+        <li>Upload both, preview, apply (skip-duplicates, append-lines).</li>
+        <li>Open Menu Analytics; confirm the new dishes appear.</li>
+      </ol>
+    </div>
+    <div class="row"><b>Expected:</b> All rows applied; new dishes have correct COGS/GP/GPM.</div>
+    <div class="row"><b>If it fails, report:</b> the preview row that errored or warned, plus the CSV content.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="stitle">C. Supplier price increase → price log → impact cascade → alerts</div>
+    <div class="row"><b>Objective:</b> Validate the core "supplier moves, dishes are flagged" promise.</div>
+    <div class="row"><b>Steps:</b>
+      <ol>
+        <li>Initialize baseline (Price Log).</li>
+        <li>Create a draft batch; raise one primary ingredient's cost by 25%.</li>
+        <li>Apply the batch.</li>
+        <li>Generate Impact Cascade.</li>
+        <li>Verify all dishes (direct and indirect) consuming that ingredient appear with old/new COGS/GPM.</li>
+        <li>Generate Alerts; expect <code>ingredient_cost_spike</code> and possibly <code>dish_newly_below_target</code>.</li>
+      </ol>
+    </div>
+    <div class="row"><b>Expected:</b> Cascade includes indirect dishes (intermediate path). Alerts appear and link to review pages.</div>
+    <div class="row"><b>If it fails, report:</b> which dishes were missed and the recipe lines that should have brought them in.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="stitle">D. Below-target dish → Dish Analysis → Apply Price → audit trail</div>
+    <div class="row"><b>Objective:</b> Validate atomic price update + audit.</div>
+    <div class="row"><b>Steps:</b>
+      <ol>
+        <li>From Menu Analytics, pick a below-target dish.</li>
+        <li>Open its Dish Analysis page.</li>
+        <li>Use Margin Manager <em>Apply this price</em> at the primary target GPM.</li>
+        <li>Confirm success toast: "Menu price updated to $X and audit entry recorded."</li>
+        <li>Scroll to Menu price audit history; verify the new entry (source <code>apply_price</code>, old/new prices, delta).</li>
+      </ol>
+    </div>
+    <div class="row"><b>Expected:</b> Single audit row with non-null delta; no warning toast.</div>
+    <div class="row"><b>If it fails, report:</b> whether the price did or did not update, and any audit-not-recorded toast (should not happen post-3.4A).</div>
+  </div>
+
+  <div class="scenario">
+    <div class="stitle">E. Team invite + role restrictions</div>
+    <div class="row"><b>Objective:</b> Validate roles and RLS through real flows.</div>
+    <div class="row"><b>Steps:</b>
+      <ol>
+        <li>Owner invites a second email as <em>manager</em>; shares link manually.</li>
+        <li>Second user signs up with the invited email; accepts invite.</li>
+        <li>Manager edits an ingredient (allowed) and tries to send a team invite (should be blocked).</li>
+        <li>Owner invites a third email as <em>viewer</em>; viewer signs in.</li>
+        <li>Viewer attempts to Apply Price (should be blocked client-side with a friendly message and server-side by RLS).</li>
+      </ol>
+    </div>
+    <div class="row"><b>Expected:</b> Each role can only do what the table in §4 allows.</div>
+    <div class="row"><b>If it fails, report:</b> the action attempted, the role, and whether the failure was a friendly message or a raw error.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="stitle">F. CSV export and data review</div>
+    <div class="row"><b>Objective:</b> Verify exports respect RLS and sanitize formulas.</div>
+    <div class="row"><b>Steps:</b>
+      <ol>
+        <li>Export ingredients, recipes, recipe lines, menu analytics, price log, alerts.</li>
+        <li>Open each in a spreadsheet.</li>
+        <li>Confirm no cross-tenant rows.</li>
+        <li>Confirm any cell starting with <code>=</code>, <code>+</code>, <code>-</code>, <code>@</code> is prefixed with <code>'</code> (single quote) in the raw CSV.</li>
+      </ol>
+    </div>
+    <div class="row"><b>Expected:</b> Files match what you see in-app; no formulas evaluated.</div>
+    <div class="row"><b>If it fails, report:</b> the offending row and which export.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="stitle">G. Negative testing</div>
+    <div class="row"><b>Objective:</b> Verify the app fails safely.</div>
+    <div class="row"><b>Steps + Expected:</b>
+      <ul>
+        <li>Upload a CSV with missing required column → preview errors, Apply disabled.</li>
+        <li>Recipe-import a line referencing a non-existent ingredient → row errors.</li>
+        <li>Set an ingredient adjustment of &minus;1 → validation error.</li>
+        <li>Set a Ct ingredient with recipe UoM = Kg → conversion error.</li>
+        <li>As a viewer, hit owner-only endpoints (e.g., add supplier) → blocked.</li>
+        <li>Create a dish with no menu_price → Menu Analytics shows "Missing price".</li>
+        <li>Create a dish with one ingredient in cost-state error → "Incomplete costing".</li>
+      </ul>
+    </div>
+    <div class="row"><b>Expected:</b> All errors are friendly; no raw DB or stack traces.</div>
+    <div class="row"><b>If it fails, report:</b> the raw error text and the action that triggered it.</div>
+  </div>
+  <p class="back-top"><a href="#top">↑ Back to top</a></p>
+</section>
+
+<!-- ===================== 22. LIMITATIONS ===================== -->
+<section class="card" id="limits">
+  <h2>22. Known limitations</h2>
+  <ul>
+    <li><strong>Single Supabase backend reused for beta/live.</strong> Intentional cost decision (~$10/mo saved). Real beta data coexists with test/demo data on <code>margin-maestro-dev</code>. Backups + append-only logs mitigate risk. <span class="badge deferred">Build 3.2 future optional</span></li>
+    <li><strong>Stripe verification deferred</strong> (OI-17, Build 2.2B). <span class="badge deferred">Deferred</span></li>
+    <li><strong>Billing production rollout deferred</strong> (OI-18). No paywall in the app yet. <span class="badge deferred">Deferred</span></li>
+    <li><strong>Sentry DSN optional / unset</strong> (OI-19, Build 3.3). Monitoring helpers are no-ops. <span class="badge deferred">Deferred</span></li>
+    <li><strong>Transactional invite emails not yet deployed live</strong> (OI-20, Build 3.1A acceptance pending). Manual link copy is the source of truth. <span class="badge deferred">Deferred</span></li>
+    <li><strong>Manual recipe edit audit is not atomic</strong> with the rest of the recipe-fields update (OI-30). If the audit insert fails the recipe save still committed. <span class="badge warn">Limitation</span></li>
+    <li><strong>Recipe import create path is not atomic</strong> across recipes, lines, and audit (OI-29). Update path's <em>menu_price</em> column <em>is</em> atomic. <span class="badge warn">Limitation</span></li>
+    <li><strong>Ingredient CSV import is not atomic</strong> — client-orchestrated across rows. <span class="badge warn">Limitation</span></li>
+    <li><strong>No XLS / XLSX / XLSM import</strong> — CSV only.</li>
+    <li><strong>No POS or external menu publishing.</strong> Margin Maestro is a decision layer.</li>
+    <li><strong>No supplier marketplace.</strong></li>
+    <li><strong>No multi-location advanced management.</strong> Restaurant switcher works; cross-location reporting does not.</li>
+    <li><strong>No menu price approval workflow.</strong> Apply Price applies immediately on confirm.</li>
+    <li><strong>No real payment testing</strong> unless Stripe test mode is explicitly configured for this project.</li>
+    <li><strong>Custom unit management is not exposed</strong> — 8 canonical units only.</li>
+    <li><strong>Google OAuth production hardening pending</strong> (OI-21). Works in beta.</li>
+    <li><strong>Per-serving metrics only</strong> — no monthly impact view (no sales volume data tracked).</li>
+  </ul>
+  <p class="back-top"><a href="#top">↑ Back to top</a></p>
+</section>
+
+<!-- ===================== 23. GLOSSARY ===================== -->
+<section class="card" id="glossary">
+  <h2>23. Glossary</h2>
+  <dl class="glossary">
+    <dt>COGS — Cost of Goods Sold</dt>
+    <dd>Sum of all ingredient line costs for a recipe at current ingredient costs.</dd>
+
+    <dt>GP — Gross Profit</dt>
+    <dd>For a dish: <code>menu_price − cost_per_serving</code>.</dd>
+
+    <dt>GPM — Gross Profit Margin</dt>
+    <dd>For a dish: <code>GP / menu_price</code>, expressed as a decimal (e.g., 0.72 = 72%).</dd>
+
+    <dt>Target GPM</dt>
+    <dd>Your restaurant's chosen target margin, set in Settings → General. Used everywhere "below target" is evaluated.</dd>
+
+    <dt>Recipe Unit Cost</dt>
+    <dd>The cost of one unit of an ingredient in the unit your recipes use it in (e.g., $0.005 per ml of olive oil). Derived for primary ingredients, entered for fixed ingredients, computed for intermediate ingredients.</dd>
+
+    <dt>Primary Ingredient</dt>
+    <dd>An ingredient you purchase from a supplier. Cost is derived from total cost + original quantity + adjustment + UoM conversion (and density if mass↔volume).</dd>
+
+    <dt>Fixed Ingredient</dt>
+    <dd>An ingredient with a manually entered cost per recipe unit. No supplier purchase math.</dd>
+
+    <dt>Intermediate Ingredient</dt>
+    <dd>An ingredient produced in-house by an Intermediate Recipe. Its recipe unit cost is the recipe's cost per serving.</dd>
+
+    <dt>Dish</dt>
+    <dd>A recipe of kind <em>dish</em> — what you sell. Has a <code>menu_price</code> and feeds Menu Analytics.</dd>
+
+    <dt>Baseline</dt>
+    <dd>The starting state for ingredient costs. Created by Baseline Initialization. Can be reset non-destructively (bumps a version number, never deletes history).</dd>
+
+    <dt>Snapshot</dt>
+    <dd>Immutable point-in-time capture of ingredient cost state, written at baseline initialization (and at non-destructive baseline reset).</dd>
+
+    <dt>Price Log</dt>
+    <dd>Append-only history of ingredient cost changes, in <code>ingredient_price_log</code>. No edits, no deletes. Corrections are new rows.</dd>
+
+    <dt>Impact Cascade</dt>
+    <dd>The traversal that takes a list of changed ingredients and surfaces every dish whose COGS, GP, GPM, or target status moves — including dishes that consume the ingredient indirectly via intermediate recipes.</dd>
+
+    <dt>Alert</dt>
+    <dd>An operator-facing signal generated from margin/cost issues (below-target, ingredient spike, missing price, etc.). Has a status workflow open → acknowledged → resolved (or dismissed).</dd>
+
+    <dt>Apply Price</dt>
+    <dd>The action that updates a dish's <code>menu_price</code> and inserts an audit row in one atomic SQL RPC call.</dd>
+
+    <dt>Menu Price Audit</dt>
+    <dd>Append-only history of dish menu price changes, in <code>menu_price_audit_log</code>. Sources: <code>apply_price</code>, <code>manual_recipe_edit</code>, <code>import</code>, <code>system</code>, <code>other</code>.</dd>
+
+    <dt>RLS — Row-Level Security</dt>
+    <dd>The Supabase / Postgres policy mechanism that enforces tenant scoping and role-based write rules at the database, not the client. Every tenant-owned table in Margin Maestro has RLS enabled.</dd>
+
+    <dt>Owner / Manager / Viewer</dt>
+    <dd>The three per-restaurant roles. See §4 for the access table.</dd>
+  </dl>
+  <p class="back-top"><a href="#top">↑ Back to top</a></p>
+</section>
+
+<footer style="text-align:center; color:#7a8896; font-size:13px; margin-top:30px;">
+  <p>Margin Maestro Beta Admin Guide · Build 3.4A — Atomic RPC Accepted · Live at <a href="https://margin-maestro.vercel.app">https://margin-maestro.vercel.app</a></p>
+</footer>
+
+</div>
+</body>
+</html>
